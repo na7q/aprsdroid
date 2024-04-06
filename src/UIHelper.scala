@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 // this class is a hack containing all the common UI code for different Activity subclasses
 
 import _root_.android.app.{Activity, ListActivity}

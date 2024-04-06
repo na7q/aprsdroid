@@ -10,7 +10,7 @@ APRSdroid is Open Source Software written in Scala and licensed under the GPLv2.
 
 Quick links:
 
-- [Google Play](https://play.google.com/store/apps/details?id=org.aprsdroid.app)
+- [Google Play](https://play.google.com/store/apps/details?id=org.na7q.app)
 - [Twitter](http://twitter.com/aprsdroid)
 - [FAQ](https://github.com/ge0rg/aprsdroid/wiki/Frequently-Asked-Questions)
 - [Configuration](https://github.com/ge0rg/aprsdroid/wiki/Settings)

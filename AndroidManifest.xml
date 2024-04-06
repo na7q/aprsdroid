@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
-	package="org.aprsdroid.app"
+	package="org.na7q.app"
 	android:installLocation="auto">
 
     <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
@@ -162,11 +162,11 @@
 		android:exported="true"
 		>
 	    <intent-filter>
-		<action android:name="org.aprsdroid.app.SERVICE" />
-		<action android:name="org.aprsdroid.app.ONCE" />
-		<action android:name="org.aprsdroid.app.SEND_PACKET" />
-		<action android:name="org.aprsdroid.app.SERVICE_STOP" />
-		<action android:name="org.aprsdroid.app.FREQUENCY" />
+		<action android:name="org.na7q.app.SERVICE" />
+		<action android:name="org.na7q.app.ONCE" />
+		<action android:name="org.na7q.app.SEND_PACKET" />
+		<action android:name="org.na7q.app.SERVICE_STOP" />
+		<action android:name="org.na7q.app.FREQUENCY" />
 	    </intent-filter>
 	</service>
 	<!-- start the service if applicable on boot -->
@@ -178,7 +178,7 @@
 	<!-- file provider for exported logs and similar things -->
 	<provider
 		android:name="androidx.core.content.FileProvider"
-		android:authorities="org.aprsdroid.fileprovider"
+		android:authorities="org.na7q.fileprovider"
 		android:exported="false"
 		android:grantUriPermissions="true">
 	    <meta-data

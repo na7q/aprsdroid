@@ -1,4 +1,4 @@
-package org.aprsdroid.app;
+package org.na7q.app;
 
 import org.mapsforge.v3.android.maps.mapgenerator.tiledownloader.TileDownloader;
 import org.mapsforge.v3.core.Tile;

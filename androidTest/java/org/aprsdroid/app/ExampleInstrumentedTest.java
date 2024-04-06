@@ -1,4 +1,4 @@
-package org.aprsdroid.app;
+package org.na7q.app;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("org.aprsdroid.app", appContext.getPackageName());
+        assertEquals("org.na7q.app", appContext.getPackageName());
     }
 }

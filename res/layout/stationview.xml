@@ -8,7 +8,7 @@
 			android:layout_height="wrap_content"
 			android:gravity="center"
 			android:orientation="horizontal">
-		<org.aprsdroid.app.SymbolView
+		<org.na7q.app.SymbolView
 		android:id="@+id/station_symbol"
 		android:layout_width="24sp"
 		android:layout_height="24sp"

@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 
 import _root_.android.location.Location
 import _root_.net.ab0oo.aprs.parser._
