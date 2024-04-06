@@ -26,7 +26,7 @@ Intents ("actions"):
    APRSdroid 1.4.1)
 
 All uppercase strings mentioned in this document are suffixes to
-`"org.aprsdroid.app."` and need to be concatenated for the effective
+`"org.na7q.app."` and need to be concatenated for the effective
 Intent action names.
 
 If you want to write a third-party app that is using APRSdroid's
@@ -50,8 +50,8 @@ using the registerReceiver code.
 	     APRSdroid intents -->
 	<receiver android:name=".APRSdroidEventReceiver">
 	    <intent-filter>
-	       <action android:name="org.aprsdroid.app.SERVICE_STARTED" />
-	       <action android:name="org.aprsdroid.app.SERVICE_STOPPED" />
+	       <action android:name="org.na7q.app.SERVICE_STARTED" />
+	       <action android:name="org.na7q.app.SERVICE_STOPPED" />
 	    </intent-filter>
 	</receiver>
 
@@ -61,9 +61,9 @@ Example code to listen for broadcasts:
 	public class APRSdroidEventReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (!intent.getAction().startsWith("org.aprsdroid.app"))
+			if (!intent.getAction().startsWith("org.na7q.app"))
 				return;
-			String a = intent.getAction().replace("org.aprsdroid.app.", "");
+			String a = intent.getAction().replace("org.na7q.app.", "");
 			switch (a) {
 			case "SERVICE_STARTED":
 				aprsdroid_running = true;
@@ -156,7 +156,7 @@ following extras:
 ### Generic Intent Construction
 
 To influence APRSdroid, you need to create an Intent with a string
-action starting with `"org.aprsdroid.app."`, followed by the uppercase
+action starting with `"org.na7q.app."`, followed by the uppercase
 action name. The intent should have additional parameters according to
 the action description, and must be delivered using
 [startService](https://developer.android.com/reference/android/content/Context.html#startService(android.content.Intent)).
@@ -169,7 +169,7 @@ Start the APRSdroid tracking service for an indeterminate runtime
 (`SERVICE`) or for one position transmission (`ONCE`).
 
 	// launch APRSdroid tracker
-	Intent i = new Intent("org.aprsdroid.app.SERVICE").setPackage("org.aprsdroid.app");
+	Intent i = new Intent("org.na7q.app.SERVICE").setPackage("org.na7q.app");
 	startService(i);
 
 ### SERVICE_STOP
@@ -177,7 +177,7 @@ Start the APRSdroid tracking service for an indeterminate runtime
 Stop the tracking service.
 
 	// stop APRSdroid tracker
-	Intent i = new Intent("org.aprsdroid.app.SERVICE_STOP").setPackage("org.aprsdroid.app");
+	Intent i = new Intent("org.na7q.app.SERVICE_STOP").setPackage("org.na7q.app");
 	startService(i);
 
 ### SEND_PACKET
@@ -194,7 +194,7 @@ Intent extras (do not use `setData()`, it doesn't work!):
 Example for sending a raw status packet:
 
 	// send raw status packet
-	Intent i = new Intent("org.aprsdroid.app.SEND_PACKET").setPackage("org.aprsdroid.app");
+	Intent i = new Intent("org.na7q.app.SEND_PACKET").setPackage("org.na7q.app");
 	i.putExtra("data", ">third-party APRS status app");
 	startService(i);
 
@@ -212,13 +212,13 @@ Intent extras:
 Example for updating the frequency:
 
 	// send raw status packet
-	Intent i = new Intent("org.aprsdroid.app.FREQUENCY").setPackage("org.aprsdroid.app");
+	Intent i = new Intent("org.na7q.app.FREQUENCY").setPackage("org.na7q.app");
 	i.putExtra("frequency", "438.750");
 	startService(i);
 
 Invocation from the adb shell:
 
-	am startservice -a org.aprsdroid.app.FREQUENCY -e frequency "438.750"
+	am startservice -a org.na7q.app.FREQUENCY -e frequency "438.750"
 
 
 ## (In-)Security

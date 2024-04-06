@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 
 import _root_.android.content.{BroadcastReceiver, ContentValues, Context, Intent}
 import _root_.android.util.Log
@@ -16,7 +16,6 @@ class MessageService(s : AprsService) {
 	
 	// Map to store the last ACK timestamps
 	private val lastAckTimestamps = mutable.Map[(String, String), Long]()
-
 
 	val pendingSender = new Runnable() { override def run() { sendPendingMessages() } }
 
@@ -96,7 +95,6 @@ class MessageService(s : AprsService) {
 
 	// return 2^n * 30s, at most 32min
 	def getRetryDelayMS(retrycnt : Int) = (RETRY_INTERVAL * 1000) * (1 << math.min(retrycnt - 1, NUM_OF_RETRIES))
-
 
 	def scheduleNextSend(delay : Long) {
 		// add some time to prevent fast looping

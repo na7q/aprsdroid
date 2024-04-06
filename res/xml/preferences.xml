@@ -44,8 +44,8 @@
 		android:title="@string/p_connsetup">
 
             <intent android:action="android.intent.action.MAIN"
-                    android:targetPackage="org.aprsdroid.app"
-                    android:targetClass="org.aprsdroid.app.BackendPrefs" />
+                    android:targetPackage="org.na7q.app"
+                    android:targetClass="org.na7q.app.BackendPrefs" />
 
         </PreferenceScreen>
     </PreferenceCategory>
@@ -113,8 +113,8 @@
 	    android:summary="@string/p_symbol_summary" >
 
             <intent android:action="android.intent.action.MAIN"
-                    android:targetPackage="org.aprsdroid.app"
-                    android:targetClass="org.aprsdroid.app.PrefSymbolAct" />
+                    android:targetPackage="org.na7q.app"
+                    android:targetClass="org.na7q.app.PrefSymbolAct" />
     </PreferenceScreen>
 
         <de.duenndns.EditTextPreferenceWithValue
@@ -141,8 +141,8 @@
 	    android:title="@string/p__location">
 
             <intent android:action="android.intent.action.MAIN"
-                    android:targetPackage="org.aprsdroid.app"
-                    android:targetClass="org.aprsdroid.app.LocationPrefs" />
+                    android:targetPackage="org.na7q.app"
+                    android:targetClass="org.na7q.app.LocationPrefs" />
     </PreferenceScreen>
 
     <PreferenceScreen

@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 
 import android.content.Context
 import android.content.Intent

@@ -1,6 +1,6 @@
 // (C) http://blog.tomgibara.com/post/190539066/android-unscaled-bitmaps
 
-package org.aprsdroid.app;
+package org.na7q.app;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;

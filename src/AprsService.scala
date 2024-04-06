@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 
 import _root_.android.app.Service
 import _root_.android.content.{Context, Intent, IntentFilter}
@@ -13,7 +13,7 @@ import scala.collection.mutable
 import java.time.Instant
 
 object AprsService {
-	val PACKAGE = "org.aprsdroid.app"
+	val PACKAGE = "org.na7q.app"
 	// action intents
 	val SERVICE = PACKAGE + ".SERVICE"
 	val SERVICE_ONCE = PACKAGE + ".ONCE"
@@ -52,8 +52,8 @@ object AprsService {
 	val API_VERSION_CODE = 1
 
 	// private intents for message handling
-	lazy val MSG_PRIV_INTENT = new Intent(MESSAGE).setPackage("org.aprsdroid.app")
-	lazy val MSG_TX_PRIV_INTENT = new Intent(MESSAGETX).setPackage("org.aprsdroid.app")
+	lazy val MSG_PRIV_INTENT = new Intent(MESSAGE).setPackage("org.na7q.app")
+	lazy val MSG_TX_PRIV_INTENT = new Intent(MESSAGETX).setPackage("org.na7q.app")
 
 	def intent(ctx : Context, action : String) : Intent = {
 		new Intent(action, null, ctx, classOf[AprsService])
