@@ -226,4 +226,16 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+	android:title="@string/p_regenerate">
+	
+		<CheckBoxPreference
+			android:key="p.regenerate"
+			android:title="@string/p_regenerate"
+			android:summary="@string/p_regenerate_summary"
+			android:dialogTitle="@string/p_regenerate_entry"			
+			android:defaultValue="false" />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

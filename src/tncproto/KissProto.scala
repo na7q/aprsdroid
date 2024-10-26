@@ -46,9 +46,12 @@ class KissProto(service : AprsService, is : InputStream, os : OutputStream) exte
 			ch match {
 			case FEND =>
 				if (buf.length > 0) {
-					Log.d(TAG, "readPacket: sending back %s".format(new String(buf.toArray)))
+					Log.d(TAG, ": sending back %s".format(new String(buf.toArray)))
 					try {
-						return Parser.parseAX25(buf.toArray).toString().trim()
+						// Parse and handle the packet
+						val packet = Parser.parseAX25(buf.toArray)
+						handlePacket(packet)
+						return packet.toString().trim()
 					} catch {
 						case e : Exception => buf.clear()
 					}
@@ -78,6 +81,26 @@ class KissProto(service : AprsService, is : InputStream, os : OutputStream) exte
 			}
 		} while (true)
 		""
+	}
+
+	// Method to handle packet processing - resend only if digipeating is enabled
+	def handlePacket(packet: APRSPacket) {
+		Log.d(TAG, "Received packet: " + packet)
+
+		// Check if the digipeating setting is enabled
+		if (service.prefs.isDigipeaterEnabled()) {
+			// Resend the packet as it was received
+			sendPacket(packet)
+			Log.d(TAG, "Digipeated packet: " + packet)
+		} else {
+			Log.d(TAG, "Digipeating is disabled. Packet not resent.")
+		}
+	}
+
+	// Send the received packet back out
+	def sendPacket(packet: APRSPacket) {
+		Log.d(TAG, "Sending repeated packet: " + packet.toString())
+		writePacket(packet)
 	}
 
 	def writePacket(p : APRSPacket) {
