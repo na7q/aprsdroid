@@ -88,7 +88,7 @@ class KissProto(service : AprsService, is : InputStream, os : OutputStream) exte
 		Log.d(TAG, "Received packet: " + packet)
 
 		// Check if the digipeating setting is enabled
-		if (service.prefs.isRegenEnabled()) {
+		if (service.prefs.isRegenerateEnabled()) {
 			// Resend the packet as it was received
 			sendPacket(packet)
 			Log.d(TAG, "Regenerated packet: " + packet)

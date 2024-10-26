@@ -12,7 +12,7 @@ class PrefsWrapper(val context : Context) {
 	def getString(key : String, defValue : String) = prefs.getString(key, defValue)
 	def getBoolean(key : String, defValue : Boolean) = prefs.getBoolean(key, defValue)
 
-	def isRegenEnabled(): Boolean = {
+	def isRegenerateEnabled(): Boolean = {
 		prefs.getBoolean("p.regen", true)
 	}
 
