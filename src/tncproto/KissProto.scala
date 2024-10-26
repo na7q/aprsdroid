@@ -83,17 +83,17 @@ class KissProto(service : AprsService, is : InputStream, os : OutputStream) exte
 		""
 	}
 
-	// Method to handle packet processing - resend only if digipeating is enabled
+	// Method to handle packet processing - resend only if regenerating is enabled
 	def handlePacket(packet: APRSPacket) {
 		Log.d(TAG, "Received packet: " + packet)
 
 		// Check if the digipeating setting is enabled
-		if (service.prefs.isDigipeaterEnabled()) {
+		if (service.prefs.isRegenEnabled()) {
 			// Resend the packet as it was received
 			sendPacket(packet)
-			Log.d(TAG, "Digipeated packet: " + packet)
+			Log.d(TAG, "Regenerated packet: " + packet)
 		} else {
-			Log.d(TAG, "Digipeating is disabled. Packet not resent.")
+			Log.d(TAG, "Regenerating is disabled. Packet not resent.")
 		}
 	}
 

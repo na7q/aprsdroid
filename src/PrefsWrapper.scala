@@ -12,8 +12,8 @@ class PrefsWrapper(val context : Context) {
 	def getString(key : String, defValue : String) = prefs.getString(key, defValue)
 	def getBoolean(key : String, defValue : Boolean) = prefs.getBoolean(key, defValue)
 
-	def isDigipeaterEnabled(): Boolean = {
-		prefs.getBoolean("p.digipeating", true)
+	def isRegenEnabled(): Boolean = {
+		prefs.getBoolean("p.regen", true)
 	}
 
 	// safely read integers
