@@ -14,7 +14,8 @@ object MessageListAdapter {
 	val LIST_FROM = Array("TSS", CALL, TEXT)
 	val LIST_TO = Array(R.id.listts, R.id.liststatus, R.id.listmessage)
 
-	val NUM_OF_RETRIES = 7
+	lazy val NUM_OF_RETRIES = prefs.getStringInt("p.messaging", 5) // Fetch NUM_OF_RETRIES from prefs, defaulting to 3 if not found
+
 	// null, incoming, out-new, out-acked, out-rejected, out-aborted
 	val COLORS = Array(0, 0xff8080b0, 0xff80a080, 0xff30b030, 0xffb03030, 0xffa08080)
 }
