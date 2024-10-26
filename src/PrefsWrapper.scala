@@ -13,7 +13,7 @@ class PrefsWrapper(val context : Context) {
 	def getBoolean(key : String, defValue : Boolean) = prefs.getBoolean(key, defValue)
 
 	def isRegenerateEnabled(): Boolean = {
-		prefs.getBoolean("p.regen", true)
+		prefs.getBoolean("p.regenerate", true)
 	}
 
 	// safely read integers
