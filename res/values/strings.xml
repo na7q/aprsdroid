@@ -109,8 +109,8 @@
 <string name="ad_homepage">Home Page</string>
 
 <string name="p_regenerate">Regenerate Packets</string>
-<string name="p_regenerate_entry">Enable/Disable</string>
-<string name="p_regenerate_summary">Check to enable</string>
+<!-- string name="p_regenerate_entry">Enable/Disable</string -->
+<string name="p_regenerate_summary">Dangerously regenerates heard packets</string>
 
 
 <!-- map view -->
