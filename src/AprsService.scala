@@ -284,6 +284,31 @@ class AprsService extends Service {
 		}
 	}
 
+	// Add this function to your AprsService class
+	def logReceivedPacket(packet: APRSPacket): Unit = {
+		// Log the received packet using Log.d
+		Log.d(TAG, s"NEW Received packet: ${packet.toString}")	
+	}
+
+
+	// Test idea for sending packets
+	def sendTestPacket(packetString: String): Unit = {
+		// Parse the incoming string to an APRSPacket object
+		try {
+			val testPacket = Parser.parse(packetString)
+
+			// Send the packet with an empty status postfix
+			sendPacket(testPacket)
+			
+			Log.d("APRSdroid.Service", s"Successfully sent packet: $packetString")
+		} catch {
+			case e: Exception =>
+				Log.e("APRSdroid.Service", s"Failed to send packet: $packetString", e)
+		}
+	}
+
+
+
 	def parsePacket(ts : Long, message : String, source : Int) {
 		try {
 			var fap = Parser.parse(message)
@@ -372,8 +397,113 @@ class AprsService extends Service {
 		}
 	}
 	def postSubmit(post : String) {
+		// Log the incoming post message for debugging
+		Log.d("APRSdroid.Service", s"Incoming post: $post")	
 		postAddPost(StorageDatabase.Post.TYPE_INCMG, R.string.post_incmg, post)
+		
+		// Process the incoming post
+		processIncomingPost(post)		
 	}
+
+	def processIncomingPost(post: String) {
+		// Try to parse the incoming post to an APRSPacket
+		try {
+			val packet = Parser.parse(post)  // Parse the incoming post to an APRSPacket
+			logReceivedPacket(packet)          // Log the received packet
+
+			// Now you can access the source call from the packet
+			val callssid = prefs.getCallSsid()			
+			val sourceCall = packet.getSourceCall()
+			val destinationCall = packet.getDestinationCall();
+			val lastUsedDigi = packet.getDigiString()
+
+
+			// Check if callssid matches sourceCall; if they match, do not digipeat
+			if (callssid == sourceCall) {
+				Log.d("APRSdroid.Service", s"No digipeat: callssid ($callssid) matches source call ($sourceCall).")
+				return // Exit if no digipeating is needed
+			}				
+			
+			val (modifiedDigiPath, digipeatOccurred) = processDigiPath(lastUsedDigi, callssid)			
+			val payload = packet.getAprsInformation()			
+			Log.d("APRSdroid.Service", s"Source: $sourceCall")
+			Log.d("APRSdroid.Service", s"Destination: $destinationCall")
+			Log.d("APRSdroid.Service", s"Digi: $lastUsedDigi")
+			Log.d("APRSdroid.Service", s"Modified Digi Path: $modifiedDigiPath")
+			
+			Log.d("APRSdroid.Service", s"Payload: $payload")
+
+			// Format the string for sending
+			val testPacket = s"$sourceCall>$destinationCall,$modifiedDigiPath:$payload"
+
+			// Optionally, send a test packet with the formatted string only if a digipeat occurred
+			if (digipeatOccurred) {
+				sendTestPacket(testPacket)
+			} else {
+				Log.d("APRSdroid.Service", "No digipeat occurred, not sending a test packet.")
+			}		
+			
+		} catch {
+			case e: Exception =>
+				Log.e("APRSdroid.Service", s"Failed to parse packet: $post", e)
+		}
+	}
+
+	def processDigiPath(lastUsedDigi: String, callssid: String): (String, Boolean) = {
+		// Log the input Digi path
+		Log.d("APRSdroid.Service", s"Original Digi Path: '$lastUsedDigi'")
+
+		// If lastUsedDigi is empty, return it unchanged
+		if (lastUsedDigi.trim.isEmpty) {
+			Log.d("APRSdroid.Service", "LastUsedDigi is empty, returning unchanged.")
+			return (lastUsedDigi, false)
+		}
+
+		// Remove leading comma for easier processing
+		val trimmedPath = lastUsedDigi.stripPrefix(",")
+
+		// Split the path into components, avoiding empty strings
+		val pathComponents = trimmedPath.split(",").toList.filter(_.nonEmpty)
+
+		// Create a new list of components with modifications
+		val (modifiedPath, modified) = pathComponents.foldLeft((List.empty[String], false)) {
+			case ((acc, hasModified), component) =>
+				// Check if the current component starts with "WIDE"
+				if (!hasModified && component.startsWith("WIDE")) {
+					// Determine the updated component based on its suffix
+					component match {
+						case w if w.endsWith("-2") =>
+							// Change -2 to -1 and insert callssid* before it
+							(acc :+ s"$callssid*" :+ w.stripSuffix("-2") + "-1", true)
+						case w if w.endsWith("-1") =>
+							// Remove the component entirely and insert callssid*
+							(acc :+ s"$callssid*", true)
+						case _ =>
+							// Leave unchanged if there's no -1 or -2
+							(acc :+ component, hasModified)
+					}
+				} else {
+					// Keep the component as it is
+					(acc :+ component, hasModified)
+				}
+		}
+
+		// Rebuild the modified path
+		val resultPath = modifiedPath.mkString(",")
+
+		// Log the modified path before returning
+		Log.d("APRSdroid.Service", s"Modified Digi Path: '$resultPath'")
+
+		// If no modification occurred, return the original lastUsedDigi
+		if (resultPath == trimmedPath) {
+			Log.d("APRSdroid.Service", "No modifications were made; returning the original path.")
+			return (lastUsedDigi, false)
+		}
+
+		// Add a leading comma back to the modified path since a modification occurred
+		(s"$resultPath", true)
+	}
+
 
 	def postAbort(post : String) {
 		postAddPost(StorageDatabase.Post.TYPE_ERROR, R.string.post_error, post)
