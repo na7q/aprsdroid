@@ -9,6 +9,8 @@ import _root_.android.util.Log
 import _root_.android.widget.Toast
 
 import _root_.net.ab0oo.aprs.parser._
+import scala.collection.mutable
+import java.time.Instant
 
 object AprsService {
 	val PACKAGE = "org.aprsdroid.app"
@@ -72,6 +74,8 @@ class AprsService extends Service {
 			filter (_.isDigit) take 2)
 
 	lazy val prefs = new PrefsWrapper(this)
+
+	lazy val dedupeTime = prefs.getStringInt("p.dedupe", 30) // Fetch NUM_OF_RETRIES from prefs, defaulting to 7 if not found
 
 	val handler = new Handler()
 
@@ -405,6 +409,38 @@ class AprsService extends Service {
 		processIncomingPost(post)		
 	}
 
+	// Map to store recent digipeats with their timestamps
+	val recentDigipeats: mutable.Map[String, Instant] = mutable.Map()
+
+	// Function to add or update the digipeat
+	def storeDigipeat(sourceCall: String, destinationCall: String, payload: String): Unit = {
+	  // Unique identifier using source call, destination call, and payload
+	  val key = s"$sourceCall>$destinationCall:$payload"
+	  recentDigipeats(key) = Instant.now() // Store the current timestamp
+	}
+
+	// Function to filter digipeats that are older than dedupeTime seconds
+	def isDigipeatRecent(sourceCall: String, destinationCall: String, payload: String): Boolean = {
+	  // Unique identifier using source call, destination call, and payload
+	  val key = s"$sourceCall>$destinationCall:$payload"
+	  recentDigipeats.get(key) match {
+		case Some(timestamp) =>
+		  // Check if the packet was heard within the last 30 seconds
+		  Instant.now().isBefore(timestamp.plusSeconds(dedupeTime))
+		case None =>
+		  false // Not found in recent digipeats
+	  }
+	}
+
+	// Function to clean up old entries
+	def cleanupOldDigipeats(): Unit = {
+	  val now = Instant.now()
+	  // Retain only those digipeats that are within the last 30 seconds
+	  recentDigipeats.retain { case (_, timestamp) =>
+		now.isBefore(timestamp.plusSeconds(dedupeTime))
+	  }
+	}
+
 	def processIncomingPost(post: String) {
 	
 		// Check if the digipeating setting is enabled
@@ -412,6 +448,9 @@ class AprsService extends Service {
 				Log.d("APRSdroid.Service", "Digipeating is disabled; skipping processing.")
 				return // Exit if digipeating is not enabled
 		}	
+
+		cleanupOldDigipeats() // Clean up old digipeats before processing
+
 
 		// Try to parse the incoming post to an APRSPacket
 		try {
@@ -423,6 +462,9 @@ class AprsService extends Service {
 			val sourceCall = packet.getSourceCall()
 			val destinationCall = packet.getDestinationCall();
 			val lastUsedDigi = packet.getDigiString()
+			val payload = packet.getAprsInformation()	
+
+			val payloadString = packet.getAprsInformation().toString() // Ensure payload is a String
 
 
 			// Check if callssid matches sourceCall; if they match, do not digipeat
@@ -431,8 +473,16 @@ class AprsService extends Service {
 				return // Exit if no digipeating is needed
 			}				
 			
+			// Check if this packet has been digipeated recently
+			if (isDigipeatRecent(sourceCall, destinationCall, payloadString)) {
+			Log.d("APRSdroid.Service", s"Packet from $sourceCall to $destinationCall and $payload has been heard recently, skipping digipeating.")
+			  return // Skip processing this packet
+			}			
+						
+			
 			val (modifiedDigiPath, digipeatOccurred) = processDigiPath(lastUsedDigi, callssid)			
-			val payload = packet.getAprsInformation()			
+
+
 			Log.d("APRSdroid.Service", s"Source: $sourceCall")
 			Log.d("APRSdroid.Service", s"Destination: $destinationCall")
 			Log.d("APRSdroid.Service", s"Digi: $lastUsedDigi")
@@ -446,6 +496,10 @@ class AprsService extends Service {
 			// Optionally, send a test packet with the formatted string only if a digipeat occurred
 			if (digipeatOccurred) {
 				sendTestPacket(testPacket)
+								
+				// Store the digipeat to the recent list
+				storeDigipeat(sourceCall, destinationCall, payloadString)				
+				
 			} else {
 				Log.d("APRSdroid.Service", "No digipeat occurred, not sending a test packet.")
 			}		

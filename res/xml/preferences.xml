@@ -226,22 +226,24 @@
 
     </PreferenceCategory>
 
-	    <!-- sub-screen "digipeating" -->
+	    <!-- sub-screen "messaging" -->
     <PreferenceCategory
 	android:title="@string/p_digipeating">
 	
 		<CheckBoxPreference
 			android:key="p.digipeating"
-			android:title="@string/p_digipeating"
+			android:title="@string/p_digipeating_entry"
 			android:summary="@string/p_digipeating_summary"
 			android:defaultValue="false" />
 
-    </PreferenceCategory>
+		<de.duenndns.EditTextPreferenceWithValue
+			android:key="p.dedupe"
+			android:defaultValue="30"
+			android:inputType="number"
+			android:title="@string/p_dedupe"
+			android:summary="@string/p_dedupe_summary"
+			android:dialogTitle="@string/p_dedupe_entry" />
 
-	<!-- Regen -->
-    <PreferenceCategory
-	android:title="@string/p_regenerate">
-	
 		<CheckBoxPreference
 			android:key="p.regenerate"
 			android:title="@string/p_regenerate"
