@@ -263,7 +263,6 @@ class AprsService extends Service {
 	}
 	def sendPacket(packet : APRSPacket) { sendPacket(packet, "") }
 
-
 	def postLocation(location : Location) {
 		var symbol = prefs.getString("symbol", "")
 		if (symbol.length != 2)
@@ -308,12 +307,9 @@ class AprsService extends Service {
 		}
 	}
 
-
-
 	def parsePacket(ts : Long, message : String, source : Int) {
-		try {					
+		try {
 			var fap = Parser.parse(message)
-			
 			if (fap.getType() == APRSTypes.T_THIRDPARTY) {
 				Log.d(TAG, "parsePacket: third-party packet from " + fap.getSourceCall())
 				val inner = fap.getAprsInformation().toString()
@@ -343,7 +339,6 @@ class AprsService extends Service {
 				case op : ObjectPacket => addPosition(ts, fap, op, op.getPosition(), op.getObjectName())
 				case msg : MessagePacket => msgService.handleMessage(ts, fap, msg)
 			}
-			
 		} catch {
 		case e : Exception =>
 			Log.d(TAG, "parsePacket() unsupported packet: " + message)

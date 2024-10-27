@@ -24,7 +24,7 @@ class MessageListAdapter(context : Context, prefs : PrefsWrapper,
 
 	lazy val storage = StorageDatabase.open(context)
 
-	lazy val NUM_OF_RETRIES = prefs.getStringInt("p.messaging", 5) // Fetch NUM_OF_RETRIES from prefs, defaulting to 3 if not found
+	lazy val NUM_OF_RETRIES = prefs.getStringInt("p.messaging", 7) // Fetch NUM_OF_RETRIES from prefs, defaulting to 7 if not found
 
 
 	reload()

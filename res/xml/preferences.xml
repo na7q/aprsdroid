@@ -226,7 +226,7 @@
 
     </PreferenceCategory>
 
-	    <!-- sub-screen "messaging" -->
+	    <!-- sub-screen "digipeating" -->
     <PreferenceCategory
 	android:title="@string/p_digipeating">
 	

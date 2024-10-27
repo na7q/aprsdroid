@@ -9,9 +9,9 @@ import _root_.net.ab0oo.aprs.parser._
 class MessageService(s : AprsService) {
 	val TAG = "APRSdroid.MsgService"
 
-	val NUM_OF_RETRIES = s.prefs.getStringInt("p.messaging", 5)
+	val NUM_OF_RETRIES = s.prefs.getStringInt("p.messaging", 7)
 
-	val RETRY_INTERVAL = s.prefs.getStringInt("p.retry", 60)
+	val RETRY_INTERVAL = s.prefs.getStringInt("p.retry", 30)
 
 
 	val pendingSender = new Runnable() { override def run() { sendPendingMessages() } }
