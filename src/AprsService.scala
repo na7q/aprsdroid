@@ -442,6 +442,14 @@ class AprsService extends Service {
 
 	def processIncomingPost(post: String) {
 	
+		// Check if backendName contains "KISS" or "AFSK"
+		if (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK")) {
+			android.util.Log.d("PrefsAct", "Backend contains KISS or AFSK")
+		} else {
+			android.util.Log.d("PrefsAct", "Backend does not contain KISS or AFSK")
+			return
+		}	
+	
 		// Check if the digipeating setting is enabled
 		if (!prefs.isDigipeaterEnabled()) {
 				Log.d("APRSdroid.Service", "Digipeating is disabled; skipping processing.")
