@@ -50,7 +50,6 @@ class KissProto(service : AprsService, is : InputStream, os : OutputStream) exte
 					try {
 						// Parse and handle the packet
 						val packet = Parser.parseAX25(buf.toArray)
-						handlePacket(packet)
 						return packet.toString().trim()
 					} catch {
 						case e : Exception => buf.clear()
@@ -81,26 +80,6 @@ class KissProto(service : AprsService, is : InputStream, os : OutputStream) exte
 			}
 		} while (true)
 		""
-	}
-
-	// Method to handle packet processing - resend only if regenerating is enabled
-	def handlePacket(packet: APRSPacket) {
-		Log.d(TAG, "Received packet: " + packet)
-
-		// Check if the digipeating setting is enabled
-		if (service.prefs.isRegenerateEnabled()) {
-			// Resend the packet as it was received
-			sendPacket(packet)
-			Log.d(TAG, "Regenerated packet: " + packet)
-		} else {
-			Log.d(TAG, "Regenerating is disabled. Packet not resent.")
-		}
-	}
-
-	// Send the received packet back out
-	def sendPacket(packet: APRSPacket) {
-		Log.d(TAG, "Sending repeated packet: " + packet.toString())
-		writePacket(packet)
 	}
 
 	def writePacket(p : APRSPacket) {

@@ -296,6 +296,7 @@ class AprsService extends Service {
 		Log.d(TAG, s"NEW Received packet: ${packet.toString}")	
 	}
 
+
 	// Test idea for sending packets
 	def sendTestPacket(packetString: String): Unit = {
 		// Parse the incoming string to an APRSPacket object
@@ -442,6 +443,7 @@ class AprsService extends Service {
 
 	def processIncomingPost(post: String) {
 	
+		val packet = Parser.parse(post)  // Parse the incoming post to an APRSPacket
 		// Check if backendName contains "KISS" or "AFSK"
 		if (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK")) {
 			android.util.Log.d("PrefsAct", "Backend contains KISS or AFSK")
@@ -450,6 +452,21 @@ class AprsService extends Service {
 			return
 		}	
 	
+
+		// Check if both digipeating and regeneration are enabled. Temp fix until re-implementation. Remove later on.
+		if (prefs.isDigipeaterEnabled() && prefs.isRegenerateEnabled()) {
+			Log.d("APRSdroid.Service", "Both Digipeating and Regeneration are enabled; Set Regen to false.")
+			prefs.setBoolean("p.regenerate", false) // Disable regeneration
+			
+		}	
+
+		// New regen
+		if (!prefs.isDigipeaterEnabled() && prefs.isRegenerateEnabled()) {
+			Log.d("APRSdroid.Service", "Regen enabled")
+			sendTestPacket(packet.toString)
+			return // Exit if both digipeating and regeneration are enabled
+		}	
+			
 		// Check if the digipeating setting is enabled
 		if (!prefs.isDigipeaterEnabled()) {
 				Log.d("APRSdroid.Service", "Digipeating is disabled; skipping processing.")
@@ -461,7 +478,6 @@ class AprsService extends Service {
 
 		// Try to parse the incoming post to an APRSPacket
 		try {
-			val packet = Parser.parse(post)  // Parse the incoming post to an APRSPacket
 			logReceivedPacket(packet)          // Log the received packet
 
 			// Now you can access the source call from the packet

@@ -13,10 +13,10 @@ class PrefsWrapper(val context : Context) {
 	def getBoolean(key : String, defValue : Boolean) = prefs.getBoolean(key, defValue)
 
 	def isDigipeaterEnabled(): Boolean = {
-		prefs.getBoolean("p.digipeating", true)
+		prefs.getBoolean("p.digipeating", false)
 	}
 	def isRegenerateEnabled(): Boolean = {
-		prefs.getBoolean("p.regenerate", true)
+		prefs.getBoolean("p.regenerate", false)
 	}
 
 	// safely read integers
