@@ -307,6 +307,8 @@ class AprsService extends Service {
 		}
 	}
 
+
+
 	def parsePacket(ts : Long, message : String, source : Int) {
 		try {
 			var fap = Parser.parse(message)
@@ -473,19 +475,29 @@ class AprsService extends Service {
 		// Create a new list of components with modifications
 		val (modifiedPath, modified) = pathComponents.foldLeft((List.empty[String], false)) {
 			case ((acc, hasModified), component) =>
-				// Check if the current component starts with "WIDE"
-				if (!hasModified && component.startsWith("WIDE")) {
-					// Determine the updated component based on its suffix
+				// Check if callssid* is in the path and skip if found
+				if (component == s"$callssid*") {
+					// Skip digipeating if callssid* is found
+					return (lastUsedDigi, false) // Return the original path, do not modify
+				} else if (!hasModified && component.startsWith("WIDE")) {
+					// Handle the first unused WIDE path
 					component match {
 						case w if w.endsWith("-2") =>
 							// Change -2 to -1 and insert callssid* before it
 							(acc :+ s"$callssid*" :+ w.stripSuffix("-2") + "-1", true)
 						case w if w.endsWith("-1") =>
-							// Remove the component entirely and insert callssid*
+							// Remove the WIDE component entirely and insert callssid*
 							(acc :+ s"$callssid*", true)
 						case _ =>
 							// Leave unchanged if there's no -1 or -2
 							(acc :+ component, hasModified)
+					}
+				} else if (component.startsWith(callssid) && !component.endsWith("*")) {
+					// Replace callssid with callssid* only if it hasn't been modified
+					if (!hasModified) {
+						(acc :+ s"$callssid*", true)
+					} else {
+						(acc :+ component, hasModified)
 					}
 				} else {
 					// Keep the component as it is
@@ -505,10 +517,9 @@ class AprsService extends Service {
 			return (lastUsedDigi, false)
 		}
 
-		// Add a leading comma back to the modified path since a modification occurred
+		// Return the modified path with a leading comma
 		(s"$resultPath", true)
 	}
-
 
 	def postAbort(post : String) {
 		postAddPost(StorageDatabase.Post.TYPE_ERROR, R.string.post_error, post)
