@@ -226,6 +226,18 @@
 
     </PreferenceCategory>
 
+	    <!-- sub-screen "messaging" -->
+    <PreferenceCategory
+	android:title="@string/p_digipeating">
+	
+		<CheckBoxPreference
+			android:key="p.digipeating"
+			android:title="@string/p_digipeating"
+			android:summary="@string/p_digipeating_summary"
+			android:defaultValue="false" />
+
+    </PreferenceCategory>
+
 	<!-- Regen -->
     <PreferenceCategory
 	android:title="@string/p_regenerate">

@@ -109,9 +109,10 @@
 <string name="ad_homepage">Home Page</string>
 
 <string name="p_regenerate">Regenerate Packets</string>
-<!-- string name="p_regenerate_entry">Enable/Disable</string -->
 <string name="p_regenerate_summary">Dangerously regenerates heard packets</string>
 
+<string name="p_digipeating">Digipeating</string>
+<string name="p_digipeating_summary">Enables WIDE path digipeating</string>
 
 <!-- map view -->
 <string name="map_overlays">Overlays</string>
