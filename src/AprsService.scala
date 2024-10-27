@@ -77,6 +77,8 @@ class AprsService extends Service {
 
 	lazy val dedupeTime = prefs.getStringInt("p.dedupe", 30) // Fetch NUM_OF_RETRIES from prefs, defaulting to 7 if not found
 
+	lazy val digipeaterpath = prefs.getString("digipeater_path", "WIDE")
+
 	val handler = new Handler()
 
 	lazy val db = StorageDatabase.open(this)
@@ -294,7 +296,6 @@ class AprsService extends Service {
 		Log.d(TAG, s"NEW Received packet: ${packet.toString}")	
 	}
 
-
 	// Test idea for sending packets
 	def sendTestPacket(packetString: String): Unit = {
 		// Parse the incoming string to an APRSPacket object
@@ -310,8 +311,6 @@ class AprsService extends Service {
 				Log.e("APRSdroid.Service", s"Failed to send packet: $packetString", e)
 		}
 	}
-
-
 
 	def parsePacket(ts : Long, message : String, source : Int) {
 		try {
@@ -533,7 +532,7 @@ class AprsService extends Service {
 				if (component == s"$callssid*") {
 					// Skip digipeating if callssid* is found
 					return (lastUsedDigi, false) // Return the original path, do not modify
-				} else if (!hasModified && component.startsWith("WIDE")) {
+				} else if (!hasModified && component.startsWith(digipeaterpath)) {
 					// Handle the first unused WIDE path
 					component match {
 						case w if w.endsWith("-2") =>

@@ -236,6 +236,17 @@
 			android:summary="@string/p_digipeating_summary"
 			android:defaultValue="false" />
 
+        <de.duenndns.EditTextPreferenceWithValue
+			android:key="digipeater_path"
+			android:hint="WIDE, TEMP, MTN"
+			android:defaultValue="WIDE"
+			android:inputType="textCapCharacters"
+			android:digits="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ,-"
+			android:title="@string/p_digipeaterpath"
+			android:summary="@string/p_digipeaterpath_summary"
+			android:dialogTitle="@string/p_digipeaterpath_entry" />
+
+
 		<de.duenndns.EditTextPreferenceWithValue
 			android:key="p.dedupe"
 			android:defaultValue="30"
@@ -258,7 +269,7 @@
 	
 		<de.duenndns.EditTextPreferenceWithValue
 			android:key="p.messaging"
-			android:defaultValue="3"
+			android:defaultValue="7"
 			android:inputType="number"
 			android:title="@string/p_message_retry"
 			android:summary="@string/p_message_retry_summary"
@@ -266,7 +277,7 @@
 
 		<de.duenndns.EditTextPreferenceWithValue
 			android:key="p.retry"
-			android:defaultValue="60"
+			android:defaultValue="30"
 			android:inputType="number"
 			android:title="@string/p_retry_interval"
 			android:summary="@string/p_retry_interval_summary"
