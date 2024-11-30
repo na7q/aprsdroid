@@ -259,21 +259,42 @@ class StorageDatabase(context : Context) extends
 		getWritableDatabase().replaceOrThrow(TABLE, CALL, cv)
 	}
 
-	def isMessageDuplicate(call : String, msgid : String, text : String) : Boolean = {
-		val c = getReadableDatabase().query(Message.TABLE, Message.COLUMNS,
-			"type = 1 AND call = ? AND msgid = ? AND text = ?",
-			Array(call, msgid, text),
-			null, null,
-			null, null)
-		val result = (c.getCount() > 0)
-		c.close()
-		result
+	def isMessageDuplicate(call: String, msgid: String, text: String, currentTs: Long): Boolean = {
+	  val timeThreshold = currentTs - 600000 // seconds in milliseconds
+
+	  // Check if the 'call' matches the BLN pattern using pattern.matcher
+	  val queryTimeThreshold = if (msgid == null || msgid.isEmpty) {
+		Log.i(TAG, "MessageDuplicateCheck No ID. queryTimeThreshold: $timeThreshold")
+		timeThreshold.toString
+		
+	  } else {
+		Log.i(TAG, "MessageDuplicateCheck Call does not match BLN pattern. queryTimeThreshold: 0")
+		"0"
+	  }
+
+	  // Perform the query
+	  val c = getReadableDatabase().query(
+		Message.TABLE,
+		Message.COLUMNS,
+		"type = 1 AND call = ? AND msgid = ? AND text = ? AND ts >= ?",
+		Array(call, msgid, text, queryTimeThreshold),
+		null, null,
+		null, null
+	  )
+
+	  // Check if there are any results
+	  val result = (c.getCount() > 0)
+	  c.close()
+
+	  result
 	}
 
-	// add an incoming message, returns false if duplicate
-	def addMessage(ts : Long, srccall : String, msg : MessagePacket) : Boolean = {
+	// Add an incoming message, returns false if duplicate
+	def addMessage(ts: Long, srccall: String, msg: MessagePacket): Boolean = {
 		import Message._
-		if (isMessageDuplicate(srccall, msg.getMessageNumber(), msg.getMessageBody())) {
+
+		// Check if the message is a duplicate considering timestamp
+		if (isMessageDuplicate(srccall, msg.getMessageNumber(), msg.getMessageBody(), ts)) {
 			Log.i(TAG, "received duplicate message from %s: %s".format(srccall, msg))
 			return false
 		}

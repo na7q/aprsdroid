@@ -39,6 +39,10 @@ class MessageService(s : AprsService) {
 	}
 
 	def handleMessage(ts : Long, ap : APRSPacket, msg : MessagePacket, LastUsedDigi : String) {
+		// Define a regex pattern for "BLN<number>" (e.g., BLN0, BLN12, etc.)
+		val blnPattern = """BLN\d+""".r
+
+		// Retrieve the configured CallSsid
 		val callssid = s.prefs.getCallSsid()
 		
 		// Retrieve the ACK duplicate time setting from preferences (default is 0 seconds)
@@ -49,7 +53,8 @@ class MessageService(s : AprsService) {
 		val messageNumber = msg.getMessageNumber() // Get the message number
 		val lastAckTime = lastAckTimestamps.get((ap.getSourceCall(), messageNumber))
 
-		if (msg.getTargetCallsign().equalsIgnoreCase(callssid)) {
+		if (msg.getTargetCallsign().equalsIgnoreCase(callssid) || blnPattern.pattern.matcher(msg.getTargetCallsign()).matches()) {
+
 			if (msg.isAck() || msg.isRej()) {
 				val new_type = if (msg.isAck())
 					StorageDatabase.Message.TYPE_OUT_ACKED
@@ -59,7 +64,17 @@ class MessageService(s : AprsService) {
 				s.db.updateMessageAcked(ap.getSourceCall(), msg.getMessageNumber(), new_type)
 				s.sendBroadcast(AprsService.MSG_PRIV_INTENT)
 			} else {
+				
+			   if (blnPattern.pattern.matcher(msg.getTargetCallsign()).matches()) {
+				 // If it matches the BLN pattern, use the modified source call with "BLN"
+				 storeNotifyMessage(ts, msg.getTargetCallsign(), msg)
+			   } else {
+				// Otherwise, use the source call as is
 				storeNotifyMessage(ts, ap.getSourceCall(), msg)
+				
+			   }
+
+				//Log.d(TAG, s"Calling storeNotifyMessage with ts = $ts, sourceCall = ${ap.getSourceCall()}, message = ${msg.getMessageBody()}")
 
 				// Only check for duplicate ACKs if the feature is enabled
 				if (s.prefs.isAckDupeEnabled) {
@@ -72,7 +87,7 @@ class MessageService(s : AprsService) {
 				}
 				
 				// Proceed to send ACK if messageNumber is not empty
-				if (msg.getMessageNumber() != "" && (!LastUsedDigi.split(",").contains(s.prefs.getCallSsid() + "*")  && !ap.getDigiString().split(",").contains(s.prefs.getCallSsid() + "*"))) {
+				if (msg.getMessageNumber() != "" && !blnPattern.pattern.matcher(msg.getTargetCallsign()).matches() && (!LastUsedDigi.split(",").contains(s.prefs.getCallSsid() + "*")  && !ap.getDigiString().split(",").contains(s.prefs.getCallSsid() + "*"))) {
 					Log.d(TAG, s"DigiString: ${ap.getDigiString()}, LastUsedDigi: ${LastUsedDigi}, CallSSID: ${s.prefs.getCallSsid()}")
 					Log.d(TAG, s"Sending ACK: msgNumber = ${msg.getMessageNumber()}, digiString = ${ap.getDigiString()}, callsign = ${s.prefs.getCallSsid()}")
 
