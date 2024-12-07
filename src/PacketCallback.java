@@ -1,6 +1,1 @@
-package com.jazzido.PacketDroid;
-
-public interface PacketCallback {
-	public void received(byte[] packet);
-	public void peak(short peak_value);
-}
+../PacketDroid/src/com/jazzido/PacketDroid/PacketCallback.java
