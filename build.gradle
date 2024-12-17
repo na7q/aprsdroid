@@ -49,6 +49,12 @@ ext {
 tasks.withType(ScalaCompile) {
 	// Suppress deprecation warnings
 	scalaCompileOptions.deprecation = false
+
+    // Specify Scala source directories explicitly
+    source = fileTree(dir: 'src/main/scala', include: '**/*.scala')
+	exclude "**/*.png"    
+	exclude "res/drawable/**"   
+    options.encoding = "UTF-8"
 }
 
 def versionCodeDate() {

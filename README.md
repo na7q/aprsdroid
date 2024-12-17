@@ -56,4 +56,12 @@ echo "mapsApiKey=AI..." > local.properties
 ./gradlew assembleRelease
 ```
 
-
+Building with Docker.
+After executing the following commands the aprsdroid-release.apk file
+will be created under the main aprsdroid folder
+```bash
+git clone https://github.com/na7q/aprsdroid
+cd aprsdroid
+docker build -t aprsdroid-env .
+docker run -v $(pwd):/home/user/aprsdroid aprsdroid-env
+```
