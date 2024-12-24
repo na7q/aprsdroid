@@ -430,6 +430,44 @@ class AprsService extends Service {
 		}
 	}
 
+
+	def parseWXReport(report: String): String = {
+		// Regex to match the part after the underscore and check for weather data
+		val combinedRegex = "(.*_)([0-9]{3}/[0-9]{3}g[0-9]{3}t[0-9]{3}r[0-9]{3}p[0-9]{3}P[0-9]{3}h[0-9]{2}b[0-9]{5})(.*)".r
+
+		// Match the report and extract components
+		report match {
+			case combinedRegex(prefix, weatherData, suffix) =>
+				// Split and extract individual weather components
+				val wind = "([0-9]{3}/[0-9]{3})".r.findFirstIn(weatherData).getOrElse("000/000")
+				val gust = "g([0-9]{3})".r.findFirstIn(weatherData).map(_.drop(1)).getOrElse("000")
+				val temp = "t([0-9]{3})".r.findFirstIn(weatherData).map(_.drop(1)).getOrElse("000")
+				val rain1h = "r([0-9]{3})".r.findFirstIn(weatherData).map(_.drop(1)).getOrElse("000")
+				val rain24h = "p([0-9]{3})".r.findFirstIn(weatherData).map(_.drop(1)).getOrElse("000")
+				val humidity = "h([0-9]{2})".r.findFirstIn(weatherData).map(_.drop(1)).getOrElse("00")
+				val pressure = "b([0-9]{5})".r.findFirstIn(weatherData).map(_.drop(1)).getOrElse("10000")
+
+				// Format values
+				val windSpeed = if (wind.endsWith("/000")) "Calm" else s"${wind.split("/")(1).toInt} km/h"
+				val gustSpeed = if (gust == "000") "None" else s"${gust.toInt} km/h"
+				val temperature = f"${temp.toInt / 10.0}%.1f°C"
+				val rain1hAmount = f"${rain1h.toInt / 10.0}%.1fmm"
+				val rain24hAmount = f"${rain24h.toInt / 10.0}%.1fmm"
+				val humidityPercent = s"${humidity.toInt}%"
+				val pressureValue = f"${pressure.toInt / 10.0}%.1f hPa"
+
+				// Combine weather data into human-readable format
+				val weatherSummary = s"W:$windSpeed,Gust:$gustSpeed,Tmp:$temperature,Rain(1h/24h):$rain1hAmount/$rain24hAmount,Hum:$humidityPercent,Pres:$pressureValue"
+
+				// Reconstruct the message with the translated weather data
+				s"$prefix$weatherSummary$suffix"
+
+			case _ =>
+				// Return the original message if no weather data is found
+				report
+		}
+	}
+
 	def parsePacket(ts : Long, message : String, source : Int) {
 		try {
 			var fap = Parser.parse(message)
@@ -459,11 +497,11 @@ class AprsService extends Service {
 			}
 			if (fap.hasFault())
 				throw new Exception("FAP fault")
+
 			fap.getAprsInformation() match {
 				case pp : PositionPacket => addPosition(ts, fap, pp, pp.getPosition(), null)
 				case op : ObjectPacket => addPosition(ts, fap, op, op.getPosition(), op.getObjectName())
 				case msg : MessagePacket => msgService.handleMessage(ts, fap, msg, digiPathCheck)
-
 			}
 		} catch {
 		case e : Exception =>
@@ -478,31 +516,46 @@ class AprsService extends Service {
 			case _ => null
 		}
 	}
-	def addPosition(ts : Long, ap : APRSPacket, field : InformationField, pos : Position, objectname : String) {
+ 
+	def addPosition(ts: Long, ap: APRSPacket, field: InformationField, pos: Position, objectname: String) {
 		val cse = getCSE(field)
 		db.addPosition(ts, ap, pos, cse, objectname)
-
 		sendBroadcast(new Intent(POSITION)
 			.putExtra(SOURCE, ap.getSourceCall())
 			.putExtra(LOCATION, AprsPacket.position2location(ts, pos, cse))
 			.putExtra(CALLSIGN, if (objectname != null) objectname else ap.getSourceCall())
 			.putExtra(PACKET, ap.toString())
-		)
+        )
 	}
 
-	def addPost(t : Int, status : String, message : String) {
+	def addPost(t: Int, status: String, message: String): Unit = {
 		val ts = System.currentTimeMillis()
-		db.addPost(ts, t, status, message)
-		if (t == StorageDatabase.Post.TYPE_POST || t == StorageDatabase.Post.TYPE_INCMG) {
-			parsePacket(ts, message, t)
+		// Check if the message contains weather data
+		val weatherDataRegex = "_.*?[0-9]{3}/[0-9]{3}g[0-9]{3}t[0-9]{3}r[0-9]{3}p[0-9]{3}P[0-9]{3}h[0-9]{2}b[0-9]{5}".r
+
+		val parsedMessage = if (weatherDataRegex.findFirstIn(message).isDefined) {
+			// Translate weather data to human-readable format
+			parseWXReport(message)
 		} else {
-			// only log status messages
-			Log.d(TAG, "addPost: " + status + " - " + message)
+			// Return the original message if no weather data is present
+			message
 		}
+
+		// Log the parsed or original message
+		db.addPost(ts, t, status, parsedMessage)
+		if (t == StorageDatabase.Post.TYPE_POST || t == StorageDatabase.Post.TYPE_INCMG) {
+			parsePacket(ts, parsedMessage, t)
+		} else {
+			// Only log status messages
+			Log.d(TAG, "addPost: " + status + " - " + parsedMessage)
+		}
+
+		// Broadcast the message
 		sendBroadcast(new Intent(UPDATE)
 			.putExtra(TYPE, t)
-			.putExtra(STATUS, message))
+			.putExtra(STATUS, parsedMessage))
 	}
+
 	// support for translated IDs
 	def addPost(t : Int, status_id : Int, message : String) {
 		addPost(t, getString(status_id), message)
