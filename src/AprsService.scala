@@ -450,7 +450,9 @@ class AprsService extends Service {
 				// Format values
 				val windSpeed = if (wind.endsWith("/000")) "Calm" else s"${wind.split("/")(1).toInt} km/h"
 				val gustSpeed = if (gust == "000") "None" else s"${gust.toInt} km/h"
-				val temperature = f"${temp.toInt / 10.0}%.1f°C"
+				val temperatureFahrenheit = temp.drop(1).toInt
+				val temperatureCelsius = (temperatureFahrenheit - 32) * 5 / 9
+				val temperature = f"$temperatureCelsius%.1f°C"
 				val rain1hAmount = f"${rain1h.toInt / 10.0}%.1fmm"
 				val rain24hAmount = f"${rain24h.toInt / 10.0}%.1fmm"
 				val humidityPercent = s"${humidity.toInt}%"
