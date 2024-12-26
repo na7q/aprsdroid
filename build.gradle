@@ -156,6 +156,7 @@ dependencies {
 	implementation 'com.google.android.gms:play-services-maps:17.0.0'
 	implementation 'com.google.maps.android:android-maps-utils:0.5'
 	implementation 'androidx.core:core:1.6.0'
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
 
 
 	implementation 'com.squareup.okio:okio:2.1.0'
