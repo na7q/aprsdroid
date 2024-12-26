@@ -492,7 +492,7 @@ class AprsService extends Service {
 				val pressureValue = f"${pressure.toInt / 10.0}%.1f hPa"
 
 				// Combine weather data into human-readable format
-				val weatherSummary = s"Wind:$windDirection $windSpeed, Gust:$gustSpeed, Temp.:$temperature, Rain(1h/24h):$rain1hAmount/$rain24hAmount, Humidity:$humidityPercent, Pressure:$pressureValue"
+				val weatherSummary = s"Temperature:$temperature, Humidity:$humidityPercent, Pressure:$pressureValue, Wind:$windDirection $windSpeed, Gust:$gustSpeed, Rain(1h/24h):$rain1hAmount/$rain24hAmount"
 
 				// Reconstruct the message with the translated weather data
 				s"$prefix$weatherSummary$suffix"
