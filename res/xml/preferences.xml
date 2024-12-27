@@ -60,6 +60,15 @@
 		android:defaultValue="false" />
     </PreferenceCategory>
 
+	<PreferenceCategory
+	    android:title="@string/p_translateWXdata">        
+
+	<CheckBoxPreference
+		android:key="p.translateWXdata"
+		android:title="@string/p_translateWXdata_entry"
+		android:summary="@string/p_translateWXdata_summary"
+		android:defaultValue="true" />
+    </PreferenceCategory>
 
     <PreferenceCategory
 	    android:title="@string/p_units_title">

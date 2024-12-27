@@ -568,7 +568,7 @@ class AprsService extends Service {
 		// Check if the message contains weather data
 		val weatherDataRegex = "_.*?[0-9]{3}/[0-9]{3}g[0-9]{3}t[0-9]{3}r[0-9]{3}p[0-9]{3}P[0-9]{3}h[0-9]{2}b[0-9]{5}".r
 
-		val parsedMessage = if (weatherDataRegex.findFirstIn(message).isDefined) {
+		val parsedMessage = if (prefs.isTranslateWXData() && weatherDataRegex.findFirstIn(message).isDefined) {
 			// Translate weather data to human-readable format
 			parseWXReport(message)
 		} else {

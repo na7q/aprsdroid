@@ -32,6 +32,9 @@ class PrefsWrapper(val context : Context) {
 	}
 	def isOfflineMap(): Boolean = {
 		prefs.getBoolean("p.offlinemap", false)
+	}
+	def isTranslateWXData(): Boolean = {
+		prefs.getBoolean("p.translateWXdata", true)
 	}	
 	// safely read integers
 	def getStringInt(key : String, defValue : Int) = {
