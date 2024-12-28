@@ -179,8 +179,9 @@ class AprsService extends Service {
 		poster = AprsBackend.instanciateUploader(this, prefs)
 		if (poster.start())
 			onPosterStarted()
-			if (prefs.isOfflineMap())
-				mapService.start()
+			if (prefs.isOfflineMap() && prefs.getString("mapmode", "osm") == "osm") {
+			  mapService.start()
+			}
 			
 			if (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK"))) {
 				igateService.start()
@@ -222,8 +223,9 @@ class AprsService extends Service {
 		// catch FC when service is killed from outside
 		if (poster != null) {
 			poster.stop()
-			if (prefs.isOfflineMap())			
-				mapService.stop()
+			if (prefs.isOfflineMap() && prefs.getString("mapmode", "osm") == "osm") {
+			  mapService.stop()
+			}
 			
 			if (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK"))) {			
 				igateService.stop()
