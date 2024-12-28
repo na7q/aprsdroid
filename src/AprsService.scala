@@ -83,7 +83,6 @@ class AprsService extends Service {
 	lazy val msgNotifier = msgService.createMessageNotifier()
 	lazy val digipeaterService = new DigipeaterService(prefs, TAG, sendDigipeatedPacket)
 	lazy val igateService = new IgateService(this, prefs)
-    lazy val mapService = new MapServer(this, prefs)
 
 	var poster : AprsBackend = null
 
@@ -179,10 +178,6 @@ class AprsService extends Service {
 		poster = AprsBackend.instanciateUploader(this, prefs)
 		if (poster.start())
 			onPosterStarted()
-			if (prefs.isOfflineMap() && prefs.getString("mapmode", "osm") == "osm") {
-			  mapService.start()
-			}
-			
 			if (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK"))) {
 				igateService.start()
 			}
@@ -223,10 +218,6 @@ class AprsService extends Service {
 		// catch FC when service is killed from outside
 		if (poster != null) {
 			poster.stop()
-			if (prefs.isOfflineMap() && prefs.getString("mapmode", "osm") == "osm") {
-			  mapService.stop()
-			}
-			
 			if (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK"))) {			
 				igateService.stop()
 			}

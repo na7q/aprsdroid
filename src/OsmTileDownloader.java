@@ -7,7 +7,7 @@ import org.mapsforge.v3.core.Tile;
 
 public class OsmTileDownloader extends TileDownloader {
     private static final String HOST_NAME_ONLINE = "tile.openstreetmap.org";
-    private static final String HOST_NAME_OFFLINE = "127.0.0.1"; // New hostname for offline maps
+    private static final String HOST_NAME_OFFLINE = null; // New hostname for offline maps
     private static final byte ZOOM_MAX = 18;
     private final StringBuilder stringBuilder = new StringBuilder();
     private static final String TAG = "OsmTileDownloader"; // Tag for logging
@@ -33,14 +33,14 @@ public class OsmTileDownloader extends TileDownloader {
 
     @Override
     public String getProtocol() {
-        String protocol = prefsWrapper.isOfflineMap() ? "http" : "https"; // Use HTTP for offline maps
+        String protocol = prefsWrapper.isOfflineMap() ? null : "https"; // Use HTTP for offline maps
         Log.d(TAG, "Getting protocol: " + protocol); // Log protocol
         return protocol;
     }
 
     @Override
     public int getPort() {
-        int port = prefsWrapper.isOfflineMap() ? 8080 : 443; // Use port 8080 for offline maps
+        int port = prefsWrapper.isOfflineMap() ? -1 : 443; // Use port 8080 for offline maps
         Log.d(TAG, "Getting port: " + port); // Log port
         return port;
     }
