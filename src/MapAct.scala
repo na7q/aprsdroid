@@ -23,6 +23,12 @@ import java.lang.UnsupportedOperationException
 
 import org.mapsforge.v3.android.maps.mapgenerator.{MapGeneratorFactory, MapGeneratorInternal}
 import org.mapsforge.v3.map.reader.header.FileOpenResult
+import org.json.JSONObject
+import org.json.JSONArray
+import java.io.File
+import java.io.IOException
+import org.json.JSONObject
+import org.json.JSONException
 
 // to make scala-style iterating over arraylist possible
 import scala.collection.JavaConversions._
@@ -252,6 +258,69 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 	override def size() = stations.size()
 	override def createItem(idx : Int) : OSMStation = stations.get(idx)
 
+
+	def loadGeoJsonOverlay(filePath: String): JSONObject = {
+	  try {
+		val file = new File(filePath)
+		if (file.exists() && file.canRead()) {
+		  val content = scala.io.Source.fromFile(file).mkString
+		  new JSONObject(content)
+		} else {
+		  null
+		}
+	  } catch {
+		case e: IOException =>
+		  // Handle file I/O exceptions
+		  println(s"Error reading the file $filePath: ${e.getMessage}")
+		  null
+		case e: JSONException =>
+		  // Handle JSON parsing exceptions
+		  println(s"Error parsing JSON from file $filePath: ${e.getMessage}")
+		  null
+		case e: Exception =>
+		  // Catch any other exceptions
+		  println(s"Unexpected error: ${e.getMessage}")
+		  null
+	  }
+	}
+
+	def parseFeatures(geoJson: JSONObject): List[(String, List[GeoPoint])] = {
+		val features = geoJson.getJSONArray("features")
+		(0 until features.length()).flatMap { i =>
+			val feature = features.getJSONObject(i)
+			val geometry = feature.getJSONObject("geometry")
+			val geometryType = geometry.getString("type")
+			val coordinates = geometry.getJSONArray("coordinates")
+
+			geometryType match {
+				case "Point" =>
+					val lon = coordinates.getDouble(0)
+					val lat = coordinates.getDouble(1)
+					List(("Point", List(new GeoPoint((lat * 1E6).toInt, (lon * 1E6).toInt))))
+
+				case "LineString" =>
+					val points = (0 until coordinates.length()).map { j =>
+						val coord = coordinates.getJSONArray(j)
+						new GeoPoint((coord.getDouble(1) * 1E6).toInt, (coord.getDouble(0) * 1E6).toInt)
+					}.toList
+					List(("LineString", points))
+
+				case "Polygon" =>
+					val rings = (0 until coordinates.length()).flatMap { j =>
+						val ring = coordinates.getJSONArray(j)
+						(0 until ring.length()).map { k =>
+							val coord = ring.getJSONArray(k)
+							new GeoPoint((coord.getDouble(1) * 1E6).toInt, (coord.getDouble(0) * 1E6).toInt)
+						}.toList
+					}.toList
+					List(("Polygon", rings))
+
+				case _ => List()
+			}
+		}.toList
+	}
+
+
 	def symbol2rect(index : Int, page : Int) : Rect = {
 		// check for overflow
 		if (index < 0 || index >= 6*16)
@@ -305,12 +374,12 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 		c.drawPath(path, tracePaint)
 	}
 
-	override def drawOverlayBitmap(c : Canvas, dp : Point, proj : Projection, zoom : Byte) : Unit = {
-
+	override def drawOverlayBitmap(c: Canvas, dp: Point, proj: Projection, zoom: Byte): Unit = {
 		if (!context.mapview.getMapPosition.isValid)
 			return
+
 		Log.d(TAG, "draw: symbolSize=" + symbolSize + " drawSize=" + drawSize)
-		val fontSize = drawSize*7/8
+		val fontSize = drawSize * 7 / 8
 		val textPaint = new Paint()
 		textPaint.setColor(0xff000000)
 		textPaint.setTextAlign(Paint.Align.CENTER)
@@ -320,13 +389,12 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 
 		val symbPaint = new Paint(textPaint)
 		symbPaint.setARGB(255, 255, 255, 255)
-		symbPaint.setTextSize(drawSize*3/4 - 1)
+		symbPaint.setTextSize(drawSize * 3 / 4 - 1)
 
 		val strokePaint = new Paint(textPaint)
 		strokePaint.setColor(0xffc8ffc8)
 		strokePaint.setStyle(Paint.Style.STROKE)
-		strokePaint.setStrokeWidth(drawSize.asInstanceOf[Float]/12.0f)
-
+		strokePaint.setStrokeWidth(drawSize.asInstanceOf[Float] / 12.0f)
 		strokePaint.setShadowLayer(10, 0, 0, 0x80c8ffc8)
 
 		// Create a separate Paint for the zoom level text
@@ -336,11 +404,11 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 
 		val p = new Point()
 		val (width, height) = (c.getWidth(), c.getHeight())
-		val ss = drawSize/2
-		
+		val ss = drawSize / 2
+
 		// Draw the zoom level text in the bottom-left corner
 		val zoomText = s"Zoom: $zoom"
-		
+
 		// Measure the width of the zoom text
 		val textWidth = zoomTextPaint.measureText(zoomText)
 
@@ -350,31 +418,96 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 
 		// Draw the zoom level text
 		c.drawText(zoomText, xPos, yPos, zoomTextPaint)
-		
+
 		for (s <- stations) {
 			proj.toPixels(s.pt, p)
 			if (p.x >= 0 && p.y >= 0 && p.x < width && p.y < height) {
 				val srcRect = symbol2rect(s.symbol)
-				val destRect = new Rect(p.x-ss, p.y-ss, p.x+ss, p.y+ss)
+				val destRect = new Rect(p.x - ss, p.y - ss, p.x + ss, p.y + ss)
 				// first draw callsign and trace
 				if (zoom >= 10) {
 					drawTrace(c, proj, s)
 
-					c.drawText(s.call, p.x, p.y+ss+fontSize, strokePaint)
-					c.drawText(s.call, p.x, p.y+ss+fontSize, textPaint)
+					c.drawText(s.call, p.x, p.y + ss + fontSize, strokePaint)
+					c.drawText(s.call, p.x, p.y + ss + fontSize, textPaint)
 				}
 				// then the bitmap
-				c.drawBitmap(iconbitmap, srcRect, destRect, null)
+				if (iconbitmap != null && !iconbitmap.isRecycled) {
+					c.drawBitmap(iconbitmap, srcRect, destRect, null)
+				} else {
+					Log.e(TAG, "Icon bitmap is null or recycled. Skipping drawBitmap.")
+				}
 				// and finally the bitmap overlay, if any
 				if (symbolIsOverlayed(s.symbol)) {
 					// use page 2, overlay letters
-					c.drawBitmap(iconbitmap, symbol2rect(s.symbol(0)-33, 2), destRect, null)
+					c.drawBitmap(iconbitmap, symbol2rect(s.symbol(0) - 33, 2), destRect, null)
 				}
 			}
 		}
 		import AprsService.block2runnable
 		context.handler.post { context.updateCoordinateInfo() }
+
+		// Add GeoJSON overlay drawing logic
+		drawGeoJsonOverlay(c, proj, zoom)
 	}
+
+	// Separate function for GeoJSON drawing
+	def drawGeoJsonOverlay(c: Canvas, proj: Projection, zoom: Byte): Unit = {
+		// Load the GeoJSON file
+		val geoJsonPath = "/sdcard/.OSM/overlay.json"
+		val geoJson = loadGeoJsonOverlay(geoJsonPath)
+
+		if (geoJson == null) {
+			Log.w(TAG, "No valid GeoJSON file found.")
+			return
+		}
+
+		val features = parseFeatures(geoJson)
+
+		if (features == null || features.isEmpty) {
+			Log.w(TAG, "No valid GeoJSON features to draw.")
+			return
+		}
+
+		val geoJsonPaint = new Paint()
+		geoJsonPaint.setStyle(Paint.Style.STROKE)
+		geoJsonPaint.setStrokeWidth(8)
+		geoJsonPaint.setColor(0xFF0000FF) // Blue color for lines/polygons
+		geoJsonPaint.setAntiAlias(true)
+
+		val geoJsonPointPaint = new Paint()
+		geoJsonPointPaint.setStyle(Paint.Style.FILL)
+		geoJsonPointPaint.setColor(0xFFFF0000) // Red color for points
+		geoJsonPointPaint.setAntiAlias(true)
+
+		for ((geometryType, points) <- features if points != null && points.nonEmpty) {
+			geometryType match {
+				case "Point" =>
+					points.foreach { pt =>
+						val screenPoint = proj.toPixels(pt, null)
+						if (screenPoint != null) {
+							c.drawCircle(screenPoint.x, screenPoint.y, 15, geoJsonPointPaint)
+						}
+					}
+
+				case "LineString" | "Polygon" =>
+					val path = new Path()
+					points.zipWithIndex.foreach { case (pt, idx) =>
+						val screenPoint = proj.toPixels(pt, null)
+						if (screenPoint != null) {
+							if (idx == 0) path.moveTo(screenPoint.x, screenPoint.y)
+							else path.lineTo(screenPoint.x, screenPoint.y)
+						}
+					}
+					if (geometryType == "Polygon") path.close()
+					c.drawPath(path, geoJsonPaint)
+
+				case _ =>
+					Log.w(TAG, s"Unsupported GeoJSON geometry type: $geometryType")
+			}
+		}
+	}
+
 
 	def addStation(sta : OSMStation) {
 		//if (calls.contains(sta.getTitle()))
