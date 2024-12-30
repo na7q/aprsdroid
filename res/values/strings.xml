@@ -236,7 +236,11 @@
 <string name="p__igaterf">Bidirectional Settings</string>
 <string name="p__igateserver">Server Settings</string>
 <string name="p__ratelimit">Transmit Rate Limiting</string>
-
+<string name="p_tilepath">File Path</string>
+<string name="p_tilepath_summary">Path to your mbtiles map</string>
+<string name="p_tilepath_entry">File Path</string>
+<string name="p_tilepath_value">/sdcard/map.mbtiles</string>
+<string name="p_tilepath_hint">/sdcard/map.mbtiles</string>
 <string name="p_conntype">Connection Protocol</string>
 <string name="p_conntype_entry">Choose the connection protocol</string>
 <string name="p_link">Connection Type</string>

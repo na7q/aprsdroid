@@ -12,6 +12,17 @@ class PrefsWrapper(val context : Context) {
 	def getString(key : String, defValue : String) = prefs.getString(key, defValue)
 	def getBoolean(key : String, defValue : Boolean) = prefs.getBoolean(key, defValue)
 
+	def getTilePath(): String = {
+	  val defaultPath = "/sdcard/map.mbtiles"
+	  val tilePath = prefs.getString("tilepath", defaultPath)
+
+	  if (tilePath == null || tilePath.trim.isEmpty) {
+		defaultPath // This is now the return value for this block
+	  } else {
+		tilePath // This is the return value if the condition is false
+	  }
+	}
+
 	def isIgateEnabled(): Boolean = {
 		prefs.getBoolean("p.igating", false)
 	}
