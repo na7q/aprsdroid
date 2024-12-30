@@ -58,6 +58,16 @@
 		android:title="@string/p_offlinemap_entry"
 		android:summary="@string/p_offlinemap_summary"
 		android:defaultValue="false" />
+
+        <de.duenndns.EditTextPreferenceWithValue
+        android:key="tilepath"
+		android:singleLine="true"
+		android:hint="@string/p_tilepath_hint"
+		android:title="@string/p_tilepath"
+		android:defaultValue="@string/p_tilepath_value"
+		android:summary="@string/p_tilepath_summary"
+		android:dialogTitle="@string/p_tilepath_entry" />		
+		
     </PreferenceCategory>
 
 

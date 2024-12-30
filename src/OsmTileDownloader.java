@@ -26,10 +26,16 @@ public class OsmTileDownloader extends TileDownloader {
 
     @Override
     public String getHostName() {
-        String hostName = prefsWrapper.isOfflineMap() ? HOST_NAME_OFFLINE : HOST_NAME_ONLINE;
-        Log.d(TAG, "Getting host name: " + hostName); // Log host name
-        return hostName;
-    }
+        // If offline mode is enabled, get the path to the offline map data
+        if (prefsWrapper.isOfflineMap()) {
+			String tilePath = prefsWrapper.getTilePath();  // This will return the tile path from preferences
+            Log.d(TAG, "Getting offline host name: " + tilePath); // Log the offline tile path
+            return tilePath; // Return the file path for offline maps
+        } else {
+            Log.d(TAG, "Getting online host name: " + HOST_NAME_ONLINE); // Log online hostname
+            return HOST_NAME_ONLINE; // Online host
+        }
+	}
 
     @Override
     public String getProtocol() {
