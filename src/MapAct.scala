@@ -104,6 +104,14 @@ class MapAct extends MapActivity with MapMenuHelper {
 		if (pos == null || pos.geoPoint == null)
 			return
 		saveMapViewPosition(pos.geoPoint.latitudeE6/1000000.0f, pos.geoPoint.longitudeE6/1000000.0f, pos.zoomLevel)
+
+		// Navigate to HubActivity when the activity is paused (screen off or app paused)
+		if (!isFinishing) {
+			val intent = new Intent(this, classOf[HubActivity])
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+			startActivity(intent)
+			finish()  // Finish the current activity so it's removed from the activity stack
+		}
 	}
 
 	override def onDestroy() {
