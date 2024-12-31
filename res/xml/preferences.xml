@@ -44,8 +44,8 @@
 		android:title="@string/p_connsetup">
 
             <intent android:action="android.intent.action.MAIN"
-                    android:targetPackage="org.aprsdroid.app"
-                    android:targetClass="org.aprsdroid.app.BackendPrefs" />
+                    android:targetPackage="org.na7q.app"
+                    android:targetClass="org.na7q.app.BackendPrefs" />
 
         </PreferenceScreen>
     </PreferenceCategory>
@@ -100,8 +100,8 @@
 		android:summary="@string/p_digipeating_preferences">
 
             <intent android:action="android.intent.action.MAIN"
-                    android:targetPackage="org.aprsdroid.app"
-                    android:targetClass="org.aprsdroid.app.DigiPrefs" />
+                    android:targetPackage="org.na7q.app"
+                    android:targetClass="org.na7q.app.DigiPrefs" />
 
         </PreferenceScreen>
     </PreferenceCategory>
@@ -115,8 +115,8 @@
 		android:summary="@string/p_igating_preferences">
 
             <intent android:action="android.intent.action.MAIN"
-                    android:targetPackage="org.aprsdroid.app"
-                    android:targetClass="org.aprsdroid.app.IgatePrefs" />
+                    android:targetPackage="org.na7q.app"
+                    android:targetClass="org.na7q.app.IgatePrefs" />
 
         </PreferenceScreen>
     </PreferenceCategory>
@@ -131,8 +131,8 @@
 		android:summary="@string/p_messaging_preferences">
 
             <intent android:action="android.intent.action.MAIN"
-                    android:targetPackage="org.aprsdroid.app"
-                    android:targetClass="org.aprsdroid.app.MessagingPrefs" />
+                    android:targetPackage="org.na7q.app"
+                    android:targetClass="org.na7q.app.MessagingPrefs" />
 
         </PreferenceScreen>
     </PreferenceCategory>
@@ -146,8 +146,8 @@
 	android:summary="@string/p__location_compressed_summary">
 
 		<intent android:action="android.intent.action.MAIN"
-			android:targetPackage="org.aprsdroid.app"
-			android:targetClass="org.aprsdroid.app.CompressedPrefs" />
+			android:targetPackage="org.na7q.app"
+			android:targetClass="org.na7q.app.CompressedPrefs" />
     </PreferenceScreen>
 
     <PreferenceScreen
@@ -156,8 +156,8 @@
 	    android:summary="@string/p_symbol_summary" >
 
             <intent android:action="android.intent.action.MAIN"
-                    android:targetPackage="org.aprsdroid.app"
-                    android:targetClass="org.aprsdroid.app.PrefSymbolAct" />
+                    android:targetPackage="org.na7q.app"
+                    android:targetClass="org.na7q.app.PrefSymbolAct" />
     </PreferenceScreen>
 
         <de.duenndns.EditTextPreferenceWithValue
@@ -184,8 +184,8 @@
 	    android:title="@string/p__location">
 
             <intent android:action="android.intent.action.MAIN"
-                    android:targetPackage="org.aprsdroid.app"
-                    android:targetClass="org.aprsdroid.app.LocationPrefs" />
+                    android:targetPackage="org.na7q.app"
+                    android:targetClass="org.na7q.app.LocationPrefs" />
     </PreferenceScreen>
 
     <PreferenceScreen

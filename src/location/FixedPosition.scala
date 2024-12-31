@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 
 import _root_.android.app.AlarmManager
 import _root_.android.app.PendingIntent
@@ -12,7 +12,7 @@ import _root_.android.util.Log
 
 class FixedPosition(service : AprsService, prefs : PrefsWrapper) extends LocationSource {
 	val TAG = "APRSdroid.FixedPosition"
-	val ALARM_ACTION = "org.aprsdroid.app.FixedPosition.ALARM"
+	val ALARM_ACTION = "org.na7q.app.FixedPosition.ALARM"
 
 	val intent = new Intent(ALARM_ACTION)
 	val pendingIntent = PendingIntent.getBroadcast(service, 0, intent,

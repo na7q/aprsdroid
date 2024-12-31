@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 
 import _root_.android.media.{AudioManager, AudioTrack}
 
@@ -45,7 +45,7 @@ class DigiRig(service : AprsService, prefs : PrefsWrapper) extends AfskUploader(
 	override val TAG = "APRSdroid.Digirig"
 
 	// USB stuff
-	val USB_PERM_ACTION = "org.aprsdroid.app.DigiRig.PERM"
+	val USB_PERM_ACTION = "org.na7q.app.DigiRig.PERM"
 	val ACTION_USB_ATTACHED = "android.hardware.usb.action.USB_DEVICE_ATTACHED"
 	val ACTION_USB_DETACHED = "android.hardware.usb.action.USB_DEVICE_DETACHED"
 

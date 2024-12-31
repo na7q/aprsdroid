@@ -1,4 +1,4 @@
-package org.aprsdroid.app;
+package org.na7q.app;
 
 import android.content.Context; // Import Context
 import android.util.Log; // Import Log for logging

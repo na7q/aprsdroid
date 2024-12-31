@@ -1,5 +1,5 @@
 
-package org.aprsdroid.app
+package org.na7q.app
 
 import android.Manifest
 import android.os.Build

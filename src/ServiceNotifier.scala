@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 
 import _root_.android.app.{Notification, NotificationChannel, NotificationManager, PendingIntent, Service}
 import _root_.android.content.{Context, Intent}

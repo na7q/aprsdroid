@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 // this class is a hack containing all the common UI code for different Activity subclasses
 
 import _root_.android.app.{Activity, ListActivity}
@@ -34,7 +34,7 @@ object UIHelper
 	def shareFile(ctx : Context, file : File, filename : String) {
 		ctx.startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND)
 			.setType("text/plain")
-			.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(ctx, "org.aprsdroid.fileprovider", file))
+			.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(ctx, "org.na7q.fileprovider", file))
 			.putExtra(Intent.EXTRA_SUBJECT, filename),
 		file.toString()))
 	}

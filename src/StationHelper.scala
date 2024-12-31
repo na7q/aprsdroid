@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 
 import _root_.android.content.res.Configuration
 import _root_.android.view.{Menu, MenuItem}

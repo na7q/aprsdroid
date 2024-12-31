@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 
 import _root_.android.util.Log
 import _root_.java.io.{InputStream, OutputStream}

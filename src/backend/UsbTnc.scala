@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 
 import android.app.PendingIntent
 import android.app.Service
@@ -37,7 +37,7 @@ object UsbTnc {
 class UsbTnc(service : AprsService, prefs : PrefsWrapper) extends AprsBackend(prefs) {
 	val TAG = "APRSdroid.Usb"
 
-	val USB_PERM_ACTION = "org.aprsdroid.app.UsbTnc.PERM"
+	val USB_PERM_ACTION = "org.na7q.app.UsbTnc.PERM"
 	val ACTION_USB_ATTACHED = "android.hardware.usb.action.USB_DEVICE_ATTACHED"
 	val ACTION_USB_DETACHED = "android.hardware.usb.action.USB_DEVICE_DETACHED"
 

@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 
 import _root_.android.content.{BroadcastReceiver, Context, Intent, IntentFilter}
 import _root_.android.os.Handler

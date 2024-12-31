@@ -1,4 +1,4 @@
-package org.aprsdroid.app
+package org.na7q.app
 
 import _root_.android.content.{BroadcastReceiver, ContentValues, Context, Intent}
 import _root_.android.util.Log

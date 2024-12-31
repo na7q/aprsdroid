@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- APRSdroid strings.xml - this file contains strings which need to be translated -->
+<!-- VARAdroid strings.xml - this file contains strings which need to be translated -->
 <resources>
-<string name="app_name">APRSdroid</string>
-<string name="app_prefs">APRSdroid Preferences</string>
-<string name="app_map">APRSdroid Map</string>
-<string name="app_hub">APRSdroid Hub</string>
-<string name="app_log">APRSdroid Log</string>
+<string name="app_name">VARAdroid</string>
+<string name="app_prefs">VARAdroid Preferences</string>
+<string name="app_map">VARAdroid Map</string>
+<string name="app_hub">VARAdroid Hub</string>
+<string name="app_log">VARAdroid Log</string>
 <string name="app_sta">Station Info</string>
 <string name="app_messages">Messages</string>
 <string name="app_messages_clear">Clear Messages</string>
-<!-- APRSdroid activity -->
-<string name="firstrun">You need to configure APRSdroid with your callsign and passcode!</string>
+<!-- VARAdroid activity -->
+<string name="firstrun">You need to configure VARAdroid with your callsign and passcode!</string>
 <string name="wrongpasscode">Your passcode does not match your callsign!</string>
 <string name="e_toolong_callsign">Your callsign is too long for Packet Radio!</string>
 <string name="anon_warning">Without a passcode, your reports will not be propagated!</string>
@@ -53,11 +53,11 @@
 <string name="msg_type_aborted">aborted</string>
 
 <!-- AprsService -->
-<string name="aprsservice">APRSdroid Service</string>
+<string name="aprsservice">VARAdroid Service</string>
 <string name="service_once">APRS Service single shot: %1$s, %2$s.</string>
 <string name="service_start">APRS Service started: %1$s, %2$s.</string>
 <string name="service_stop">APRS Service stopped.</string>
-<string name="service_no_location">You need to enable either GPS or Network Location for APRSdroid to work properly!</string>
+<string name="service_no_location">You need to enable either GPS or Network Location for VARAdroid to work properly!</string>
 <string name="service_sm_no_gps">SmartBeaconing™ requires GPS!</string>
 <!-- service result codes -->
 <string name="post_error">Error</string>
@@ -67,7 +67,7 @@
 <string name="post_reconnect">Connection lost. Reconnect in %d seconds...</string>
 
 <!-- first run dialog -->
-<string name="fr_title">Welcome to APRSdroid!</string>
+<string name="fr_title">Welcome to VARAdroid!</string>
 <string name="fr_text">This software may only be used by licensed amateur radio
 	operators!</string>
 <string name="fr_text2">You need to enter your callsign to use this software.
@@ -75,7 +75,7 @@
 <string name="fr_text3">Only needed for APRS over the Internet:</string>
 
 <!-- about dialog -->
-<string name="ad_title">About APRSdroid v%s</string>
+<string name="ad_title">About VARAdroid v%s</string>
 <string name="ad_copyright">Copyright © 2009-2021 Georg Lukas (DO1GL)\n
 	https://aprsdroid.org
 	\n\n
@@ -260,7 +260,7 @@
 <string name="p_conn_kwd_gps">Use Android GPS</string>
 <string name="p_conn_kwd_gps_summary">Forward NMEA sentences to radio</string>
 <string name="p_conn_kwd_gps_debug">Display GPS in log</string>
-<string name="p_conn_kwd_gps_debug_summary">Show raw NMEA in APRSdroid</string>
+<string name="p_conn_kwd_gps_debug_summary">Show raw NMEA in VARAdroid</string>
 <!-- array of APRS-IS protocols -->
 <string name="p_aprsis_tcp">TCP connection</string>
 <string name="p_aprsis_http">HTTP POST (send only)</string>
@@ -367,7 +367,7 @@
 <string name="p_gps_med">Medium</string>
 <string name="p_gps_low">Low</string>
 <string name="p_keepscreen">Keep screen awake</string>
-<string name="p_keepscreen_summary">Do not turn off screen when APRSdroid is in the foreground</string>
+<string name="p_keepscreen_summary">Do not turn off screen when VARAdroid is in the foreground</string>
 
 <!-- messaging -->
 <string name="p__display">Display and Notifications</string>
@@ -488,7 +488,7 @@
 <string name="p_reconnect_entry">Timeout value in seconds</string>
 
 <string name="p_mapfile">Map file name</string>
-<string name="p_mapfile_summary">MapsForge map file for APRSdroid</string>
+<string name="p_mapfile_summary">MapsForge map file for VARAdroid</string>
 <string name="p_mapfile_choose">Choose map file</string>
 <string name="mapfile_error">Error loading map file %s!</string>
 
@@ -510,7 +510,7 @@
 
 <!-- Bluetooth TNC settings -->
 <string name="p_bt_client">Client Mode</string>
-<string name="p_bt_client_summary">APRSdroid establishes the connection (Keep this on!)</string>
+<string name="p_bt_client_summary">VARAdroid establishes the connection (Keep this on!)</string>
 <string name="p_bt_tnc_device">TNC Bluetooth Device</string>
 <string name="p_bt_tnc_device_summary">Choose your TNC from paired devices</string>
 <string name="p_bt_tnc_device_entry">Choose device</string>
