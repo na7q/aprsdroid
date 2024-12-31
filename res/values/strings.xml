@@ -248,6 +248,8 @@
 <string name="p_connsetup">Connection Preferences</string>
 <string name="p_connlog">Connection Logging</string>
 <string name="p_connlog_summary">Verbose status output in Log</string>
+<string name="p_hwacceleration_summary">Toggle hardware acceleration for the map view</string>
+<string name="p_hwacceleration_title">Enable Hardware Acceleration</string>
 <!-- array of connection types -->
 <string name="p_conn_aprsis">Internet (APRS-IS)</string>
 <string name="p_conn_afsk">Audio (AFSK)</string>

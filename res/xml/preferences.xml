@@ -68,6 +68,12 @@
 		android:summary="@string/p_tilepath_summary"
 		android:dialogTitle="@string/p_tilepath_entry" />		
 		
+	<CheckBoxPreference
+		android:key="hardware_acceleration"
+		android:title="@string/p_hwacceleration_title"
+		android:summary="@string/p_hwacceleration_summary"
+		android:defaultValue="true" />	
+
     </PreferenceCategory>
 
 

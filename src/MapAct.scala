@@ -29,6 +29,7 @@ import java.io.File
 import java.io.IOException
 import org.json.JSONObject
 import org.json.JSONException
+import android.view.WindowManager
 
 // to make scala-style iterating over arraylist possible
 import scala.collection.JavaConversions._
@@ -46,15 +47,40 @@ class MapAct extends MapActivity with MapMenuHelper {
 	lazy val locReceiver = new LocationReceiver2[ArrayList[OSMStation]](staoverlay.load_stations,
 			staoverlay.replace_stations, staoverlay.cancel_stations)
 
-	override def onCreate(savedInstanceState: Bundle) {
-		super.onCreate(savedInstanceState)
-		setContentView(R.layout.mapview)
-		mapview.setBuiltInZoomControls(true)
-		mapview.getOverlays().add(staoverlay)
-		mapview.setTextScale(getResources().getDisplayMetrics().density)
-
-		startLoading()
+	// Function to apply hardware acceleration based on user preference
+	def applyHardwareAcceleration(useHardwareAcceleration: Boolean, mapview: MapView): Unit = {
+	  if (useHardwareAcceleration) {
+		// Enable hardware acceleration globally
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+							 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
+		Log.d("Map", "Hardware acceleration enabled globally.")
+	  } else {
+		// Disable hardware acceleration globally and for the MapView
+		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
+		mapview.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+		Log.d("Map", "Hardware acceleration disabled for MapView.")
+	  }
 	}
+
+	override def onCreate(savedInstanceState: Bundle) {
+	  super.onCreate(savedInstanceState)
+	  setContentView(R.layout.mapview)
+
+	  // Retrieve user preference for hardware acceleration
+	  val useHardwareAcceleration = prefs.getBoolean("hardware_acceleration", true)
+
+	  // Initialize map view settings
+	  val mapview = findViewById(R.id.mapview).asInstanceOf[MapView]
+	  mapview.setBuiltInZoomControls(true)
+	  mapview.getOverlays.add(staoverlay)
+	  mapview.setTextScale(getResources.getDisplayMetrics.density)
+
+	  // Apply the hardware acceleration settings
+	  applyHardwareAcceleration(useHardwareAcceleration, mapview)
+
+	  startLoading()
+	}
+
 
 	override def onResume() {
 		super.onResume()
@@ -139,6 +165,7 @@ class MapAct extends MapActivity with MapMenuHelper {
 		}
 		if (error != null)
 			Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+
 		// all map file attempts failed, fall back to online
 		try {
 			if (mapview.getMapFile == null) {
