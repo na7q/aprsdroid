@@ -15,6 +15,8 @@ import _root_.android.widget.Toast
 import _root_.org.mapsforge.v3.android.maps._
 import _root_.org.mapsforge.v3.core.{GeoPoint, Tile}
 import _root_.org.mapsforge.v3.android.maps.overlay.{ItemizedOverlay, OverlayItem}
+import android.os.PowerManager
+import android.content.Context
 
 import _root_.scala.collection.mutable.ArrayBuffer
 import _root_.java.io.File
@@ -105,13 +107,17 @@ class MapAct extends MapActivity with MapMenuHelper {
 			return
 		saveMapViewPosition(pos.geoPoint.latitudeE6/1000000.0f, pos.geoPoint.longitudeE6/1000000.0f, pos.zoomLevel)
 
-		// Navigate to HubActivity when the activity is paused (screen off or app paused)
-		if (!isFinishing) {
-			val intent = new Intent(this, classOf[HubActivity])
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
-			startActivity(intent)
-			finish()  // Finish the current activity so it's removed from the activity stack
-		}
+	  // Check if the screen is off
+	  val powerManager = getSystemService(Context.POWER_SERVICE).asInstanceOf[PowerManager]
+	  val isScreenOn = powerManager.isInteractive  // Check if the screen is on
+
+	  // Only navigate to HubActivity if the screen was off
+	  if (!isScreenOn && !isFinishing) {
+		val intent = new Intent(this, classOf[HubActivity])
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+		startActivity(intent)
+		finish()  // Finish the current activity so it's removed from the activity stack
+	  }
 	}
 
 	override def onDestroy() {
