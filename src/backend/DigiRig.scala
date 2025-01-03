@@ -168,12 +168,13 @@ class DigiRig(service : AprsService, prefs : PrefsWrapper) extends AfskUploader(
 
 	override def update(packet: APRSPacket): String = {
 		// Need to "parse" the packet in order to replace the Digipeaters
-		packet.setDigipeaters(Digipeater.parseList(Digis, true))
+		val digipathlist = if (packet.getDigiString().nonEmpty) packet.getDigiString().substring(1) else ""
+		packet.setDigipeaters(Digipeater.parseList(digipathlist, true))
 		val from = packet.getSourceCall()
 		val to = packet.getDestinationCall()
 		val data = packet.getAprsInformation().toString()
-		val msg = new APRSFrame(from, to, Digis, data, FrameLength).getMessage()
-		Log.d(TAG, "update(): From: " + from + " To: " + to + " Via: " + Digis + " telling " + data)
+		val msg = new APRSFrame(from,to,digipathlist,data,FrameLength).getMessage()
+		Log.d(TAG, "update(): From: " + from +" To: "+ to +" Via: " + digipathlist + " telling " + data)
 
 		ser.setRTS(true)
 		audioPlaying = true
