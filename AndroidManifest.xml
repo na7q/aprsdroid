@@ -95,6 +95,7 @@
 		android:parentActivityName=".PrefsAct"
 		android:launchMode="singleTop"
 		android:configChanges="orientation|keyboardHidden|screenSize" />
+		
 	<activity android:name=".IgatePrefs"
 		android:label="@string/p__igating"
 		android:parentActivityName=".PrefsAct"
@@ -110,6 +111,18 @@
 	<activity android:name=".MessagingPrefs"
 		android:label="@string/p__messaging"
 		android:parentActivityName=".PrefsAct"
+		android:launchMode="singleTop"
+		android:configChanges="orientation|keyboardHidden|screenSize" />		
+		
+	<activity android:name=".NotificationPrefs"
+		android:label="@string/p__notification"
+		android:parentActivityName=".NotificationPrefs"
+		android:launchMode="singleTop"
+		android:configChanges="orientation|keyboardHidden|screenSize" />		
+		
+	<activity android:name=".PrivacyPrefs"
+		android:label="@string/p__location"
+		android:parentActivityName=".PrivacyPrefs"
 		android:launchMode="singleTop"
 		android:configChanges="orientation|keyboardHidden|screenSize" />		
 		
