@@ -192,8 +192,8 @@
 	    android:title="@string/p_privacy"
 	    android:summary="@string/p_privacy_summary">
 		<intent android:action="android.intent.action.MAIN"
-				android:targetPackage="org.aprsdroid.app"
-				android:targetClass="org.aprsdroid.app.PrivacyPrefs" />
+				android:targetPackage="org.na7q.app"
+				android:targetClass="org.na7q.app.PrivacyPrefs" />
 
     </PreferenceScreen>
     </PreferenceCategory>
@@ -211,8 +211,8 @@
 	    android:summary="@string/p__notification_summary">
 		
 		<intent android:action="android.intent.action.MAIN"
-				android:targetPackage="org.aprsdroid.app"
-				android:targetClass="org.aprsdroid.app.NotificationPrefs" />		
+				android:targetPackage="org.na7q.app"
+				android:targetClass="org.na7q.app.NotificationPrefs" />		
 
     </PreferenceScreen>
     </PreferenceCategory>
