@@ -79,6 +79,7 @@ class MessageService(s : AprsService) {
 					// No recent ACK, we need to send an ACK
 					val ack = s.newPacket(new MessagePacket(ap.getSourceCall(), "ack", msg.getMessageNumber()))
 					s.sendPacket(ack)
+					s.sendIsPacket(ack.toString)
 
 					// Update the last ACK timestamp for this source call and message number
 					lastAckTimestamps((ap.getSourceCall(), msg.getMessageNumber())) = System.currentTimeMillis()
@@ -138,6 +139,7 @@ class MessageService(s : AprsService) {
 				// this message needs to be transmitted
 				val msg = s.newPacket(new MessagePacket(call, text, msgid))
 				s.sendPacket(msg)
+				s.sendIsPacket(msg.toString)				
 				val cv = new ContentValues()
 				cv.put(RETRYCNT, (retrycnt + 1).asInstanceOf[java.lang.Integer])
 				cv.put(TS, System.currentTimeMillis.asInstanceOf[java.lang.Long])

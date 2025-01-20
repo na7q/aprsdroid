@@ -52,6 +52,13 @@
 		android:title="@string/p_igconnectretry"
 		android:summary="@string/p_igconnectretry_summary"
 		android:dialogTitle="@string/p_igconnectretry_entry" />
+
+	<CheckBoxPreference
+		android:key="p.positiontois"
+		android:title="Send Position IS"
+		android:summary="Sends position reports to RF and APRS-IS."
+		android:defaultValue="false" />	
+
 	</PreferenceCategory>
 
     <PreferenceCategory

@@ -363,6 +363,13 @@ class AprsService extends Service {
 	}
 	def sendPacket(packet : APRSPacket) { sendPacket(packet, "") }
 
+	def sendIsPacket(packet : String): Unit = {
+	  if (igateService.isConnectionRunning && prefs.getBoolean("p.positiontois", false)) {
+	    Log.d("AprsService", "Connection is active")
+	    igateService.handlePostSubmitData(packet)
+	  }
+	}
+
 	def formatLocMice(symbol : String, status : String, location : Location) = {
 		val privambiguity = 5 - prefs.getStringInt("priv_ambiguity", 0)
 		val ambiguity = if (privambiguity == 5) 0 else privambiguity
@@ -413,8 +420,9 @@ class AprsService extends Service {
 		 formatLoc(symbol, status, location)
 	   }
 		  
-		Log.d(TAG, "packet: " + packet)
-		sendPacket(packet, " (±%dm)".format(location.getAccuracy.asInstanceOf[Int]))
+		Log.d(TAG, "packet: " + packet)	
+		sendPacket(packet, " (±%dm)".format(location.getAccuracy.asInstanceOf[Int]))	
+		sendIsPacket(packet.toString)
 	}
 
 	def sendPacketFinished(result : String) {
@@ -527,7 +535,7 @@ class AprsService extends Service {
 	def addPost(t : Int, status : String, message : String) {
 		val ts = System.currentTimeMillis()
 		db.addPost(ts, t, status, message)
-		if (t == StorageDatabase.Post.TYPE_POST || t == StorageDatabase.Post.TYPE_INCMG) {
+		if (t == StorageDatabase.Post.TYPE_POST || t == StorageDatabase.Post.TYPE_INCMG || t == StorageDatabase.Post.TYPE_IG) {
 			parsePacket(ts, message, t)
 		} else {
 			// only log status messages
