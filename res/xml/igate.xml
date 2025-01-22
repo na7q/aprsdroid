@@ -55,8 +55,8 @@
 
 	<CheckBoxPreference
 		android:key="p.positiontois"
-		android:title="Send Position IS"
-		android:summary="Sends position reports to RF and APRS-IS."
+		android:title="@string/p_positiontois_title"
+		android:summary="@string/p_positiontois_summary"
 		android:defaultValue="false" />	
 
 	</PreferenceCategory>
