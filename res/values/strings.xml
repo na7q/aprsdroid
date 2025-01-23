@@ -137,6 +137,10 @@
 <string name="p_dedupe_entry">Timeout in seconds</string>
 <string name="p_dedupe_summary">Digipeat timeout for duplicate packets</string>
 
+<string name="p_bt_reconnect">BT reconnect timeout</string>
+<string name="p_bt_reconnect_entry">Time before reconnecting</string>
+<string name="p_bt_reconnect_summary">Timeout value in seconds</string>
+
 <string name="p_digipeaterpath">Digipeater Path</string>
 <string name="p_digipeaterpath_entry">Set Digi Path</string>
 <string name="p_digipeaterpath_summary">Paths to digipeat</string>
@@ -483,6 +487,9 @@
 <string name="p_igsotimeout_summary">Time before resetting the connection</string>
 <string name="p_igsotimeout_entry">Timeout value in seconds (0 = disable)</string>
 
+<string name="p_positiontois_title">Send Position IS</string>
+<string name="p_positiontois_summary">Sends position reports to RF and APRS-IS.</string>
+
 <string name="p_reconnect">TCP reconnect timeout</string>
 <string name="p_reconnect_summary">Time before reconnecting</string>
 <string name="p_reconnect_entry">Timeout value in seconds</string>
@@ -539,8 +546,7 @@
 <!-- connecting to [device name] channel [bluetooth channel id] -->
 <string name="bt_connecting_to_channel">Connecting to %s channel %d…</string>
 <string name="bt_connected">Connected to TNC.</string>
-<string name="bt_reconnecting">Reconnecting in 3s…</string>
-
+<string name="bt_reconnecting">Reconnecting in %s seconds…</string>
 
 <string name="afsk_info_sco_req">Requesting bluetooth SCO link...</string>
 <string name="afsk_info_sco_est">Bluetooth SCO link established.</string>

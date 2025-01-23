@@ -1,7 +1,7 @@
 package org.na7q.app
 import _root_.android.content.Context
 
-import _root_.java.io.{BufferedReader, InputStreamReader, OutputStream, PrintWriter, IOException}
+import _root_.java.io.{BufferedReader, BufferedWriter, InputStreamReader, OutputStream, OutputStreamWriter, PrintWriter, IOException}
 import _root_.java.net.{Socket, SocketException}
 import _root_.android.util.Log
 import _root_.net.ab0oo.aprs.parser._
@@ -113,6 +113,10 @@ class IgateService(service: AprsService, prefs: PrefsWrapper) extends Connection
     createConnection()
     
     reconnecting = false
+  }
+
+  def isConnectionRunning: Boolean = {
+    conn != null && conn.running
   }
 
   // Callback implementation when the connection is lost
@@ -272,13 +276,19 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
 
   // Send data to the server
   def sendData(data: String): Unit = {
-    Log.d("IgateService", s"sendData() - Sending data: $data")
-    if (writer != null) {
-      writer.println(data)
-      writer.flush()
-    } else {
-      Log.e("IgateService", "sendData() - Writer is null, cannot send data.")
-    }
+	Log.d("IgateService", s"sendData() - Sending data: $data")
+	  
+	// Run the task in a new thread
+	new Thread(new Runnable {
+	  override def run(): Unit = {
+		if (writer != null) {
+		  writer.println(data)
+		  writer.flush()
+		} else {
+		  Log.e("IgateService", "sendData() - Writer is null, cannot send data.")
+		}
+	  }
+	}).start()
   }
 
   // Clean up resources
