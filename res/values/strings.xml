@@ -487,8 +487,8 @@
 <string name="p_igsotimeout_summary">Time before resetting the connection</string>
 <string name="p_igsotimeout_entry">Timeout value in seconds (0 = disable)</string>
 
-<string name="p_positiontois_title">Send Position IS</string>
-<string name="p_positiontois_summary">Sends position reports to RF and APRS-IS.</string>
+<string name="p_positiontois_title">Send Packets to RF &amp; APRS-IS</string>
+<string name="p_positiontois_summary">Sends all your packets to RF and APRS-IS.</string>
 
 <string name="p_reconnect">TCP reconnect timeout</string>
 <string name="p_reconnect_summary">Time before reconnecting</string>
