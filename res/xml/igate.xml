@@ -6,7 +6,8 @@
 	<CheckBoxPreference
 		android:key="p.igating"
 		android:title="@string/p_igating_entry"
-		android:summary="@string/p_igating_summary"
+		android:summaryOff="@string/p_igating_disabled_summary"
+		android:summaryOn="@string/p_igating_enabled_summary"		
 		android:defaultValue="false" />
 
 	<CheckBoxPreference

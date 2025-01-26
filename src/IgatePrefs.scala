@@ -1,6 +1,6 @@
 package org.na7q.app
 
-import _root_.android.content.SharedPreferences
+import _root_.android.content.{Intent, SharedPreferences}
 import _root_.android.os.Bundle
 import _root_.android.preference.{PreferenceActivity, CheckBoxPreference}
 import android.util.Log
@@ -38,19 +38,28 @@ class IgatePrefs extends PreferenceActivity with SharedPreferences.OnSharedPrefe
   }
 
   // This method will enable/disable the checkboxes based on their current state
-	private def updateCheckBoxState(): Unit = {
-	  val igatingPref = findPreference("p.igating").asInstanceOf[CheckBoxPreference]
+  private def updateCheckBoxState(): Unit = {
+    val igatingPref = findPreference("p.igating").asInstanceOf[CheckBoxPreference]
 
-	  // Check if the service is running using your logic
-	  val isServiceRunning = prefs.getBoolean("service_running", false)
+    // Now, check the state of the checkbox and call igateStart or igateStop
+    if (igatingPref.isChecked) {
+      startIgateService()
+    } else {
+      stopIgateService()
+    }
+  }
 
-	  if (isServiceRunning) {
-		// Disable the checkbox and update the summary
-		igatingPref.setEnabled(false)
-		igatingPref.setSummary("Setting disabled while the service is running.")
-	  } else {
-		// Enable the checkbox and restore the default summary
-		igatingPref.setEnabled(true)
-	  }
-	}
+  // Function to start the iGate service
+  private def startIgateService(): Unit = {
+    val serviceIntent = new Intent(this, classOf[AprsService])
+    serviceIntent.setAction(AprsService.IGATE_START) // Trigger the iGate start action
+    startService(serviceIntent)
+  }
+
+  // Function to stop the iGate service
+  private def stopIgateService(): Unit = {
+    val serviceIntent = new Intent(this, classOf[AprsService])
+    serviceIntent.setAction(AprsService.IGATE_STOP)
+    startService(serviceIntent)
+  }
 }
