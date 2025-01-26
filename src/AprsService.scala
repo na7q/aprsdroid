@@ -178,9 +178,6 @@ class AprsService extends Service {
 		poster = AprsBackend.instanciateUploader(this, prefs)
 		if (poster.start())
 			onPosterStarted()
-			if (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK"))) {
-				igateService.start()
-			}
 	}
 
 	def onPosterStarted() {
@@ -201,6 +198,9 @@ class AprsService extends Service {
 		// startup completed, remember state
 		if (!singleShot)
 			prefs.setBoolean("service_running", true)
+			if (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK"))) {
+				igateService.start()
+			}		
 	}
 
 	override def onBind(i : Intent) : IBinder = null
