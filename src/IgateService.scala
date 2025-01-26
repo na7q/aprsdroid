@@ -62,7 +62,10 @@ class IgateService(service: AprsService, prefs: PrefsWrapper) extends Connection
       Log.d(TAG, "stop() - Waiting for connection thread to join.")
       conn.join(50)
       conn.shutdown()  // Make sure the socket is cleanly closed
+	  conn = null	  
       Log.d(TAG, "stop() - Connection shutdown.")
+	  service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", "IGate Stopped")
+	  
     } else {
       Log.d(TAG, "stop() - No connection to stop.")
     }
@@ -87,7 +90,7 @@ class IgateService(service: AprsService, prefs: PrefsWrapper) extends Connection
 	val service_running = prefs.getBoolean("service_running", false) // Default to false if not set
 	  
 	// If the service is already running, don't proceed
-	if (!service_running) {
+	if (!service_running || !prefs.isIgateEnabled) {
 	  Log.d(TAG, "start() - Service is not running, skipping connection.")
 	  reconnecting = false
 	  return
@@ -142,6 +145,7 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
 
   override def run(): Unit = {
     Log.d("IgateService", s"run() - Starting TCP connection to $host with timeout $timeout")
+	service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", "Starting IGate...")	
 	service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", s"Connecting to $host:$port")
 
     while (running) {

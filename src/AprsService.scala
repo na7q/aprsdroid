@@ -46,7 +46,9 @@ object AprsService {
 	//  +- SOURCE
 	val DEST = "dest"			// destination callsign
 	val BODY = "body"			// body of the message
-
+	val IGATE_START = PACKAGE + ".IGATE_START"
+	val IGATE_STOP = PACKAGE + ".IGATE_STOP"
+	
 	// APRSdroid API version
 	val API_VERSION_CODE = 1
 
@@ -107,6 +109,14 @@ class AprsService extends Service {
 			if (running)
 				stopSelf()
 			return
+		} else 
+			if (i.getAction() == IGATE_START) {
+				igateStart()
+			return
+		} else 
+			if (i.getAction() == IGATE_STOP) {
+				igateStop()
+			return			
 		} else
 		if (i.getAction() == SERVICE_SEND_PACKET) {
 			if (!running) {
@@ -180,6 +190,16 @@ class AprsService extends Service {
 			onPosterStarted()
 	}
 
+	def igateStart() {
+		if (prefs.getBoolean("service_running", false) && (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK")))) {
+		igateService.start()
+		}
+	}
+
+	def igateStop() {
+		igateService.stop()
+	}
+
 	def onPosterStarted() {
 		Log.d(TAG, "onPosterStarted")
 		// (re)start location source, get location source name
@@ -198,9 +218,7 @@ class AprsService extends Service {
 		// startup completed, remember state
 		if (!singleShot)
 			prefs.setBoolean("service_running", true)
-			if (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK"))) {
-				igateService.start()
-			}		
+			igateStart()		
 	}
 
 	override def onBind(i : Intent) : IBinder = null
@@ -218,9 +236,7 @@ class AprsService extends Service {
 		// catch FC when service is killed from outside
 		if (poster != null) {
 			poster.stop()
-			if (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK"))) {			
-				igateService.stop()
-			}
+			igateStop()
 			showToast(getString(R.string.service_stop))
 
 			sendBroadcast(new Intent(SERVICE_STOPPED))
