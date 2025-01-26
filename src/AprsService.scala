@@ -535,7 +535,7 @@ class AprsService extends Service {
 	def addPost(t : Int, status : String, message : String) {
 		val ts = System.currentTimeMillis()
 		db.addPost(ts, t, status, message)
-		if (t == StorageDatabase.Post.TYPE_POST || t == StorageDatabase.Post.TYPE_INCMG || t == StorageDatabase.Post.TYPE_IG) {
+		if ((t == StorageDatabase.Post.TYPE_POST || t == StorageDatabase.Post.TYPE_INCMG) || (prefs.getBoolean("p.positiontois", false) && t == StorageDatabase.Post.TYPE_IG)) {
 			parsePacket(ts, message, t)
 		} else {
 			// only log status messages

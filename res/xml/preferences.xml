@@ -59,15 +59,18 @@
 		android:summary="@string/p_offlinemap_summary"
 		android:defaultValue="false" />
 
-        <de.duenndns.EditTextPreferenceWithValue
-        android:key="tilepath"
-		android:singleLine="true"
-		android:hint="@string/p_tilepath_hint"
-		android:title="@string/p_tilepath"
-		android:defaultValue="@string/p_tilepath_value"
-		android:summary="@string/p_tilepath_summary"
-		android:dialogTitle="@string/p_tilepath_entry" />		
-		
+	<Preference
+		android:key="mbtiles_file_picker"
+		android:title="@string/p_mbtiles_file_picker_title"
+		android:summary="@string/p_mbtiles_file_picker_summary"
+		android:defaultValue=""
+		android:selectable="true" />
+
+	<Preference
+		android:key="all_files_access"
+		android:title="@string/p_all_files_access_title"
+		android:summary="@string/p_all_files_access_summary" />
+
 	<CheckBoxPreference
 		android:key="hardware_acceleration"
 		android:title="@string/p_hwacceleration_title"
