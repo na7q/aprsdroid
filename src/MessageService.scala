@@ -7,12 +7,12 @@ import _root_.android.os.Handler
 import _root_.net.ab0oo.aprs.parser._
 import scala.collection.mutable
 
-class MessageService(s : AprsService) {
+class MessageService(s : AprsService, prefs : PrefsWrapper) {
 	val TAG = "APRSdroid.MsgService"
 
-	val NUM_OF_RETRIES = s.prefs.getStringInt("p.messaging", 7)
+	val NUM_OF_RETRIES = prefs.getStringInt("p.messaging", 7)
 
-	val RETRY_INTERVAL = s.prefs.getStringInt("p.retry", 30)
+	val RETRY_INTERVAL = prefs.getStringInt("p.retry", 30)
 	
 	// Map to store the last ACK timestamps
 	private val lastAckTimestamps = mutable.Map[(String, String), Long]()
@@ -96,8 +96,22 @@ class MessageService(s : AprsService) {
 	}
 
 	// return 2^n * 30s, at most 32min
-	def getRetryDelayMS(retrycnt : Int) = (RETRY_INTERVAL * 1000) * (1 << math.min(retrycnt - 1, NUM_OF_RETRIES))
-
+	def getRetryDelayMS(retrycnt : Int): Long = {	 
+	  val NUM_OF_RETRIES = prefs.getStringInt("p.messaging", 7)
+	  val RETRY_INTERVAL = prefs.getStringInt("p.retry", 30)
+		
+	  if (retrycnt >= NUM_OF_RETRIES) {
+		Log.d(TAG, "If retry inverval rate")
+		  
+		// Fixed delay for the final retry. Allows a reasonable time to wait for Ack (e.g., 30 seconds)
+		30 * 1000
+	  } else {
+		// Exponential backoff for the previous retries
+		(RETRY_INTERVAL * 1000) * (1 << math.min(retrycnt - 1, NUM_OF_RETRIES - 1))
+		Log.d(TAG, "Else retry inverval rate")
+		
+	  }
+	}
 
 	def scheduleNextSend(delay : Long) {
 		// add some time to prevent fast looping
@@ -118,6 +132,8 @@ class MessageService(s : AprsService) {
 		// when to schedule next send round
 		var next_run = Long.MaxValue
 
+		val NUM_OF_RETRIES = prefs.getStringInt("p.messaging", 7)
+
 		val c = s.db.getPendingMessages(NUM_OF_RETRIES)
 		//Log.d(TAG, "sendPendingMessages")
 		c.moveToFirst()
@@ -129,12 +145,12 @@ class MessageService(s : AprsService) {
 			val msgtype = c.getInt(COLUMN_TYPE)
 			val text = c.getString(COLUMN_TEXT)
 			val t_send = ts + getRetryDelayMS(retrycnt) - System.currentTimeMillis()
+			
 			val retries = if (msgid == null || msgid.isEmpty) 1 else NUM_OF_RETRIES
 			Log.d(TAG, "pending message: %d/%d (%ds) ->%s '%s'".format(retrycnt, retries,
 				t_send/1000, call, text))
-			if (retrycnt == retries && t_send <= 0) {
+			if ((retrycnt > retries) || (retrycnt == retries && t_send <= 0)) {
 				// this message timed out
-				// Check if msgid is empty and update the message type to TYPE_OUT_ACKED
 				val messageType = if (msgid == null || msgid.isEmpty) 
 					StorageDatabase.Message.TYPE_OUT_ACKED 
 				else 
