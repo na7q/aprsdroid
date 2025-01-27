@@ -129,15 +129,21 @@ class MessageService(s : AprsService) {
 			val msgtype = c.getInt(COLUMN_TYPE)
 			val text = c.getString(COLUMN_TEXT)
 			val t_send = ts + getRetryDelayMS(retrycnt) - System.currentTimeMillis()
-			Log.d(TAG, "pending message: %d/%d (%ds) ->%s '%s'".format(retrycnt, NUM_OF_RETRIES,
+			val retries = if (msgid == null || msgid.isEmpty) 1 else NUM_OF_RETRIES
+			Log.d(TAG, "pending message: %d/%d (%ds) ->%s '%s'".format(retrycnt, retries,
 				t_send/1000, call, text))
-			if (retrycnt == NUM_OF_RETRIES && t_send <= 0) {
+			if (retrycnt == retries && t_send <= 0) {
 				// this message timed out
-				s.db.updateMessageType(c.getLong(/* COLUMN_ID */ 0), TYPE_OUT_ABORTED)
+				// Check if msgid is empty and update the message type to TYPE_OUT_ACKED
+				val messageType = if (msgid == null || msgid.isEmpty) 
+					StorageDatabase.Message.TYPE_OUT_ACKED 
+				else 
+					StorageDatabase.Message.TYPE_OUT_ABORTED
+				s.db.updateMessageType(c.getLong(0), messageType)				
 				s.sendBroadcast(AprsService.MSG_PRIV_INTENT)
-			} else if (retrycnt < NUM_OF_RETRIES && t_send <= 0) {
+			} else if (retrycnt < retries && t_send <= 0) {
 				// this message needs to be transmitted
-				val msg = s.newPacket(new MessagePacket(call, text, msgid))
+				val msg = s.newPacket(new MessagePacket(call, text, Option(msgid).getOrElse("")))
 				s.sendPacket(msg)
 				s.sendIsPacket(msg.toString)				
 				val cv = new ContentValues()
@@ -148,7 +154,7 @@ class MessageService(s : AprsService) {
 				s.sendBroadcast(AprsService.MSG_PRIV_INTENT)
 				// schedule potential re-transmission
 				next_run = math.min(next_run, getRetryDelayMS(retrycnt + 1))
-			} else if (retrycnt < NUM_OF_RETRIES) {
+			} else if (retrycnt < retries) {
 				// schedule transmission
 				next_run = math.min(next_run, t_send)
 			}
