@@ -125,11 +125,6 @@ class PrefsAct extends PreferenceActivity {
 			sharedPreferences.edit()
 				.putString(pref_name, file)
 				.commit()
-
-			// Update the summary of the file picker preference to show the filename
-			val filePickerPref = findPreference(pref_name)
-			Toast.makeText(this, getString(R.string.selected_file, new File(file).getName()), Toast.LENGTH_SHORT).show()
-			// reload prefs
 			finish()
 			startActivity(getIntent())
 		} else {
@@ -157,7 +152,7 @@ class PrefsAct extends PreferenceActivity {
 					if (resolvedPath != null) {
 					PreferenceManager.getDefaultSharedPreferences(this)
 							.edit().putString("tilepath", resolvedPath).commit()
-						Toast.makeText(this, resolvedPath, Toast.LENGTH_SHORT).show()
+						Toast.makeText(this, getString(R.string.selected_file, new File(resolvedPath).getName()), Toast.LENGTH_SHORT).show()
 					} else {
 						Toast.makeText(this, R.string.mapfile_error, Toast.LENGTH_SHORT).show()
 					}
