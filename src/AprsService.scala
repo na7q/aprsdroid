@@ -80,7 +80,7 @@ class AprsService extends Service {
 
 	lazy val db = StorageDatabase.open(this)
 
-	lazy val msgService = new MessageService(this)
+	lazy val msgService = new MessageService(this, prefs)
 	lazy val locSource = LocationSource.instanciateLocation(this, prefs)
 	lazy val msgNotifier = msgService.createMessageNotifier()
 	lazy val digipeaterService = new DigipeaterService(prefs, TAG, sendDigipeatedPacket)

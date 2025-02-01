@@ -60,11 +60,16 @@
 		android:defaultValue="false" />
 
 	<Preference
-		android:key="mbtiles_file_picker"
+		android:key="tilepath"
 		android:title="@string/p_mbtiles_file_picker_title"
 		android:summary="@string/p_mbtiles_file_picker_summary"
 		android:defaultValue=""
 		android:selectable="true" />
+
+    <de.duenndns.PreferenceWithValue
+	    android:key="themefile"
+	    android:title="@string/p_themefile"
+	    android:summary="@string/p_themefile_summary" />	
 
 	<Preference
 		android:key="all_files_access"
