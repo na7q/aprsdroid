@@ -190,9 +190,9 @@ class MapAct extends MapActivity with MapMenuHelper {
 		}
 
 		// Load the theme if it exists
-		val themefile = new File(prefs.getString("themefile", android.os.Environment.getExternalStorageDirectory() + "/aprsdroid.xml"))
-		if (themefile.exists())
-			mapview.setRenderTheme(themefile)
+		//val themefile = new File(prefs.getString("themefile", android.os.Environment.getExternalStorageDirectory() + "/aprsdroid.xml"))
+		//if (themefile.exists())
+		//	mapview.setRenderTheme(themefile)
 
 		// Load the saved map view position
 		loadMapViewPosition()

@@ -65,7 +65,7 @@ class PrefsAct extends PreferenceActivity {
             })
         }
 		fileChooserPreference("tilepath", 123456, R.string.p_mbtiles_file_picker_title)
-		fileChooserPreference("themefile", 123457, R.string.p_themefile_choose)
+		//fileChooserPreference("themefile", 123457, R.string.p_themefile_choose)
 	}
 	override def onResume() {
 		super.onResume()
@@ -163,8 +163,8 @@ class PrefsAct extends PreferenceActivity {
 					}
 					finish()
 					startActivity(getIntent())
-				case 123457 =>
-					parseFilePickerResult(data, "themefile", R.string.themefile_error)					
+				//case 123457 =>
+					//parseFilePickerResult(data, "themefile", R.string.themefile_error)					
 				case 123458 =>
 					data.setClass(this, classOf[ProfileImportActivity])
 					startActivity(data)
