@@ -163,8 +163,7 @@ class MapAct extends MapActivity with MapMenuHelper {
 		var mapfile = new File(mapfilePath)
 		
 		val isMapFileValid = mapfilePath.endsWith(".map") && mapfile.exists() && mapfile.canRead()
-		val isMbTiles = mapfilePath.endsWith(".mbtiles")
-		
+
 		// If offline mode is enabled, we attempt to load the map file
 		if (prefs.isOfflineMap()) {
 		  try { //Temp fix for mapfile null on mapsforge
