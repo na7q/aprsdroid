@@ -91,10 +91,18 @@ class PrefsAct extends PreferenceActivity {
 	def resolveContentUri(uri : Uri) = {
 		val Array(storage, path) = uri.getPath().replace("/document/", "").split(":", 2)
 		android.util.Log.d("PrefsAct", "resolveContentUri s=" + storage + " p=" + path)
-		if (storage == "primary")
+		
+		val resolvedPath = if (storage == "primary")
 			Environment.getExternalStorageDirectory() + "/" + path
 		else
 			"/storage/" + storage + "/" + path
+		
+		// Remove "/storage/raw//" if present on Fire Tablet devices
+		val fixedPath = resolvedPath.replace("/storage/raw//", "")
+
+		android.util.Log.d("PrefsAct", s"Fixed path: $fixedPath")
+		fixedPath
+		
 	}
 
 	def parseFilePickerResult(data : Intent, pref_name : String, error_id : Int) {
