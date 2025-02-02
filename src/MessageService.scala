@@ -7,12 +7,12 @@ import _root_.android.os.Handler
 import _root_.net.ab0oo.aprs.parser._
 import scala.collection.mutable
 
-class MessageService(s : AprsService, prefs : PrefsWrapper) {
+class MessageService(s : AprsService) {
 	val TAG = "APRSdroid.MsgService"
 
-	val NUM_OF_RETRIES = prefs.getStringInt("p.messaging", 7)
+	val NUM_OF_RETRIES = s.prefs.getStringInt("p.messaging", 7)
 
-	val RETRY_INTERVAL = prefs.getStringInt("p.retry", 30)
+	val RETRY_INTERVAL = s.prefs.getStringInt("p.retry", 30)
 	
 	// Map to store the last ACK timestamps
 	private val lastAckTimestamps = mutable.Map[(String, String), Long]()
@@ -96,20 +96,15 @@ class MessageService(s : AprsService, prefs : PrefsWrapper) {
 	}
 
 	// return 2^n * 30s, at most 32min
-	def getRetryDelayMS(retrycnt : Int): Long = {	 
-	  val NUM_OF_RETRIES = prefs.getStringInt("p.messaging", 7)
-	  val RETRY_INTERVAL = prefs.getStringInt("p.retry", 30)
-		
+	def getRetryDelayMS(retrycnt: Int): Long = {	 
 	  if (retrycnt >= NUM_OF_RETRIES) {
-		Log.d(TAG, "If retry inverval rate")
-		  
-		// Fixed delay for the final retry. Allows a reasonable time to wait for Ack (e.g., 30 seconds)
-		30 * 1000
+		val finalDelay = 30 * 1000
+		Log.d(TAG, s"Final retry delay: $finalDelay seconds")
+		return finalDelay  // Explicit return
 	  } else {
-		// Exponential backoff for the previous retries
-		(RETRY_INTERVAL * 1000) * (1 << math.min(retrycnt - 1, NUM_OF_RETRIES - 1))
-		Log.d(TAG, "Else retry inverval rate")
-		
+		val backoffDelay = (RETRY_INTERVAL * 1000) * (1 << math.min(retrycnt - 1, NUM_OF_RETRIES - 1))
+		Log.d(TAG, s"Retry interval for attempt $retrycnt: $backoffDelay ms")
+		return backoffDelay  // Explicit return
 	  }
 	}
 
@@ -132,8 +127,6 @@ class MessageService(s : AprsService, prefs : PrefsWrapper) {
 		// when to schedule next send round
 		var next_run = Long.MaxValue
 
-		val NUM_OF_RETRIES = prefs.getStringInt("p.messaging", 7)
-
 		val c = s.db.getPendingMessages(NUM_OF_RETRIES)
 		//Log.d(TAG, "sendPendingMessages")
 		c.moveToFirst()
@@ -149,7 +142,7 @@ class MessageService(s : AprsService, prefs : PrefsWrapper) {
 			val retries = if (msgid == null || msgid.isEmpty) 1 else NUM_OF_RETRIES
 			Log.d(TAG, "pending message: %d/%d (%ds) ->%s '%s'".format(retrycnt, retries,
 				t_send/1000, call, text))
-			if ((retrycnt > retries) || (retrycnt == retries && t_send <= 0)) {
+			if (retrycnt == retries && t_send <= 0) {				
 				// this message timed out
 				val messageType = if (msgid == null || msgid.isEmpty) 
 					StorageDatabase.Message.TYPE_OUT_ACKED 
