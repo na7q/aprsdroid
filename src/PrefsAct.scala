@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat
 import java.io.{File, PrintWriter}
 import java.util.Date
 import android.provider.Settings
-import de.duenndns.EditTextPreferenceWithValue
+
 
 import org.json.JSONObject
 
@@ -64,9 +64,8 @@ class PrefsAct extends PreferenceActivity {
                 }
             })
         }
-
-        // Set up file picker for "Select .mbtiles File" preference
-        fileChooserPreference("mbtiles_file_picker", 123456, R.string.p_mbtiles_file_picker_title)
+		fileChooserPreference("tilepath", 123456, R.string.p_mbtiles_file_picker_title)
+		//fileChooserPreference("themefile", 123457, R.string.p_themefile_choose)
 	}
 	override def onResume() {
 		super.onResume()
@@ -76,12 +75,12 @@ class PrefsAct extends PreferenceActivity {
 
 		// Update the summary of 'tilepath' if a valid path is set
 		if (tilepath != null && tilepath.nonEmpty) {
-			val tilepathPref = findPreference("mbtiles_file_picker")
+			val tilepathPref = findPreference("tilepath")
 			val filename = new File(tilepath).getName() // Extract the file name from the path
 			tilepathPref.setSummary(s"$tilepath")
 		} else {
 			// If no tilepath is set, show the default summary
-			val tilepathPref = findPreference("mbtiles_file_picker")
+			val tilepathPref = findPreference("tilepath")
 		}
 			
 		findPreference("p_connsetup").setSummary(prefs.getBackendName())
@@ -92,10 +91,18 @@ class PrefsAct extends PreferenceActivity {
 	def resolveContentUri(uri : Uri) = {
 		val Array(storage, path) = uri.getPath().replace("/document/", "").split(":", 2)
 		android.util.Log.d("PrefsAct", "resolveContentUri s=" + storage + " p=" + path)
-		if (storage == "primary")
+		
+		val resolvedPath = if (storage == "primary")
 			Environment.getExternalStorageDirectory() + "/" + path
 		else
 			"/storage/" + storage + "/" + path
+		
+		// Remove "/storage/raw//" if present on Fire Tablet devices
+		val fixedPath = resolvedPath.replace("/storage/raw//", "")
+
+		android.util.Log.d("PrefsAct", s"Fixed path: $fixedPath")
+		fixedPath
+		
 	}
 
 	def parseFilePickerResult(data : Intent, pref_name : String, error_id : Int) {
@@ -124,13 +131,8 @@ class PrefsAct extends PreferenceActivity {
 		if (file != null) {
 			val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 			sharedPreferences.edit()
-				.putString("tilepath", file)  // Store the file path under the 'tilepath' key
+				.putString(pref_name, file)
 				.commit()
-
-			// Update the summary of the file picker preference to show the filename
-			val filePickerPref = findPreference("mbtiles_file_picker")
-			Toast.makeText(this, getString(R.string.selected_file, new File(file).getName()), Toast.LENGTH_SHORT).show()
-			// reload prefs
 			finish()
 			startActivity(getIntent())
 		} else {
@@ -146,7 +148,26 @@ class PrefsAct extends PreferenceActivity {
 		if (resultCode == android.app.Activity.RESULT_OK) {
 			reqCode match {
 				case 123456 =>
-					parseFilePickerResult(data, "mbtiles_file", R.string.mbtiles_error)
+					//parseFilePickerResult(data, "mapfile", R.string.mapfile_error)
+					val takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+					getContentResolver.takePersistableUriPermission(data.getData(), takeFlags)
+					val resolvedPath = data.getData().getScheme match {
+						case "file" => data.getData().getPath
+						case "content" => resolveContentUri(data.getData())
+						case _ => null
+					}
+
+					if (resolvedPath != null) {
+					PreferenceManager.getDefaultSharedPreferences(this)
+							.edit().putString("tilepath", resolvedPath).commit()
+						Toast.makeText(this, getString(R.string.selected_file, new File(resolvedPath).getName()), Toast.LENGTH_SHORT).show()
+					} else {
+						Toast.makeText(this, R.string.mapfile_error, Toast.LENGTH_SHORT).show()
+					}
+					finish()
+					startActivity(getIntent())
+				//case 123457 =>
+					//parseFilePickerResult(data, "themefile", R.string.themefile_error)					
 				case 123458 =>
 					data.setClass(this, classOf[ProfileImportActivity])
 					startActivity(data)

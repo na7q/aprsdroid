@@ -49,5 +49,11 @@
 		android:summary="@string/p_msgdupetime_summary"
 		android:dialogTitle="@string/p_msgdupetime_entry" />
 
+	<CheckBoxPreference
+		android:key="p.msgidoff"
+		android:title="Disable Message ID"
+		android:summary="Removes message ID from outgoing packets"
+		android:defaultValue="false" />
+
 
 </PreferenceScreen>

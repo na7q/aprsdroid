@@ -135,6 +135,8 @@ class MessageActivity extends StationHelper(R.string.app_messages)
 	}
 	def sendMessage(msg : String) {
 		import StorageDatabase.Message._
+		
+		val MSGID_OFF = prefs.getBoolean("p.msgidoff", false)
 
 		if (msg.length() == 0)
 			return
@@ -145,7 +147,10 @@ class MessageActivity extends StationHelper(R.string.app_messages)
 		cv.put(TS, System.currentTimeMillis().asInstanceOf[java.lang.Long])
 		cv.put(RETRYCNT, 0.asInstanceOf[java.lang.Integer])
 		cv.put(CALL, targetcall)
-		cv.put(MSGID, storage.createMsgId(targetcall).asInstanceOf[java.lang.Integer])
+		// Check if prefs.msgidoff is enabled and only set MSGID if not
+		if (!MSGID_OFF) {
+			cv.put(MSGID, storage.createMsgId(targetcall).asInstanceOf[java.lang.Integer])
+		}
 		cv.put(TYPE, TYPE_OUT_NEW.asInstanceOf[java.lang.Integer])
 		cv.put(TEXT, msg)
 		storage.addMessage(cv)

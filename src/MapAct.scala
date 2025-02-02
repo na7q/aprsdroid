@@ -159,36 +159,65 @@ class MapAct extends MapActivity with MapMenuHelper {
         }
 
 	def reloadMapAndTheme() {
-		val mapfile = new File(prefs.getString("mapfile", android.os.Environment.getExternalStorageDirectory() + "/aprsdroid.map"))
-		var error = if (mapfile.exists() && mapfile.canRead()) {
-			val result = mapview.setMapFile(mapfile)
-			// output map loader's error if loading failed
-			if (result.isSuccess) null else result.getErrorMessage
-		} else if (prefs.getString("mapfile", null) != null) {
-			// output generic error if file was configured but is not loadable
-			getString(R.string.mapfile_error, mapfile)
-		} else {
-			// do not output error if no map file was configured, silently load online osm
-			null
-		}
-		if (error != null)
-			Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+		val mapfilePath = prefs.getString("tilepath", android.os.Environment.getExternalStorageDirectory() + "")
+		var mapfile = new File(mapfilePath)
+		
+		val isMapFileValid = mapfilePath.endsWith(".map") && mapfile.exists() && mapfile.canRead()
 
-		// all map file attempts failed, fall back to online
-		try {
-			if (mapview.getMapFile == null) {
-				val map_source = MapGeneratorInternal.MAPNIK
-				val map_gen = OsmTileDownloader.create(this)
-				map_gen.setUserAgent(getString(R.string.build_version))
-				mapview.setMapGenerator(map_gen)
+		// If offline mode is enabled, we attempt to load the map file
+		if (prefs.isOfflineMap()) {
+		  try { //Temp fix for mapfile null on mapsforge
+			if (isMapFileValid) {
+			  val result = mapview.setMapFile(mapfile)
+			  // Output map loader's error if loading failed
+			  var error = if (result.isSuccess) null else result.getErrorMessage
+			  if (error != null) {
+				Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+			  }
+			} else {
+			  // If offline mode is enabled, but the .map file isn't valid, fall back to online
+			  loadOnlineMap()
+			  }
+			} catch {
+			  case e: Exception =>
+			  Log.e("MapAct", "Unexpected error during map reload", e)
+			  // Navigate to HubActivity if there's a general error
+			  navigateToHubActivity()
 			}
-		} catch {
-		case _ : UnsupportedOperationException =>  /* ignore, this is thrown by online map generator */
+		} else {
+		  // Offline mode is not enabled, fall back to online map
+		  loadOnlineMap()
 		}
-		val themefile = new File(prefs.getString("themefile", android.os.Environment.getExternalStorageDirectory() + "/aprsdroid.xml"))
-		if (themefile.exists())
-			mapview.setRenderTheme(themefile)
+
+		// Load the theme if it exists
+		//val themefile = new File(prefs.getString("themefile", android.os.Environment.getExternalStorageDirectory() + "/aprsdroid.xml"))
+		//if (themefile.exists())
+		//	mapview.setRenderTheme(themefile)
+
+		// Load the saved map view position
 		loadMapViewPosition()
+	}
+	
+	// Navigate to HubActivity to reset state
+	def navigateToHubActivity(): Unit = {
+	  val intent = new Intent(this, classOf[HubActivity])
+	  intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+	  startActivity(intent)
+	  finish()
+	}
+
+	// Helper function to load online map
+	def loadOnlineMap() {
+		try {
+			// Set the map generator to Mapnik (or any other online tile source)
+			val map_source = MapGeneratorInternal.MAPNIK
+			val map_gen = OsmTileDownloader.create(this)
+			map_gen.setUserAgent(getString(R.string.build_version))
+			mapview.setMapGenerator(map_gen)
+		} catch {
+			case _: UnsupportedOperationException => 
+				// Ignore if thrown by online map generator
+		}
 	}
 
 	override def onKeyDown(keyCode : Int, event : KeyEvent) : Boolean = {

@@ -60,7 +60,7 @@
 		android:defaultValue="false" />
 
 	<Preference
-		android:key="mbtiles_file_picker"
+		android:key="tilepath"
 		android:title="@string/p_mbtiles_file_picker_title"
 		android:summary="@string/p_mbtiles_file_picker_summary"
 		android:defaultValue=""
