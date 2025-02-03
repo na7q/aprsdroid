@@ -48,7 +48,9 @@ object AprsService {
 	val BODY = "body"			// body of the message
 	val IGATE_START = PACKAGE + ".IGATE_START"
 	val IGATE_STOP = PACKAGE + ".IGATE_STOP"
-	
+	val CUSTOM_PACKET = PACKAGE + ".CUSTOM_PACKET"
+	val STOP_CUSTOM_PACKET = PACKAGE + ".STOP_CUSTOM_PACKET"
+
 	// APRSdroid API version
 	val API_VERSION_CODE = 1
 
@@ -86,6 +88,7 @@ class AprsService extends Service {
 	lazy val msgNotifier = msgService.createMessageNotifier()
 	lazy val digipeaterService = new DigipeaterService(prefs, TAG, sendDigipeatedPacket)
 	lazy val igateService = new IgateService(this, prefs)
+	lazy val custompacketService = new CustomPacketService(this, prefs)
 
 	var poster : AprsBackend = null
 
@@ -117,7 +120,15 @@ class AprsService extends Service {
 		} else 
 			if (i.getAction() == IGATE_STOP) {
 				igateStop()
-			return			
+			return		
+		} else 
+			if (i.getAction() == CUSTOM_PACKET) {
+				startcustomPacket()
+			return
+		} else 
+			if (i.getAction() == STOP_CUSTOM_PACKET) {
+				stopcustomPacket()
+			return				
 		} else
 		if (i.getAction() == SERVICE_SEND_PACKET) {
 			if (!running) {
@@ -191,6 +202,21 @@ class AprsService extends Service {
 			onPosterStarted()
 	}
 
+	def startcustomPacket() = {
+		custompacketService.startCustomPacketLoop()
+	}
+
+	def stopcustomPacket() = {
+		custompacketService.stopCustomPacketLoop()
+	}
+
+	def sendcustomPacket(packet : String) = {
+		val digipath = prefs.getString("digi_path", "WIDE1-1")
+		
+		val p = Parser.parseBody(prefs.getCallSsid(), APP_VERSION, Digipeater.parseList(digipath, true), packet)
+		sendPacket(p)
+	}
+
 	def igateStart() {
 		if (prefs.getBoolean("service_running", false) && (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK")))) {
 		igateService.start()
@@ -226,6 +252,8 @@ class AprsService extends Service {
 		if (!igaterunning && prefs.isIgateEnabled()) {
 			igateStart()
 		}
+		
+		startcustomPacket()		
 	}
 
 	override def onBind(i : Intent) : IBinder = null

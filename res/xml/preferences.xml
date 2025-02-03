@@ -240,4 +240,25 @@
 
     </PreferenceCategory>
 
+	    <PreferenceCategory 
+			android:title="Objects">
+
+            <CheckBoxPreference
+                android:key="objects"
+                android:title="Enable Object"
+                android:summary="Enable Objects"
+                android:defaultValue="false" />
+
+            <de.duenndns.EditTextPreferenceWithValue
+                android:key="object_value"
+				android:defaultValue=";TEST     *111111z4621.77N/12342.95WrTest"				
+                android:inputType="text"
+                android:title="Object packet"
+                android:hint="hint"				
+                android:summary="summary"
+                android:dialogTitle="title" />
+
+    </PreferenceCategory>
+	
+
 </PreferenceScreen>
