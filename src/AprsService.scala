@@ -61,6 +61,7 @@ object AprsService {
 	}
 
 	var running = false
+	var igaterunning = false	
 	var link_error = 0
 
 	implicit def block2runnable[F](f: => F) = new Runnable() { def run() { f } }
@@ -193,11 +194,13 @@ class AprsService extends Service {
 	def igateStart() {
 		if (prefs.getBoolean("service_running", false) && (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK")))) {
 		igateService.start()
+		igaterunning = true
 		}
 	}
 
 	def igateStop() {
 		igateService.stop()
+		igaterunning = false
 	}
 
 	def onPosterStarted() {
@@ -216,9 +219,13 @@ class AprsService extends Service {
 			.putExtra(CALLSIGN, callssid))
 
 		// startup completed, remember state
-		if (!singleShot)
+		if (!singleShot) {
 			prefs.setBoolean("service_running", true)
-			igateStart()		
+		}
+		
+		if (!igaterunning && prefs.isIgateEnabled()) {
+			igateStart()
+		}
 	}
 
 	override def onBind(i : Intent) : IBinder = null
@@ -236,12 +243,12 @@ class AprsService extends Service {
 		// catch FC when service is killed from outside
 		if (poster != null) {
 			poster.stop()
-			igateStop()
 			showToast(getString(R.string.service_stop))
 
 			sendBroadcast(new Intent(SERVICE_STOPPED))
 		}
 		msgService.stop()
+		igateStop()
 		locSource.stop()
 		scala.util.control.Exception.ignoring(classOf[IllegalArgumentException]) {
 			unregisterReceiver(msgNotifier)
