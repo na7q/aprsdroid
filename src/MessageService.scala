@@ -143,18 +143,15 @@ class MessageService(s : AprsService) {
 			Log.d(TAG, "pending message: %d/%d (%ds) ->%s '%s'".format(retrycnt, retries,
 				t_send/1000, call, text))
 			if (retrycnt == retries && t_send <= 0) {				
-				// this message timed out
-				val messageType = if (msgid == null || msgid.isEmpty) 
-					StorageDatabase.Message.TYPE_OUT_ACKED 
-				else 
-					StorageDatabase.Message.TYPE_OUT_ABORTED
-				s.db.updateMessageType(c.getLong(0), messageType)				
+				s.db.updateMessageType(c.getLong(0), TYPE_OUT_ABORTED)
 				s.sendBroadcast(AprsService.MSG_PRIV_INTENT)
 			} else if (retrycnt < retries && t_send <= 0) {
 				// this message needs to be transmitted
 				val msg = s.newPacket(new MessagePacket(call, text, Option(msgid).getOrElse("")))
 				s.sendPacket(msg)
-				s.sendIsPacket(msg.toString)				
+				s.sendIsPacket(msg.toString)								
+				if (msgid == null || msgid.isEmpty) 
+					s.db.updateMessageType(c.getLong(0), TYPE_OUT_ACKED)
 				val cv = new ContentValues()
 				cv.put(RETRYCNT, (retrycnt + 1).asInstanceOf[java.lang.Integer])
 				cv.put(TS, System.currentTimeMillis.asInstanceOf[java.lang.Long])
