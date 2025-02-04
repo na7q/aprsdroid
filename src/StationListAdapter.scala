@@ -68,6 +68,9 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		val lon = cursor.getInt(COLUMN_LON)
 		val qrg = cursor.getString(COLUMN_QRG)
 		val symbol = cursor.getString(COLUMN_SYMBOL)
+		val speedInKnots = cursor.getFloat(COLUMN_SPEED)
+		val speed = speedInKnots * 1.15078               // Convert from knots to mph to get corrected speed
+		val course = cursor.getFloat(COLUMN_COURSE)
 		val dist = Array[Float](0, 0)
 
 		if (call == mycall) {
@@ -98,6 +101,27 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		distage.setText(distanceText)
 		
 		view.findViewById(R.id.station_symbol).asInstanceOf[SymbolView].setSymbol(symbol)
+
+		// Add speed and course to the UI (simplified version)
+		val speedTextView = view.findViewById(R.id.station_speed).asInstanceOf[TextView]
+		val courseTextView = view.findViewById(R.id.station_course).asInstanceOf[TextView]
+
+		// Convert speed based on the preference
+		val speedText = if (isMetric) {
+		  val speedInKmh = speed * 1.60934 // 1 mph = 1.60934 km/h
+		  f"Speed: $speedInKmh%.1fkmh"
+		} else {
+		  f"Speed: $speed%.1fmph"
+		}
+
+		// Set visibility based on the speed value (only show if valid)
+		speedTextView.setVisibility(if (speed > 0) View.VISIBLE else View.GONE)
+		if (speed > 0) speedTextView.setText(speedText) // Assuming speed is in km/h
+
+		// Set visibility based on the course value (only show if valid)
+		courseTextView.setVisibility(if (course > 0) View.VISIBLE else View.GONE)
+		if (course > 0) courseTextView.setText(f"Course: $course%.1f°") // Assuming course is in degrees
+
 		super.bindView(view, context, cursor)
 	}
 
