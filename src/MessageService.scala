@@ -98,7 +98,7 @@ class MessageService(s : AprsService) {
 	// return 2^n * 30s, at most 32min
 	def getRetryDelayMS(retrycnt: Int): Long = {	 
 	  if (retrycnt >= NUM_OF_RETRIES) {
-		val finalDelay = 30 * 1000
+		val finalDelay = 15 * 1000
 		Log.d(TAG, s"Final retry delay: $finalDelay seconds")
 		return finalDelay  // Explicit return
 	  } else {
@@ -137,15 +137,13 @@ class MessageService(s : AprsService) {
 			val msgid = c.getString(COLUMN_MSGID)
 			val msgtype = c.getInt(COLUMN_TYPE)
 			val text = c.getString(COLUMN_TEXT)
-			val t_send = ts + getRetryDelayMS(retrycnt) - System.currentTimeMillis()
-			
-			val retries = if (msgid == null || msgid.isEmpty) 1 else NUM_OF_RETRIES
-			Log.d(TAG, "pending message: %d/%d (%ds) ->%s '%s'".format(retrycnt, retries,
+			val t_send = ts + getRetryDelayMS(retrycnt) - System.currentTimeMillis()			
+			Log.d(TAG, "pending message: %d/%d (%ds) ->%s '%s'".format(retrycnt, NUM_OF_RETRIES,
 				t_send/1000, call, text))
-			if (retrycnt == retries && t_send <= 0) {				
+			if (retrycnt == NUM_OF_RETRIES && t_send <= 0) {
 				s.db.updateMessageType(c.getLong(0), TYPE_OUT_ABORTED)
 				s.sendBroadcast(AprsService.MSG_PRIV_INTENT)
-			} else if (retrycnt < retries && t_send <= 0) {
+			} else if (retrycnt < NUM_OF_RETRIES && t_send <= 0) {
 				// this message needs to be transmitted
 				val msg = s.newPacket(new MessagePacket(call, text, Option(msgid).getOrElse("")))
 				s.sendPacket(msg)
@@ -160,7 +158,7 @@ class MessageService(s : AprsService) {
 				s.sendBroadcast(AprsService.MSG_PRIV_INTENT)
 				// schedule potential re-transmission
 				next_run = math.min(next_run, getRetryDelayMS(retrycnt + 1))
-			} else if (retrycnt < retries) {
+			} else if (retrycnt < NUM_OF_RETRIES) {
 				// schedule transmission
 				next_run = math.min(next_run, t_send)
 			}
