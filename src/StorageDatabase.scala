@@ -350,26 +350,35 @@ class StorageDatabase(context : Context) extends
 			"call = ? OR call LIKE ? OR origin = ? OR origin LIKE ?", Array(barecall, wildcard, barecall, wildcard),
 			null, null, null, null)
 	}
-	def getNeighbors(mycall : String, lat : Int, lon : Int, ts : Long, limit : String) : Cursor = {
-		// calculate latitude correction
-		val corr = (cos(Pi*lat/180000000.0)*cos(Pi*lat/180000000.0)*100).toInt
-		//Log.d(TAG, "getNeighbors: correcting by %d".formatLocal(null, corr))
-		// add a distance column to the query
+	def getNeighbors(mycall: String, lat: Int, lon: Int, ts: Long, limit: String): Cursor = {
+		val corr = (cos(Pi * lat / 180000000.0) * cos(Pi * lat / 180000000.0) * 100).toInt
 		val newcols = Station.COLUMNS :+ Station.COL_DIST.formatLocal(null, lat, lat, lon, lon, corr)
-		getReadableDatabase().query(Station.TABLE, newcols,
-			"ts > ? or call = ?", Array(ts.toString, mycall),
-			null, null, "dist", limit)
+		getReadableDatabase().query(
+			Station.TABLE,
+			newcols,
+			"ts > ? or call = ?",
+			Array(ts.toString, mycall),
+			null,
+			null,
+			"ts DESC",   // Changed from "dist" to "ts DESC"
+			limit
+		)
 	}
 
-	def getNeighborsLike(call : String, lat : Int, lon : Int, ts : Long, limit : String) : Cursor = {
-		// calculate latitude correction
-		val corr = (cos(Pi*lat/180000000.0)*cos(Pi*lat/180000000.0)*100).toInt
-		Log.d(TAG, "getNeighborsLike: correcting by %d".formatLocal(null, corr))
-		// add a distance column to the query
+
+	def getNeighborsLike(call: String, lat: Int, lon: Int, ts: Long, limit: String): Cursor = {
+		val corr = (cos(Pi * lat / 180000000.0) * cos(Pi * lat / 180000000.0) * 100).toInt
 		val newcols = Station.COLUMNS :+ Station.COL_DIST.formatLocal(null, lat, lat, lon, lon, corr)
-		getReadableDatabase().query(Station.TABLE, newcols,
-			"call like ?", Array(call),
-			null, null, "dist", limit)
+		getReadableDatabase().query(
+			Station.TABLE,
+			newcols,
+			"call like ?",
+			Array(call),
+			null,
+			null,
+			"ts DESC",   // Changed from "dist" to "ts DESC"
+			limit
+		)
 	}
 
 	def addPost(ts : Long, posttype : Int, status : String, message : String) {
