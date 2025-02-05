@@ -82,6 +82,8 @@ class PrefsWrapper(val context : Context) {
 
 	def getShowAge() = getStringInt("show_age", 30)*60L*1000
 	
+	def getSortByHubDistance() = getBoolean("sort_by_hub_distance", false)
+
 	// get the array index for a given list pref
 	def getListItemIndex(pref : String, default : String, values : Int) = {
 		android.util.Log.d("getLII", getString(pref, default))
