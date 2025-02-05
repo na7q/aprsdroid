@@ -291,6 +291,27 @@ trait UIHelper extends Activity
 			.create.show
 	}
 
+	def sortDialog() {
+		val currentPref = prefs.getBoolean("sort_by_hub_distance", true)
+		val selected = if (currentPref) 0 else 1
+
+	    val sortOptions = Array(getString(R.string.sort_distance), getString(R.string.sort_newest)).map(_.asInstanceOf[CharSequence])
+	  
+		new AlertDialog.Builder(this)
+			.setTitle(R.string.p_sortby)
+			.setSingleChoiceItems(sortOptions, selected, new DialogInterface.OnClickListener() {
+				override def onClick(dialog: DialogInterface, which: Int) {
+					val isDistance = (which == 0)
+					prefs.prefs.edit().putBoolean("sort_by_hub_distance", isDistance).commit()
+					sendBroadcast(new Intent(AprsService.UPDATE))
+					onStartLoading()
+					dialog.dismiss()
+				}
+			})
+			.create()
+			.show()
+	}
+
 	def sendMessageBroadcast(dest : String, body : String) {
 		sendBroadcast(new Intent(AprsService.MESSAGETX)
 			.putExtra(AprsService.SOURCE, prefs.getCallSsid())
@@ -308,6 +329,7 @@ trait UIHelper extends Activity
 			menu.findItem(id).setVisible(id != menu_id)
 		})
 		menu.findItem(R.id.age).setVisible(R.id.map == menu_id || R.id.hub == menu_id)
+		menu.findItem(R.id.sortby).setVisible(R.id.hub == menu_id)
 		menu.findItem(R.id.overlays).setVisible(R.id.map == menu_id)
 		true
 	}
@@ -344,6 +366,9 @@ trait UIHelper extends Activity
 		case R.id.age =>
 			ageDialog()
 			true
+		case R.id.sortby =>
+			sortDialog()
+			true			
 		// switch between activities
 		case R.id.hub =>
 			startActivity(new Intent(this, classOf[HubActivity]).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT));
