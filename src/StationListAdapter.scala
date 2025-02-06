@@ -9,7 +9,6 @@ import _root_.android.util.Log
 import _root_.android.view.View
 import _root_.android.widget.{SimpleCursorAdapter, TextView}
 import _root_.android.widget.FilterQueryProvider
-import android.widget.RelativeLayout
 
 object StationListAdapter {
 	import StorageDatabase.Station._
@@ -122,12 +121,6 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		// Set visibility based on the course value (only show if valid)
 		courseTextView.setVisibility(if (course > 0) View.VISIBLE else View.GONE)
 		if (course > 0) courseTextView.setText(f"Course: $course%.1f°") // Assuming course is in degrees
-		
-		if (speed == 0 && course > 0) {
-		  val layoutParams = courseTextView.getLayoutParams.asInstanceOf[RelativeLayout.LayoutParams]
-		  layoutParams.topMargin = 0  // Set marginTop to 0
-		  courseTextView.setLayoutParams(layoutParams)
-		}
 		
 		super.bindView(view, context, cursor)
 	}
