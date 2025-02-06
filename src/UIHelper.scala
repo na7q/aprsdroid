@@ -323,6 +323,7 @@ trait UIHelper extends Activity
 	abstract override def onCreateOptionsMenu(menu : Menu) : Boolean = {
 		getMenuInflater().inflate(R.menu.options_activities, menu);
 		getMenuInflater().inflate(R.menu.options_map, menu);
+		getMenuInflater().inflate(R.menu.custom, menu);
 		getMenuInflater().inflate(R.menu.options, menu);
 		// disable the "own" menu
 		Array(R.id.hub, R.id.map, R.id.log, R.id.conversations).map((id) => {
