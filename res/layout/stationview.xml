@@ -30,12 +30,12 @@
         android:id="@+id/station_distage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:textStyle="bold"
         android:textColor="#d0d0b0"
         android:textSize="13sp"
-        android:layout_marginRight="3sp" />
+		android:gravity="center_horizontal|center_vertical"
+        android:layout_marginRight="25sp" />
 		
     <!-- QRG on the far right (can be GONE if not needed) -->
     <TextView
@@ -55,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/station_distage"
-        android:layout_marginTop="5sp"
+        android:layout_marginTop="0sp"
         android:textColor="#b0b080"
         android:textSize="14sp"
         android:typeface="monospace"
@@ -66,7 +66,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/station_speed"
-        android:layout_marginTop="2sp"
+        android:layout_marginTop="0sp"
         android:textColor="#b0b080"
         android:textSize="14sp"
         android:typeface="monospace"
