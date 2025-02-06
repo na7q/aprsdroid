@@ -5,7 +5,7 @@
     android:padding="5sp">
 
     <!-- Symbol on the left -->
-    <org.na7q.app.SymbolView
+    <org.aprsdroid.app.SymbolView
         android:id="@+id/station_symbol"
         android:layout_width="24sp"
         android:layout_height="24sp"
