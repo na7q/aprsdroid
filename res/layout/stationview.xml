@@ -11,7 +11,8 @@
         android:layout_height="24sp"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="1sp"
-        android:layout_marginRight="3sp" />
+        android:layout_marginRight="3sp"
+		android:layout_marginTop="3sp" />
 
     <!-- Callsign next to symbol -->
     <TextView
