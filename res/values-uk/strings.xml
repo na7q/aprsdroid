@@ -434,7 +434,7 @@
 
 <string name="no_perm_text">The following permissions are required:</string>
 
-<string name="p_igconnectretry">З'єднання Повторне інтервал</string>
+<string name="p_igconnectretry">З\'єднання Повторне інтервал</string>
 <string name="selected_file">Вибраний файл: %1 $ s</string>
 <string name="p_timelastheard">Нещодавно заслухав час на станції</string>
 <string name="clearallmessages">Чіткі повідомлення</string>
@@ -496,7 +496,7 @@
 <string name="p_ratelimit5_summary">Обмеження кількості пакетів TX за 5 хв.</string>
 <string name="p_link_ble">Bluetooth Низька енергія</string>
 <string name="p_digipeating_summary">Увімкнути DigiPeater</string>
-<string name="p_igsotimeout_summary">Час перед скиданням з'єднання</string>
+<string name="p_igsotimeout_summary">Час перед скиданням з\'єднання</string>
 <string name="p_bt_reconnect_entry">Час перед відновленням</string>
 <string name="p_dedupe_summary">Час очікування Digipeat для дублікатів пакетів</string>
 <string name="p_retry_interval_entry">Повторне інтервальне стартове ставка</string>
@@ -504,7 +504,7 @@
 <string name="p__location_compressed_beacons_off">Надішліть нестисненні маяки</string>
 <string name="p_ratelimit1_entry">Обмеження пакету через 1 хв інтервалу</string>
 <string name="p_offlinemap">Карти ОСМ</string>
-<string name="p_igserver_entry">Введіть ім'я хоста APRS-IS</string>
+<string name="p_igserver_entry">Введіть ім\'я хоста APRS-IS</string>
 <string name="p_hwacceleration_summary">Перемикання апаратного прискорення для перегляду карти</string>
 <string name="p_igsotimeout_entry">Значення тайм -ауту в секундах (0 = відключити)</string>
 <string name="p_igating_disabled_summary">IGATE в даний час відключений</string>

@@ -435,7 +435,7 @@
 <string name="p_reconnect_summary">Tyd voordat dit weer kontak maak</string>
 <string name="sortby">Sorteer volgens ...</string>
 <string name="p_messaging_preferences">Gevorderde boodskapopsies</string>
-<string name="p_igfilter_entry">Voer 'n filter in vir inkomende pakkies</string>
+<string name="p_igfilter_entry">Voer \'n filter in vir inkomende pakkies</string>
 <string name="p_message_retry_entry">Aantal boodskappe om weer te probeer</string>
 <string name="p_igpath_summary">APRS-IS na RF Digi Path</string>
 <string name="freq_control_title">Stel frekwensie in</string>

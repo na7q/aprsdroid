@@ -462,7 +462,7 @@
 <string name="p_igating_entry">IGega</string>
 <string name="sort_distance">Sorteerima</string>
 <string name="p_igserver_hint">Host: sadam</string>
-<string name="p_mbtiles_file_picker_title">Valige MapsForgev3 või .Mbtiles'i kaart</string>
+<string name="p_mbtiles_file_picker_title">Valige MapsForgev3 või .Mbtiles\'i kaart</string>
 <string name="p_igconnectretry_summary">Ühendage serveriga sekunditega uuesti</string>
 <string name="p__location_mice_beacons_on">Saada Mic-e majakad</string>
 <string name="p_positiontois_title">Saatke paketid RF &amp; APRS-IS-i</string>

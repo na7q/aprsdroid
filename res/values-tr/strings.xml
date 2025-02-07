@@ -437,7 +437,7 @@
 <string name="p_message_retry_summary">Mesaj yeniden deneme sınırı</string>
 <string name="p_igfilter_entry">Gelen paketler için bir filtre girin</string>
 <string name="p_igfilter_hint">b/arkadaş o/nesne ...</string>
-<string name="p_positiontois_summary">Tüm paketlerinizi RF ve APRS-IS'ye gönderir.</string>
+<string name="p_positiontois_summary">Tüm paketlerinizi RF ve APRS-IS\'ye gönderir.</string>
 <string name="p_message_retry_entry">Yeniden denenecek mesaj sayısı</string>
 <string name="p_digipeating_entry">Dijitatçı</string>
 <string name="p_aprsistraffic_summary">Günlükteki tüm APRS-IL trafiğini bastırır</string>
@@ -453,8 +453,8 @@
 <string name="p_igserver_hint">Ev sahibi: Liman</string>
 <string name="p_mbtiles_file_picker_title">Mapsforgev3 veya .mbtiles haritasını seçin</string>
 <string name="p_igconnectretry_summary">Saniyeler içinde sunucuya yeniden bağlanın</string>
-<string name="p__location_mice_beacons_on">MIC-E Beacons'ı Gönderin</string>
-<string name="p_positiontois_title">Paketleri RF &amp; APRS'ye gönderin-</string>
+<string name="p__location_mice_beacons_on">MIC-E Beacons\'ı Gönderin</string>
+<string name="p_positiontois_title">Paketleri RF &amp; APRS\'ye gönderin-</string>
 <string name="p_reconnect">TCP Zaman Aşımını Yeniden Bağlayın</string>
 <string name="p_digipeating">Digipeating Tercihleri</string>
 <string name="sort_newest">En yenisine göre sıralayın</string>
@@ -466,7 +466,7 @@
 <string name="p_msgdupetoggle">Yinelenen mesajlar</string>
 <string name="p_dedupe_entry">Saniyeler içinde zaman aşımı</string>
 <string name="p_igserver_summary">APRS-TCP sunucusu (bağlantı noktası 14580) iletişim kurmak için</string>
-<string name="p_aprsistorf_summary">Mesajların RF'ye geçmesine izin verir</string>
+<string name="p_aprsistorf_summary">Mesajların RF\'ye geçmesine izin verir</string>
 <string name="p_msgdupetime_title">Dupe Mesaj Zaman Aşımı</string>
 <string name="p_timelastheard_entry">Dakikalar halinde zaman aşımı</string>
 <string name="ad_thanks_7">Mike, NA7Q: DigiPeating, Igating, Mbtiles Eşleme ve daha fazlası!</string>
@@ -475,15 +475,15 @@
 <string name="p__digipeating">Digipeating Tercihleri</string>
 <string name="p_offlinemap_entry">Çevrimdışı eşlemeyi etkinleştirin</string>
 <string name="p__location_mice_beacons_off">Sıkıştırılmamış işaretleri gönderin</string>
-<string name="p_aprsistorf_entry">Çift yönlü igate'i etkinleştirin</string>
+<string name="p_aprsistorf_entry">Çift yönlü igate\'i etkinleştirin</string>
 <string name="p_directonly_entry">Sadece doğrudan</string>
 <string name="p_afsk_vox">Vok</string>
 <string name="p_igserver">Sunucu</string>
-<string name="freq_control_options_summary">Başlangıçta Freq'i ayarlar</string>
+<string name="freq_control_options_summary">Başlangıçta Freq\'i ayarlar</string>
 <string name="p_ackdupe_interval_entry">ACK Dupe Zaman Aşımı (0 = ACK devre dışı)</string>
 <string name="p_ratelimit5_summary">5 dakikalık aralıklarla TX paketlerinin sınır sayısı</string>
 <string name="p_link_ble">Bluetooth Düşük Enerji</string>
-<string name="p_digipeating_summary">DigiPeater'ı Etkinleştir</string>
+<string name="p_digipeating_summary">DigiPeater\'ı Etkinleştir</string>
 <string name="p_igsotimeout_summary">Bağlantıyı sıfırlamadan önce zaman</string>
 <string name="p_bt_reconnect_entry">Yeniden Bağlanmadan Önce Zaman</string>
 <string name="p_dedupe_summary">Yinelenen paketler için digipeat zaman aşımı</string>
@@ -501,7 +501,7 @@
 <string name="freq_control_summary">Frekans</string>
 <string name="p_ackdupetoggle">Ack Dupe Zaman Aşımı</string>
 <string name="p__location_compressed_summary">Normal ve MIC-E Sıkıştırma</string>
-<string name="p_timelastheard_summary">Yakın zamanda duyulan istasyonların RF'sine mesaj göndermek için dakikalar</string>
+<string name="p_timelastheard_summary">Yakın zamanda duyulan istasyonların RF\'sine mesaj göndermek için dakikalar</string>
 <string name="p__messaging">Mesajlaşma tercihleri</string>
 <string name="p_afsk_digirig">Digirig</string>
 <string name="p_msgdupetime_entry">Dupe Mesaj Zaman Aşımı (0 = devre dışı)</string>

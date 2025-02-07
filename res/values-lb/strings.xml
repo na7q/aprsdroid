@@ -476,7 +476,7 @@
 <string name="p_ratelimit5_summary">Limitéiert Zuel vun TX Päckchen a 5 min Intervall</string>
 <string name="p_link_ble">Bluetooth niddereg Energie</string>
 <string name="p_digipeating_summary">Aktivéiert Digioter</string>
-<string name="p_igsotimeout_summary">Zäit ier Dir d'Verbindung zréckgesat gëtt</string>
+<string name="p_igsotimeout_summary">Zäit ier Dir d\'Verbindung zréckgesat gëtt</string>
 <string name="p_bt_reconnect_entry">Zäit ier Dir nokritt</string>
 <string name="p_dedupe_summary">Digipeat Timeout fir Duplikat Päckchen</string>
 <string name="p_retry_interval_entry">Probéiert den Intervalls Start Taux</string>
@@ -485,7 +485,7 @@
 <string name="p_ratelimit1_entry">Packet Limit um 1 min Intervall</string>
 <string name="p_offlinemap">Osm Kaart</string>
 <string name="p_igserver_entry">Gitt den APRS-Ass Server Hostnumm</string>
-<string name="p_hwacceleration_summary">Toggle Hardware Beschleunegung fir d'Kaart Vue</string>
+<string name="p_hwacceleration_summary">Toggle Hardware Beschleunegung fir d\'Kaart Vue</string>
 <string name="p_igsotimeout_entry">Timeout Wäert a Sekonnen (0 = Desaktivéieren)</string>
 <string name="p_igating_disabled_summary">Igate aktuell behënnert</string>
 <string name="p_directonly_summary">Nëmmen digipéiert Statiounen direkt héieren</string>

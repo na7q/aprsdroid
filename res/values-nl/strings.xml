@@ -441,7 +441,7 @@ Je kan ook je voorkeuren aanpassen via het menu.</string>
 <string name="p_positiontois_summary">Stuurt al uw pakketten naar RF en APRS-IS.</string>
 <string name="p_message_retry_entry">Aantal berichten om opnieuw te proberen</string>
 <string name="p_digipeating_entry">Digipeater</string>
-<string name="p_aprsistraffic_summary">Onderdrukt alle APR's-IS-verkeer in het logboek</string>
+<string name="p_aprsistraffic_summary">Onderdrukt alle APR\'s-IS-verkeer in het logboek</string>
 <string name="p__location_compressed_beacons_on">Stuur gecomprimeerde bakens</string>
 <string name="p__location_mice_beacons">MIC-E gecomprimeerde bakens</string>
 <string name="freq_control_options">Schakel radiofrequentiebeheer in</string>
@@ -522,7 +522,7 @@ Je kan ook je voorkeuren aanpassen via het menu.</string>
 <string name="p_msgdupetime_summary">Dubbele berichten toegestaan ​​na time -out</string>
 <string name="p_afsk_pttport">Push-to-Talk-poort</string>
 <string name="p_hwacceleration_title">Schakel hardware -versnelling in</string>
-<string name="p_aprsistraffic_entry">Onderdruk APR's-is-is verkeerslogboek</string>
+<string name="p_aprsistraffic_entry">Onderdruk APR\'s-is-is verkeerslogboek</string>
 <string name="mbtiles_error">MBtiles -fout</string>
 <string name="p__igating">Igerende voorkeuren</string>
 <string name="sortby">Sorteer door ...</string>

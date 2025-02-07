@@ -530,7 +530,7 @@
 <string name="p_igpath">Digi nga agianan</string>
 <string name="p_ratelimit5_entry">Limitasyon sa Packet sa 5 Min Interval</string>
 <string name="p__location_compressed_settings">Gipilit ang mga setting sa Beacon</string>
-<string name="p_regenerate_summary">Peligro nga nagbag-o nga nakadungog mga packet nga wala'y filter !!</string>
+<string name="p_regenerate_summary">Peligro nga nagbag-o nga nakadungog mga packet nga wala\'y filter !!</string>
 <string name="p_msgdupetime_summary">Gitugotan ang mga duplicate nga mensahe pagkahuman sa oras</string>
 <string name="p_afsk_pttport">Push-to-talk port</string>
 <string name="p_hwacceleration_title">Pag-ayo sa pagpadali sa hardware</string>

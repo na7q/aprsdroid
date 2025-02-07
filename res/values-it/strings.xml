@@ -481,7 +481,7 @@
 <string name="p_directonly_entry">Solo diretto</string>
 <string name="p_afsk_vox">Vox</string>
 <string name="p_igserver">Server</string>
-<string name="freq_control_options_summary">Imposta freq all'inizio</string>
+<string name="freq_control_options_summary">Imposta freq all\'inizio</string>
 <string name="p_ackdupe_interval_entry">Ack Dupe Timeout (0 = ACK disabilitato)</string>
 <string name="p_ratelimit5_summary">Limitare il numero di pacchetti TX in intervallo di 5 minuti</string>
 <string name="p_link_ble">Bluetooth a bassa energia</string>
@@ -508,7 +508,7 @@
 <string name="p_afsk_digirig">Digirig</string>
 <string name="p_msgdupetime_entry">Timeout del messaggio dupe (0 = disabilitato)</string>
 <string name="p_igfilter_summary">Filtro per i pacchetti in arrivo</string>
-<string name="p_units">Preferenza dell'unità</string>
+<string name="p_units">Preferenza dell\'unità</string>
 <string name="p_dedupe">Dedupe timeout</string>
 <string name="p_igating_enabled_summary">Iigate attualmente abilitato</string>
 <string name="p_retry_interval">Retry Interval</string>
@@ -522,7 +522,7 @@
 <string name="p_regenerate_summary">Si rigenera pericolosamente i pacchetti senza filtro !!</string>
 <string name="p_msgdupetime_summary">Messaggi duplicati consentiti dopo il timeout</string>
 <string name="p_afsk_pttport">Porta push-to-talk</string>
-<string name="p_hwacceleration_title">Abilita l'accelerazione dell'hardware</string>
+<string name="p_hwacceleration_title">Abilita l\'accelerazione dell\'hardware</string>
 <string name="p_aprsistraffic_entry">Sopprimere il registro del traffico APRS-IS</string>
 <string name="mbtiles_error">Errore Mbtiles</string>
 <string name="p__igating">Preferenze di igating</string>

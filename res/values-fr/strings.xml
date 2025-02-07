@@ -463,7 +463,7 @@
 <string name="p_igconnectretry_summary">Reconnecter au serveur en quelques secondes</string>
 <string name="p__location_mice_beacons_on">Envoyer des balises mic-e</string>
 <string name="p_positiontois_title">Envoyer des paquets à RF et APRS-IS</string>
-<string name="p_reconnect">TCP reconnecter le délai d'expiration</string>
+<string name="p_reconnect">TCP reconnecter le délai d\'expiration</string>
 <string name="p_digipeating">Préférences de digipeat</string>
 <string name="sort_newest">Trier par le plus récent</string>
 <string name="p_mbtiles_file_picker_summary">Aucun fichier sélectionné</string>
@@ -479,7 +479,7 @@
 <string name="p_timelastheard_entry">Timeout en quelques minutes</string>
 <string name="ad_thanks_7">Mike, NA7Q: Digipeating, Igating, Mbtiles Mapping, et plus encore!</string>
 <string name="freq_control_hint">144.390</string>
-<string name="p_igconnectretry_entry">Réessayer l'intervalle en quelques secondes</string>
+<string name="p_igconnectretry_entry">Réessayer l\'intervalle en quelques secondes</string>
 <string name="p__digipeating">Préférences de digipeat</string>
 <string name="p_offlinemap_entry">Activer la cartographie hors ligne</string>
 <string name="p__location_mice_beacons_off">Envoyer des balises non compressées</string>
@@ -494,14 +494,14 @@
 <string name="p_igsotimeout_summary">Temps avant de réinitialiser la connexion</string>
 <string name="p_bt_reconnect_entry">Temps avant de reconnecter</string>
 <string name="p_dedupe_summary">Digipeat Timeout pour les paquets en double</string>
-<string name="p_retry_interval_entry">Taux de début d'intervalle de réception</string>
+<string name="p_retry_interval_entry">Taux de début d\'intervalle de réception</string>
 <string name="p_digipeating_preferences">Fonctions Digi &amp; Regen</string>
 <string name="p__location_compressed_beacons_off">Envoyer des balises non compressées</string>
 <string name="p_ratelimit1_entry">Limite de paquets à 1 min Intervalle</string>
 <string name="p_offlinemap">Cartes OSM</string>
-<string name="p_igserver_entry">Entrez le nom d'hôte du serveur APRS-IS</string>
-<string name="p_hwacceleration_summary">Basculer l'accélération du matériel pour la vue de la carte</string>
-<string name="p_igsotimeout_entry">Valeur de délai d'expiration en secondes (0 = désactiver)</string>
+<string name="p_igserver_entry">Entrez le nom d\'hôte du serveur APRS-IS</string>
+<string name="p_hwacceleration_summary">Basculer l\'accélération du matériel pour la vue de la carte</string>
+<string name="p_igsotimeout_entry">Valeur de délai d\'expiration en secondes (0 = désactiver)</string>
 <string name="p_igating_disabled_summary">Igate actuellement désactivé</string>
 <string name="p_directonly_summary">Seules les stations Digipeats directement entendues</string>
 <string name="p__ratelimit">Limitation du taux de transmission</string>
@@ -527,7 +527,7 @@
 <string name="p_regenerate_summary">Dangereusement régénéré entendu des paquets sans filtre !!</string>
 <string name="p_msgdupetime_summary">Messages en double autorisés après le temps mort</string>
 <string name="p_afsk_pttport">Port push-talk</string>
-<string name="p_hwacceleration_title">Activer l'accélération matérielle</string>
+<string name="p_hwacceleration_title">Activer l\'accélération matérielle</string>
 <string name="p_aprsistraffic_entry">Supprimer le journal de trafic APRS-IS</string>
 <string name="mbtiles_error">Erreur de mbtiles</string>
 <string name="p__igating">Préférences igatives</string>
@@ -539,11 +539,11 @@
 <string name="p_digipeaterpath_summary">Chemins vers Digipeat</string>
 <string name="p_all_files_access_summary">Appuyez pour gérer les autorisations pour tous les fichiers accès.</string>
 <string name="p_igsotimeout">Timeout de socket TCP</string>
-<string name="p_bt_reconnect">BT reconnecter le délai d'expiration</string>
+<string name="p_bt_reconnect">BT reconnecter le délai d\'expiration</string>
 <string name="p_igpath_entry">Définir le chemin RF Digi</string>
 <string name="p_ackdupetoggle_summary">Envoie des ACK Dupe après la période de temps mort</string>
 <string name="p_ratelimit5">Limite de taux TX 5 min</string>
-<string name="p_units_entry">Sélectionner l'unité de distance</string>
+<string name="p_units_entry">Sélectionner l\'unité de distance</string>
 <string name="p_messaging">Préférences de messagerie</string>
 <string name="p_igfilter">Filtre à paquets</string>
 <string name="p_msgdupetoggle_summary">Permet des messages dupe après la période de temps mort</string>
