@@ -82,5 +82,7 @@
         android:typeface="monospace"
         android:focusable="false"
         android:layout_below="@id/station_course"
-        android:layout_marginTop="5sp" />
+        android:layout_marginTop="5sp"
+		android:visibility="gone" />
+		
 </RelativeLayout>

@@ -9,7 +9,6 @@ import _root_.android.util.Log
 import _root_.android.view.View
 import _root_.android.widget.{SimpleCursorAdapter, TextView}
 import _root_.android.widget.FilterQueryProvider
-import android.widget.RelativeLayout
 
 object StationListAdapter {
 	import StorageDatabase.Station._
@@ -73,6 +72,7 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		val speed = speedInKnots * 1.15078               // Convert from knots to mph to get corrected speed
 		val course = cursor.getFloat(COLUMN_COURSE)
 		val dist = Array[Float](0, 0)
+		val comment = cursor.getString(COLUMN_COMMENT) // Retrieve COMMENT data
 
 		if (call == mycall) {
 			view.setBackgroundColor(0x4020ff20)
@@ -106,7 +106,15 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		// Add speed and course to the UI (simplified version)
 		val speedTextView = view.findViewById(R.id.station_speed).asInstanceOf[TextView]
 		val courseTextView = view.findViewById(R.id.station_course).asInstanceOf[TextView]
-
+		val listMessageTextView = view.findViewById(R.id.listmessage).asInstanceOf[TextView]		
+		
+		if (comment != null && comment.trim.nonEmpty) {
+			listMessageTextView.setText(comment)
+			listMessageTextView.setVisibility(View.VISIBLE) // Make it visible if comment is not empty
+		} else {
+			listMessageTextView.setVisibility(View.GONE)  // Hide it if comment is empty or null
+		}
+		
 		// Convert speed based on the preference
 		val speedText = if (isMetric) {
 		  val speedInKmh = speed * 1.60934 // 1 mph = 1.60934 km/h
@@ -122,12 +130,6 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		// Set visibility based on the course value (only show if valid)
 		courseTextView.setVisibility(if (course > 0) View.VISIBLE else View.GONE)
 		if (course > 0) courseTextView.setText(f"Course: $course%.1f°") // Assuming course is in degrees
-		
-		if (speed == 0 && course > 0) {
-		  val layoutParams = courseTextView.getLayoutParams.asInstanceOf[RelativeLayout.LayoutParams]
-		  layoutParams.topMargin = 0  // Set marginTop to 0
-		  courseTextView.setLayoutParams(layoutParams)
-		}
 		
 		super.bindView(view, context, cursor)
 	}
