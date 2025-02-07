@@ -72,6 +72,7 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		val speed = speedInKnots * 1.15078               // Convert from knots to mph to get corrected speed
 		val course = cursor.getFloat(COLUMN_COURSE)
 		val dist = Array[Float](0, 0)
+		val comment = cursor.getString(COLUMN_COMMENT) // Retrieve COMMENT data
 
 		if (call == mycall) {
 			view.setBackgroundColor(0x4020ff20)
@@ -105,7 +106,15 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		// Add speed and course to the UI (simplified version)
 		val speedTextView = view.findViewById(R.id.station_speed).asInstanceOf[TextView]
 		val courseTextView = view.findViewById(R.id.station_course).asInstanceOf[TextView]
-
+		val listMessageTextView = view.findViewById(R.id.listmessage).asInstanceOf[TextView]		
+		
+		if (comment != null && comment.trim.nonEmpty) {
+			listMessageTextView.setText(comment)
+			listMessageTextView.setVisibility(View.VISIBLE) // Make it visible if comment is not empty
+		} else {
+			listMessageTextView.setVisibility(View.GONE)  // Hide it if comment is empty or null
+		}
+		
 		// Convert speed based on the preference
 		val speedText = if (isMetric) {
 		  val speedInKmh = speed * 1.60934 // 1 mph = 1.60934 km/h
