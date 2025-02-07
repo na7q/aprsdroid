@@ -8,10 +8,6 @@
 		android:title="@string/singlelog"
 		android:alphabeticShortcut="s"
 		android:icon="@android:drawable/ic_menu_myplaces" />
-	<item android:id="@+id/sortby"
-		android:title="@string/sortby"
-		android:alphabeticShortcut="e"
-		android:icon="@android:drawable/ic_menu_delete" />
 	<item android:id="@+id/export"
 		android:title="@string/export_log"
 		android:alphabeticShortcut="x"
