@@ -9,6 +9,7 @@ import _root_.android.util.Log
 import _root_.android.view.View
 import _root_.android.widget.{SimpleCursorAdapter, TextView}
 import _root_.android.widget.FilterQueryProvider
+import java.util.regex.{Matcher, Pattern}
 
 object StationListAdapter {
 	import StorageDatabase.Station._
@@ -73,6 +74,7 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		val course = cursor.getFloat(COLUMN_COURSE)
 		val dist = Array[Float](0, 0)
 		val comment = cursor.getString(COLUMN_COMMENT) // Retrieve COMMENT data
+		val wx = parseWeatherData(comment, symbol)
 
 		if (call == mycall) {
 			view.setBackgroundColor(0x4020ff20)
@@ -107,8 +109,18 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		val speedTextView = view.findViewById(R.id.station_speed).asInstanceOf[TextView]
 		val courseTextView = view.findViewById(R.id.station_course).asInstanceOf[TextView]
 		val listMessageTextView = view.findViewById(R.id.listmessage).asInstanceOf[TextView]		
-		
-		if (comment != null && comment.trim.nonEmpty) {
+		val wxTextView = view.findViewById(R.id.wx).asInstanceOf[TextView]		
+
+		if (wx.isDefined && wx.get.trim.nonEmpty) {
+		  // If wx contains a non-empty value, set the text and make it visible
+		  wxTextView.setText(wx.get)
+		  wxTextView.setVisibility(View.VISIBLE)
+		} else {
+		  // If wx is None or empty, hide the wx TextView
+		  wxTextView.setVisibility(View.GONE)
+		}
+
+		if (comment != null && comment.trim.nonEmpty && wx.isEmpty) {
 			listMessageTextView.setText(comment)
 			listMessageTextView.setVisibility(View.VISIBLE) // Make it visible if comment is not empty
 		} else {
@@ -132,6 +144,76 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		if (course > 0) courseTextView.setText(f"Course: $course%.1f°") // Assuming course is in degrees
 		
 		super.bindView(view, context, cursor)
+	}
+	
+	def parseWeatherData(comment: String, symbol: String): Option[String] = {
+	  // Check if the symbol ends with '_'
+	  if (symbol.endsWith("_")) {
+		// Log if the symbol ends with '_'
+		Log.d("WeatherParser", s"Symbol ends with '_', proceeding with parsing.")
+		Log.d("WeatherParser", s"Raw comment: $comment")
+
+		//val pattern = ".*(\\d{3}|\\.\\.\\.)/(\\d{3}|\\.\\.\\.)*(g\\d{3})?(t[-\\d]{3})?(r\\d{3})?(p\\d{3})?(P\\d{3})?(h\\d{2})?(b\\d{5})?(L\\d{3})?(l\\d{3})?(.*)".r
+		//val pattern = ".*(\\d{3}|\\.\\.\\.)/(\\d{3}|\\.\\.\\.)?(g\\d{3}|g\\.\\.\\.)?(t[-\\d]{3}|t\\.\\.\\.)?(r\\d{3}|r\\.\\.\\.)?(p\\d{3}|p\\.\\.\\.)?(P\\d{3}|P\\.\\.\\.)?(h\\d{2}|h\\.\\.)?(b\\d{5}|b\\.\\.\\.)?(L\\d{3}|L\\.\\.\\.)?(l\\d{3}|l\\.\\.\\.)?\\s*(.*)".r
+		val pattern = ".*?(\\d{3}|\\.\\.\\.)/(\\d{3}|\\.\\.\\.)?(g\\d{3}|g\\.\\.\\.)?(t[-\\d]{3}|t\\.\\.\\.)?(r\\d{3}|r\\.\\.\\.)?(p\\d{3}|p\\.\\.\\.)?(P\\d{3}|P\\.\\.\\.)?(h\\d{2}|h\\.\\.)?(b\\d{5}|b\\.\\.\\.)?(L\\d{3}|L\\.\\.\\.)?(l\\d{3}|l\\.\\.\\.)?\\s*(.*)?".r
+
+		//val pattern = ".*?(\\d{3}|\\.\\.\\.)/(\\d{3}|\\.\\.\\.)?(g\\d{3}|g\\.\\.\\.)?(t[-\\d]{3}|t\\.\\.\\.)?(r\\d{3}|r\\.\\.\\.)?(p\\d{3}|p\\.\\.\\.)?(P\\d{3}|P\\.\\.\\.)?(h\\d{2}|h\\.\\.)?(b\\d{5}|b\\.\\.\\.)?(L\\d{3}|L\\.\\.\\.)?(l\\d{3}|l\\.\\.\\.)?(?:\\s+(.*))?".r
+
+		// Define regex patterns for all weather components
+		val patterns = List(
+		  "DirectionSpeed" -> ".*(\\d{3}|\\.\\.\\.)/(\\d{3}|\\.\\.\\.).*".r,
+		  "Gust" -> ".*g(\\d{3}).*".r,
+		  "Temp" -> ".*t([-\\d]{3}).*".r,
+		  "Rain1hr" -> ".*r(\\d{3}).*".r,
+		  "Rain24hr" -> ".*p(\\d{3}).*".r,
+		  "RainMidnight" -> ".*P(\\d{3}).*".r,
+		  "Humidity" -> ".*h(\\d{2}).*".r,
+		  "Pressure" -> ".*b(\\d{5}).*".r,
+		  "LuminosityLow" -> ".*L(\\d{3}).*".r,
+		  "LuminosityHigh" -> ".*l(\\d{3}).*".r
+		)
+
+		// Use foldLeft to accumulate the parsed data
+		val weatherDataList = patterns.foldLeft(List[String]()) { (acc, patternPair) =>
+		  val (name, pattern) = patternPair
+		  comment match {
+			case pattern(data @ _*) if name == "DirectionSpeed" =>
+			  // Ensure exactly 2 items (direction and speed)
+			  if (data.length == 2) {
+				val direction = data(0)
+				val speed = data(1)
+				Log.d("WeatherParser", s"Matched $name data: direction = $direction, speed = $speed")
+				acc :+ s"Direction: $direction Speed: $speed"
+			  } else acc
+
+			case pattern(data @ _*) =>
+			  Log.d("WeatherParser", s"Matched $name data: ${data.mkString(", ")}")
+			  acc :+ s"$name: ${data.mkString(", ")}"
+
+			case _ => acc // No match for this pattern, leave the accumulator unchanged
+		  }
+		}
+
+		// Extract the remaining comment (everything after weather data)
+		val remainingComment = comment match {
+		  case pattern(_, _, _, _, _, _, _, _, _, _, _, remaining) => remaining.trim
+		  case _ => "" // If the pattern doesn't match, return an empty string
+		}
+
+		// Add the remaining comment to the weather data list if it's non-empty
+		if (weatherDataList.nonEmpty || remainingComment.nonEmpty) {
+		  val result = weatherDataList.mkString(" ") + (if (remainingComment.nonEmpty) s" Comment: $remainingComment" else "")
+		  Log.d("WeatherParser", s"Final parsed weather data: $result")
+		  Some(result)
+		} else {
+		  Log.d("WeatherParser", "No matches found for weather data.")
+		  None
+		}
+	  } else {
+		// If symbol does not end with '_', log and return None
+		Log.d("WeatherParser", s"Symbol does not end with '_', returning empty result.")
+		None
+	  }
 	}
 
 	def getNeighborFilter() = new FilterQueryProvider() {

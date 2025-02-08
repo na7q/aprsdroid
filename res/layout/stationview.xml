@@ -85,4 +85,16 @@
         android:layout_marginTop="5sp"
 		android:visibility="gone" />
 		
+    <TextView
+        android:id="@+id/wx"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#8080b0"
+        android:textSize="17sp"
+        android:typeface="monospace"
+        android:focusable="false"
+        android:layout_below="@id/station_course"
+        android:layout_marginTop="5sp"
+		android:visibility="gone" />		
+		
 </RelativeLayout>
