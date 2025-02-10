@@ -536,4 +536,7 @@
 <string name="p_all_files_access_title">Grant Späicher Permissiounen</string>
 <string name="p_igpath_summary">Aps-ass zu rf digi Wee</string>
 
+<string name="p_message_id_title">Desaktivéiere Message ID</string>
+<string name="p_message_id_summary">Entfernt Message ID vun Sortie Päckchen</string>
+
 </resources>

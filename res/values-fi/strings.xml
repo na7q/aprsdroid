@@ -542,4 +542,7 @@
 <string name="p_all_files_access_title">Apurahatalousoikeudet</string>
 <string name="p_igpath_summary">APRS-on RF Digi -polku</string>
 
+<string name="p_message_id_title">Poista viestitunnus käytöstä</string>
+<string name="p_message_id_summary">Poistaa viestitunnuksen lähtevistä paketeista</string>
+
 </resources>

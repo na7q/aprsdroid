@@ -541,4 +541,7 @@
 <string name="p_all_files_access_title">Dovoljenja za shranjevanje</string>
 <string name="p_igpath_summary">APRS-IS RF DIGI PATH</string>
 
+<string name="p_message_id_title">Onemogoči ID sporočila</string>
+<string name="p_message_id_summary">Odstrani ID sporočila iz odhodnih paketov</string>
+
 </resources>

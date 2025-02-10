@@ -541,4 +541,7 @@
 <string name="p_digipeating_summary">Активирайте DigiPeater</string>
 <string name="p_afsk_vox">Vox</string>
 
+<string name="p_message_id_title">Деактивирайте идентификатора на съобщението</string>
+<string name="p_message_id_summary">Премахва идентификационния номер на съобщението от изходящи пакети</string>
+
 </resources>

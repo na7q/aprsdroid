@@ -557,4 +557,7 @@
 <string name="p_all_files_access_title">अनुदान भण्डारण अनुमतिहरू</string>
 <string name="p_igpath_summary">एपीआर-आरएफ डिग्री मार्गमा छ</string>
 
+<string name="p_message_id_title">सन्देश आईडी असक्षम गर्नुहोस्</string>
+<string name="p_message_id_summary">बहिर्गमन प्याकेटबाट सन्देश आईडी हटाउँछ</string>
+
 </resources>

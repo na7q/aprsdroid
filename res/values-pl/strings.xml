@@ -547,4 +547,7 @@ z późniejszych wersji. \n\n Niniejszy program rozpowszechniany jest z nadziej�
 <string name="p_all_files_access_title">Uprawnienia do przechowywania dotacji</string>
 <string name="p_igpath_summary">APRS-IS do RF Digi Path</string>
 
+<string name="p_message_id_title">Wyłącz identyfikator wiadomości</string>
+<string name="p_message_id_summary">Usuwa identyfikator wiadomości z wychodzących pakietów</string>
+
 </resources>

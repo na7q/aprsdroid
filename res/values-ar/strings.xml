@@ -559,4 +559,7 @@
 <string name="p_digipeating_summary">تمكين digipeater</string>
 <string name="p_afsk_vox">فوكس</string>
 
+<string name="p_message_id_title">تعطيل معرف الرسالة</string>
+<string name="p_message_id_summary">يزيل معرف الرسالة من الحزم الصادرة</string>
+
 </resources>

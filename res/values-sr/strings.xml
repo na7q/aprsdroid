@@ -540,4 +540,7 @@
 <string name="p_all_files_access_title">Дозволе за складиштење грантова</string>
 <string name="p_igpath_summary">АПР-ови-је да РФ ДИГИ пут</string>
 
+<string name="p_message_id_title">Онемогући ИД поруке</string>
+<string name="p_message_id_summary">Уклања ИД поруке од одлазних пакета</string>
+
 </resources>

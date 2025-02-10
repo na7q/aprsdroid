@@ -541,4 +541,7 @@
 <string name="p_all_files_access_title">BILDNING AV LAGNING Behörighet</string>
 <string name="p_igpath_summary">APRS-IS TO RF DIGI PATH</string>
 
+<string name="p_message_id_title">Inaktivera meddelande -ID</string>
+<string name="p_message_id_summary">Tar bort meddelandets ID från utgående paket</string>
+
 </resources>

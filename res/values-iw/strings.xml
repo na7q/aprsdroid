@@ -543,4 +543,7 @@
 <string name="p_all_files_access_title">הענק הרשאות אחסון</string>
 <string name="p_igpath_summary">APRS- IS ל- RF DIGI PATH</string>
 
+<string name="p_message_id_title">השבת מזהה הודעה</string>
+<string name="p_message_id_summary">מסיר מזהה הודעות ממנות יוצאות</string>
+
 </resources>

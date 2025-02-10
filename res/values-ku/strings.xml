@@ -559,4 +559,7 @@
 <string name="p_all_files_access_title">Destûrên hilanînê bistînin</string>
 <string name="p_igpath_summary">Aprs-Riya RF Digi ye</string>
 
+<string name="p_message_id_title">Nasnameya peyamê asteng bikin</string>
+<string name="p_message_id_summary">Nasnameya peyamê ji pakêtên derketî vedihewîne</string>
+
 </resources>

@@ -539,4 +539,7 @@
 <string name="p_all_files_access_title">Δικαιώματα αποθήκευσης χορήγησης</string>
 <string name="p_igpath_summary">APRS-είναι στο RF DIGI PATH</string>
 
+<string name="p_message_id_title">Απενεργοποιήστε το αναγνωριστικό μηνύματος</string>
+<string name="p_message_id_summary">Αφαιρεί το αναγνωριστικό μηνύματος από τα εξερχόμενα πακέτα</string>
+
 </resources>

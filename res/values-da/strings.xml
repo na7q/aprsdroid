@@ -543,4 +543,7 @@
 <string name="p_all_files_access_title">Tilskud opbevaringstilladelser</string>
 <string name="p_igpath_summary">Aprs-er til RF Digi-stien</string>
 
+<string name="p_message_id_title">Deaktiver meddelelses -ID</string>
+<string name="p_message_id_summary">Fjerner meddelelses -ID fra udgående pakker</string>
+
 </resources>

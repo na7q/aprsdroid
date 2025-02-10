@@ -544,4 +544,7 @@
 <string name="p_all_files_access_title">Разрешения на хранение гранта</string>
 <string name="p_igpath_summary">APRS-IS для RF Digi Path</string>
 
+<string name="p_message_id_title">Отключить идентификатор сообщения</string>
+<string name="p_message_id_summary">Удаляет идентификатор сообщения из исходящих пакетов</string>
+
 </resources>

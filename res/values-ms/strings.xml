@@ -541,4 +541,7 @@
 <string name="p_all_files_access_title">Kebenaran Penyimpanan Geran</string>
 <string name="p_igpath_summary">APRS-adalah laluan RF Digi</string>
 
+<string name="p_message_id_title">Lumpuhkan ID Mesej</string>
+<string name="p_message_id_summary">Membuang ID mesej dari paket keluar</string>
+
 </resources>

@@ -546,4 +546,7 @@
 <string name="p_all_files_access_title">Conceder permissões de armazenamento</string>
 <string name="p_igpath_summary">APRS-IS para RF DIGI PATH</string>
 
+<string name="p_message_id_title">Desative o ID da mensagem</string>
+<string name="p_message_id_summary">Remove o ID da mensagem de pacotes de saída</string>
+
 </resources>

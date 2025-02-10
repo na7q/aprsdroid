@@ -558,4 +558,7 @@
 <string name="p_all_files_access_title">Veita geymsluheimildir</string>
 <string name="p_igpath_summary">APRS-IS til RF Digi Path</string>
 
+<string name="p_message_id_title">Slökkva á skilríkjum skilaboða</string>
+<string name="p_message_id_summary">Fjarlægir skilríki skilaboða úr sendum pakka</string>
+
 </resources>

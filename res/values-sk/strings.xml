@@ -558,4 +558,7 @@
 <string name="p_all_files_access_title">Povolenia na ukladanie grantu</string>
 <string name="p_igpath_summary">APRS-IS to RF DIGI Cesta</string>
 
+<string name="p_message_id_title">Zakázať ID správy</string>
+<string name="p_message_id_summary">Odstraňuje ID správy z odchádzajúcich paketov</string>
+
 </resources>

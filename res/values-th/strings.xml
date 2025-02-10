@@ -557,4 +557,7 @@
 <string name="p_all_files_access_title">ให้สิทธิ์การจัดเก็บ</string>
 <string name="p_igpath_summary">APRS-is to RF Digi Path</string>
 
+<string name="p_message_id_title">ปิดใช้งานรหัสข้อความ</string>
+<string name="p_message_id_summary">ลบรหัสข้อความจากแพ็กเก็ตขาออก</string>
+
 </resources>

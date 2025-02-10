@@ -545,4 +545,7 @@ Je kan ook je voorkeuren aanpassen via het menu.</string>
 <string name="p_all_files_access_title">Subsidie ​​machtigingen</string>
 <string name="p_igpath_summary">Aprs-is is naar rf digi pad</string>
 
+<string name="p_message_id_title">Schakel bericht -ID uit</string>
+<string name="p_message_id_summary">Verwijdert bericht -ID uit uitgaande pakketten</string>
+
 </resources>

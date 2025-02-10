@@ -544,4 +544,7 @@
 <string name="p_all_files_access_title">Hibe depolama izinleri</string>
 <string name="p_igpath_summary">APRS-RF digi yoluna</string>
 
+<string name="p_message_id_title">Mesaj kimliğini devre dışı bırak</string>
+<string name="p_message_id_summary">Giden paketlerden mesaj kimliğini kaldırır</string>
+
 </resources>

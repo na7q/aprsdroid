@@ -560,4 +560,7 @@
 <string name="p_all_files_access_title">Támogatás tárolási engedélyek</string>
 <string name="p_igpath_summary">APRS-IS az RF Digi Pathhoz</string>
 
+<string name="p_message_id_title">Az üzenet azonosítójának letiltása</string>
+<string name="p_message_id_summary">Eltávolítja az üzenetazonosítványt a kimenő csomagokból</string>
+
 </resources>

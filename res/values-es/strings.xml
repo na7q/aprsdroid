@@ -545,4 +545,7 @@
 <string name="p_all_files_access_title">Permisos de almacenamiento de subvención</string>
 <string name="p_igpath_summary">APRS-es a RF Digi Path</string>
 
+<string name="p_message_id_title">Desactivar el ID de mensaje</string>
+<string name="p_message_id_summary">Elimina el ID de mensaje de los paquetes salientes</string>
+
 </resources>

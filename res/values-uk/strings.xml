@@ -556,4 +556,7 @@
 <string name="p_all_files_access_title">Дозвіл на зберігання</string>
 <string name="p_igpath_summary">Aprs-IS до RF Digi Path</string>
 
+<string name="p_message_id_title">Вимкнути ідентифікатор повідомлення</string>
+<string name="p_message_id_summary">Видаляє ідентифікатор повідомлення з вихідних пакетів</string>
+
 </resources>

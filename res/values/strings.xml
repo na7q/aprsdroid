@@ -151,6 +151,8 @@
 <string name="p_igpath_entry">Set RF Digi Path</string>
 <string name="p_igpath_summary">APRS-IS to RF Digi Path</string>
 
+<string name="p_message_id_title">Disable Message ID</string>
+<string name="p_message_id_summary">Removes message ID from outgoing packets</string>
 <!-- map view -->
 <string name="map_overlays">Overlays</string>
 <string name="map_google">Google: Map</string>

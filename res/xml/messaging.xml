@@ -51,8 +51,8 @@
 
 	<CheckBoxPreference
 		android:key="p.msgidoff"
-		android:title="Disable Message ID"
-		android:summary="Removes message ID from outgoing packets"
+		android:title="@string/p_message_id_title"
+		android:summary="@string/p_message_id_summary"
 		android:defaultValue="false" />
 
 

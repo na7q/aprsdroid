@@ -558,4 +558,7 @@
 <string name="p_all_files_access_title">अनुदान भंडारण अनुमतियाँ</string>
 <string name="p_igpath_summary">Aprs-rf digi पथ के लिए है</string>
 
+<string name="p_message_id_title">संदेश आईडी अक्षम करें</string>
+<string name="p_message_id_summary">आउटगोइंग पैकेट से संदेश आईडी निकालता है</string>
+
 </resources>

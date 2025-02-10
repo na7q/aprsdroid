@@ -541,4 +541,7 @@
 <string name="p_all_files_access_title">ストレージ許可を付与します</string>
 <string name="p_igpath_summary">aprs-is to rf digiパス</string>
 
+<string name="p_message_id_title">メッセージIDを無効にします</string>
+<string name="p_message_id_summary">発信パケットからメッセージIDを削除します</string>
+
 </resources>

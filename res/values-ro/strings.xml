@@ -557,4 +557,7 @@
 <string name="p_all_files_access_title">Permisiuni de depozitare a acordării</string>
 <string name="p_igpath_summary">APRS-este la RF Digi Path</string>
 
+<string name="p_message_id_title">Dezactivați ID -ul mesajului</string>
+<string name="p_message_id_summary">Elimină ID -ul mesajului din pachetele de ieșire</string>
+
 </resources>

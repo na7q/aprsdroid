@@ -540,4 +540,7 @@
 <string name="p_all_files_access_title">Dozvole za dodjelu dodjele</string>
 <string name="p_igpath_summary">APRS-IS to RF digi staza</string>
 
+<string name="p_message_id_title">Onemogući ID poruke</string>
+<string name="p_message_id_summary">Uklanja ID poruke iz odlaznih paketa</string>
+
 </resources>

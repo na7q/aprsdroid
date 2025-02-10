@@ -543,4 +543,7 @@
 <string name="p_all_files_access_title">Oprávnění ukládání grantů</string>
 <string name="p_igpath_summary">APRS-IS na RF Digi GATI</string>
 
+<string name="p_message_id_title">Zakázat ID zprávy</string>
+<string name="p_message_id_summary">Odstraňuje ID zprávy z odchozích paketů</string>
+
 </resources>

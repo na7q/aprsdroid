@@ -502,7 +502,7 @@ http://www.gnu.de/documents/gpl-2.0.de.html</string>
 <string name="freq_control_summary">Freq</string>
 <string name="p_ackdupetoggle">ACK Dupe Timeout</string>
 <string name="p__location_compressed_summary">Normale oder Mic-E Baken</string>
-<string name="p_timelastheard_summary">Minuten um Messages kürzlich gehörter Stationen über HF auszusenden
+<string name="p_timelastheard_summary">Minuten um Messages kürzlich gehörter Stationen über HF auszusenden</string>
 <string name="p__messaging">Messaging Einstellungen</string>
 <string name="p_afsk_digirig">Digirig</string>
 <string name="p_msgdupetime_entry">DUPE Messages Timeout (0 = deaktiviert)</string>
@@ -544,5 +544,8 @@ http://www.gnu.de/documents/gpl-2.0.de.html</string>
 <string name="p_ackdupe_interval_summary">DUPE ACKS After Timeout erlaubt</string>
 <string name="p_all_files_access_title">Speicherberechtigungen gewähren</string>
 <string name="p_igpath_summary">APRS-IS zu HF Digi Pfad</string>
+
+<string name="p_message_id_title">Message ID deaktivieren</string>
+<string name="p_message_id_summary">Entfernt die Message ID von ausgehenden Paketen</string>
 
 </resources>

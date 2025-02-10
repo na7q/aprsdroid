@@ -558,4 +558,7 @@
 <string name="p_all_files_access_title">Permisos de almacenamento de subvencións</string>
 <string name="p_igpath_summary">APRS-is to rf digi ruta</string>
 
+<string name="p_message_id_title">Desactivar ID da mensaxe</string>
+<string name="p_message_id_summary">Elimina o ID da mensaxe dos paquetes saíntes</string>
+
 </resources>

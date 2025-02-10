@@ -555,4 +555,7 @@
 <string name="p_all_files_access_title">Andke ladustamislubadele</string>
 <string name="p_igpath_summary">APRS-IS RF DIGI PATH</string>
 
+<string name="p_message_id_title">Keelake teade ID</string>
+<string name="p_message_id_summary">Eemaldab väljaminevatest pakettidest sõnumi ID</string>
+
 </resources>

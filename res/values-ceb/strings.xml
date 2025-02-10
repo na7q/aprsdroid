@@ -557,4 +557,7 @@
 <string name="p_all_files_access_title">Paghatag pagtugot sa pagtipig</string>
 <string name="p_igpath_summary">Ang APRS-AYA SA RF DIGI DATI</string>
 
+<string name="p_message_id_title">I-disable ang mensahe ID</string>
+<string name="p_message_id_summary">Nagtangtang sa Mensahe ID gikan sa mga outgoing packet</string>
+
 </resources>

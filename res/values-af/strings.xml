@@ -536,4 +536,7 @@
 <string name="p_digipeating_summary">Aktiveer Digipeater</string>
 <string name="p_afsk_vox">Vox</string>
 
+<string name="p_message_id_title">Skakel boodskap -ID uit</string>
+<string name="p_message_id_summary">Verwyder die boodskap -ID van uitgaande pakkies</string>
+
 </resources>
