@@ -547,6 +547,6 @@
 <string name="p_igpath_summary">APRS-IS a RF Digi Path</string>
 
 <string name="p_message_id_title">Disabilita ID messaggio</string>
-<string name="p_message_id_summary">Rimuove l'ID messaggio dai pacchetti in uscita</string>
+<string name="p_message_id_summary">Rimuove l\'ID messaggio dai pacchetti in uscita</string>
 
 </resources>

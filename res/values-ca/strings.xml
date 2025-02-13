@@ -559,7 +559,7 @@
 <string name="p_all_files_access_title">Permisos d’emmagatzematge de la concessió</string>
 <string name="p_igpath_summary">APRS-és a RF Digi ruta</string>
 
-<string name="p_message_id_title">Desactiva l'identificador de missatge</string>
-<string name="p_message_id_summary">Elimina l'identificador del missatge dels paquets sortints</string>
+<string name="p_message_id_title">Desactiva l\'identificador de missatge</string>
+<string name="p_message_id_summary">Elimina l\'identificador del missatge dels paquets sortints</string>
 
 </resources>
