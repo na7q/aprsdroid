@@ -1,17 +1,18 @@
 package org.aprsdroid.app
 
 import android.bluetooth.{BluetoothAdapter, BluetoothDevice}
-import android.bluetooth.le.{ScanCallback, ScanResult}
+import android.bluetooth.le.{ScanCallback, ScanResult, BluetoothLeScanner}
 import android.util.AttributeSet
-import _root_.android.content.{Context, SharedPreferences, DialogInterface}
-import _root_.android.preference.{Preference, PreferenceManager}
+import android.content.{Context, SharedPreferences, DialogInterface}
+import android.preference.{Preference, PreferenceManager}
 import android.app.AlertDialog
-import android.bluetooth.le.BluetoothLeScanner
-import android.os.Handler
-import android.os.Looper
+import android.os.{Build, Handler, Looper}
 import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.ArrayAdapter
+import androidx.core.app.ActivityCompat
+import android.Manifest
+import android.app.Activity
 
 class BleScannerPreference(context: Context, attrs: AttributeSet) extends Preference(context, attrs) {
 
@@ -25,123 +26,149 @@ class BleScannerPreference(context: Context, attrs: AttributeSet) extends Prefer
   private def init(): Unit = {
     setOnPreferenceClickListener(new Preference.OnPreferenceClickListener {
       override def onPreferenceClick(preference: Preference): Boolean = {
-        startBleScan()
+        if (checkAndRequestBluetoothPermissions()) {
+          startBleScan()
+        }
         true
       }
     })
   }
 
-	private def startBleScan(): Unit = {
-	  bluetoothAdapter match {
-		case Some(adapter) if adapter.isEnabled =>
-		  bleScanner.foreach { scanner =>
-			val deviceList = scala.collection.mutable.ListBuffer.empty[BluetoothDevice]
+  /** Check and request runtime permissions for Bluetooth scanning (Android 12+) */
+  private def checkAndRequestBluetoothPermissions(): Boolean = {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12+
+      val permissions = Array(
+        Manifest.permission.BLUETOOTH_SCAN,
+        Manifest.permission.BLUETOOTH_CONNECT
+      )
 
-			// Check permissions
-			if (context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-			  Log.e("BleScanner", "Location permission not granted.")
-			  return
-			}
+      val missingPermissions = permissions.filter { perm =>
+        context.checkSelfPermission(perm) != PackageManager.PERMISSION_GRANTED
+      }
 
-			// Show "Scanning..." dialog first
-			val scanningDialog = new AlertDialog.Builder(context)
-			  .setTitle("Scanning for Devices")
-			  .setMessage("Please wait...")
-			  .setCancelable(false) // Prevent selection until scan is done
-			  .show()
+      if (missingPermissions.nonEmpty) {
+        val activity = context match {
+          case act: Activity => act
+          case _ => null
+        }
 
-			val scanCallback = new ScanCallback() {
-			  override def onScanResult(callbackType: Int, result: ScanResult): Unit = {
-				val device = result.getDevice
-				Log.d("BleScanner", s"Device found: ${device.getName} - ${device.getAddress}")
+        if (activity != null) {
+          ActivityCompat.requestPermissions(activity, missingPermissions, 1)
+        } else {
+          Log.e("BleScanner", "Could not request permissions: context is not an Activity.")
+        }
+        return false // Permissions not yet granted
+      }
+    }
+    true // Permissions granted
+  }
 
-				// Add unique devices
-				if (!deviceList.contains(device)) {
-				  deviceList += device
-				}
-			  }
+  private def startBleScan(): Unit = {
+    bluetoothAdapter match {
+      case Some(adapter) if adapter.isEnabled =>
+        bleScanner.foreach { scanner =>
+          val deviceList = scala.collection.mutable.ListBuffer.empty[BluetoothDevice]
 
-			  override def onScanFailed(errorCode: Int): Unit = {
-				Log.e("BleScanner", s"Scan failed with error code $errorCode")
-			  }
-			}
+          // Ensure permissions are granted before scanning
+          if (!checkAndRequestBluetoothPermissions()) {
+            Log.e("BleScanner", "Bluetooth scan permission not granted.")
+            return
+          }
 
-			// Start scanning
-			scanner.startScan(scanCallback)
+          // Show "Scanning..." dialog first
+          val scanningDialog = new AlertDialog.Builder(context)
+            .setTitle("Scanning for Devices")
+            .setMessage("Please wait...")
+            .setCancelable(false) // Prevent selection until scan is done
+            .show()
 
-			// Stop scanning and show device selection dialog after 5 seconds
-			handler.postDelayed(new Runnable {
-			  override def run(): Unit = {
-				scanner.stopScan(scanCallback)
-				scanningDialog.dismiss() // Close scanning message
+          val scanCallback = new ScanCallback() {
+            override def onScanResult(callbackType: Int, result: ScanResult): Unit = {
+              val device = result.getDevice
+              Log.d("BleScanner", s"Device found: ${device.getName} - ${device.getAddress}")
 
-				// Show device selection dialog
-				showDeviceSelectionDialog(deviceList.toSeq)
-			  }
-			}, 5000) // Scan for 5 seconds
-		  }
+              if (!deviceList.contains(device)) {
+                deviceList += device
+              }
+            }
 
-		case Some(adapter) if !adapter.isEnabled =>
-		  Log.e("BleScanner", "Bluetooth is disabled, enabling now.")
-		  adapter.enable()
+            override def onScanFailed(errorCode: Int): Unit = {
+              Log.e("BleScanner", s"Scan failed with error code $errorCode")
+            }
+          }
 
-		case None =>
-		  Log.e("BleScanner", "Bluetooth adapter not available on this device.")
-	  }
-	}
+          // Start scanning
+          scanner.startScan(scanCallback)
 
-	private def showDeviceSelectionDialog(devices: Seq[BluetoothDevice]): Unit = {
-	  if (devices.isEmpty) {
-		new AlertDialog.Builder(context)
-		  .setTitle("No BLE Devices Found")
-		  .setMessage("Try again?")
-		  .setPositiveButton("Rescan", new DialogInterface.OnClickListener {
-			override def onClick(dialog: DialogInterface, which: Int): Unit = {
-			  startBleScan() // Restart the scan
-			}
-		  })
-		  .setNegativeButton("Cancel", null)
-		  .show()
-		return
-	  }
+          // Stop scanning and show device selection dialog after 5 seconds
+          handler.postDelayed(new Runnable {
+            override def run(): Unit = {
+              scanner.stopScan(scanCallback)
+              scanningDialog.dismiss() // Close scanning message
 
-	  val deviceSnapshot = devices.toList // Freeze the device list
-	  val deviceListCharSequence = deviceSnapshot.map { device =>
-		s"${Option(device.getName).getOrElse("Unknown")} - ${device.getAddress}"
-	  }.map(_.asInstanceOf[CharSequence]).toArray
+              // Show device selection dialog
+              showDeviceSelectionDialog(deviceList.toSeq)
+            }
+          }, 5000) // Scan for 5 seconds
+        }
 
-	  new AlertDialog.Builder(context)
-		.setTitle("Select BLE Device")
-		.setItems(deviceListCharSequence, new DialogInterface.OnClickListener {
-		  override def onClick(dialog: DialogInterface, which: Int): Unit = {
-			if (which >= 0 && which < deviceSnapshot.size) {
-			  val selectedDevice = deviceSnapshot(which)
-			  saveSelectedDevice(selectedDevice)
-			} else {
-			  Log.e("BleScanner", s"Invalid selection index: $which (List size: ${deviceSnapshot.size})")
-			}
-		  }
-		})
-		.setPositiveButton("Rescan", new DialogInterface.OnClickListener {
-		  override def onClick(dialog: DialogInterface, which: Int): Unit = {
-			startBleScan() // Restart scan
-		  }
-		})
-		.setNegativeButton("Cancel", null)
-		.show()
-	}
+      case Some(adapter) if !adapter.isEnabled =>
+        Log.e("BleScanner", "Bluetooth is disabled, enabling now.")
+        adapter.enable()
 
+      case None =>
+        Log.e("BleScanner", "Bluetooth adapter not available on this device.")
+    }
+  }
 
-	private def updateDeviceListInDialog(dialog: AlertDialog, deviceList: Seq[BluetoothDevice]): Unit = {
-	  // Convert the device list to an array of CharSequences for display in the dialog
-	  val deviceListCharSequence = deviceList.map { device =>
-		s"${Option(device.getName).getOrElse("Unknown")} - ${device.getAddress}"
-	  }.map(_.asInstanceOf[CharSequence]).toArray
+  private def showDeviceSelectionDialog(devices: Seq[BluetoothDevice]): Unit = {
+    if (devices.isEmpty) {
+      new AlertDialog.Builder(context)
+        .setTitle("No BLE Devices Found")
+        .setMessage("Try again?")
+        .setPositiveButton("Rescan", new DialogInterface.OnClickListener {
+          override def onClick(dialog: DialogInterface, which: Int): Unit = {
+            startBleScan() // Restart the scan
+          }
+        })
+        .setNegativeButton("Cancel", null)
+        .show()
+      return
+    }
 
-	  // Update the items in the existing dialog's ListView
-	  dialog.getListView.setAdapter(new ArrayAdapter[CharSequence](context, android.R.layout.simple_list_item_1, deviceListCharSequence))
-	}
+    val deviceSnapshot = devices.toList // Freeze the device list
+    val deviceListCharSequence = deviceSnapshot.map { device =>
+      s"${Option(device.getName).getOrElse("Unknown")} - ${device.getAddress}"
+    }.map(_.asInstanceOf[CharSequence]).toArray
 
+    new AlertDialog.Builder(context)
+      .setTitle("Select BLE Device")
+      .setItems(deviceListCharSequence, new DialogInterface.OnClickListener {
+        override def onClick(dialog: DialogInterface, which: Int): Unit = {
+          if (which >= 0 && which < deviceSnapshot.size) {
+            val selectedDevice = deviceSnapshot(which)
+            saveSelectedDevice(selectedDevice)
+          } else {
+            Log.e("BleScanner", s"Invalid selection index: $which (List size: ${deviceSnapshot.size})")
+          }
+        }
+      })
+      .setPositiveButton("Rescan", new DialogInterface.OnClickListener {
+        override def onClick(dialog: DialogInterface, which: Int): Unit = {
+          startBleScan() // Restart scan
+        }
+      })
+      .setNegativeButton("Cancel", null)
+      .show()
+  }
+
+  private def updateDeviceListInDialog(dialog: AlertDialog, deviceList: Seq[BluetoothDevice]): Unit = {
+    val deviceListCharSequence = deviceList.map { device =>
+      s"${Option(device.getName).getOrElse("Unknown")} - ${device.getAddress}"
+    }.map(_.asInstanceOf[CharSequence]).toArray
+
+    dialog.getListView.setAdapter(new ArrayAdapter[CharSequence](context, android.R.layout.simple_list_item_1, deviceListCharSequence))
+  }
 
   private def saveSelectedDevice(device: BluetoothDevice): Unit = {
     val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -151,7 +178,6 @@ class BleScannerPreference(context: Context, attrs: AttributeSet) extends Prefer
       .putString("ble.name", deviceName)
       .apply()
 
-    // Set the summary with the selected device's name and address
     setSummary(s"$deviceName - ${device.getAddress}")
   }
 }
