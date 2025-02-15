@@ -59,12 +59,7 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper) extends AprsBa
 		// Must use application context here, otherwise authorization dialogs always fail, and
 		// other GATT operations intermittently fail.
 		info(R.string.ble_connecting, tncmac)
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			gatt = tncDevice.connectGatt(service.getApplicationContext, false, callback, BluetoothDevice.TRANSPORT_LE)
-		} else {
-			// Dual-mode devices are not supported
-			gatt = tncDevice.connectGatt(service.getApplicationContext, false, callback)
-		}
+		gatt = tncDevice.connectGatt(service.getApplicationContext(), false, callback, BluetoothDevice.TRANSPORT_LE)
 	}
 
 	private def tryReconnect(): Boolean = {
