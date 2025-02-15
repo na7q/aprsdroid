@@ -557,6 +557,8 @@
 <string name="bt_connected">Connected to TNC.</string>
 <string name="bt_reconnecting">Reconnecting in %s seconds…</string>
 
+<string name="ble_connecting">Connecting to BLE service on %s…</string>
+<string name="ble_disconnect">Unexpected BLE disconnect (status = %s)</string>
 <string name="afsk_info_sco_req">Requesting bluetooth SCO link...</string>
 <string name="afsk_info_sco_est">Bluetooth SCO link established.</string>
 

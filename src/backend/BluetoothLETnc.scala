@@ -9,7 +9,7 @@ import _root_.android.bluetooth.BluetoothGattCallback
 import _root_.android.bluetooth.BluetoothGatt
 import _root_.android.bluetooth.BluetoothDevice
 import _root_.net.ab0oo.aprs.parser._
-import android.os.Build
+import _root_.android.os.Build
 
 import java.io._
 import java.util.concurrent.Semaphore
@@ -59,12 +59,7 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper) extends AprsBa
 		// Must use application context here, otherwise authorization dialogs always fail, and
 		// other GATT operations intermittently fail.
 		info(R.string.ble_connecting, tncmac)
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			gatt = tncDevice.connectGatt(service.getApplicationContext, false, callback, BluetoothDevice.TRANSPORT_LE)
-		} else {
-			// Dual-mode devices are not supported
-			gatt = tncDevice.connectGatt(service.getApplicationContext, false, callback)
-		}
+		gatt = tncDevice.connectGatt(service.getApplicationContext(), false, callback, BluetoothDevice.TRANSPORT_LE)
 	}
 
 	private def tryReconnect(): Boolean = {
@@ -323,7 +318,7 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper) extends AprsBa
 	override def stop(): Unit = {
 		if (gatt != null) {
 			conn.returnFreq()
-			reconnect = false			
+			reconnect = false
 			gatt.disconnect()
 			gatt.close()
 			gatt = null
