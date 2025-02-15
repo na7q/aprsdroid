@@ -18,7 +18,9 @@ import java.util.concurrent.Semaphore
 // This requires API level 21 at a minimum, API level 23 to work with dual-mode devices.
 class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper) extends AprsBackend(prefs) {
 	private val TAG = "APRSdroid.BluetoothLE"
-
+	
+	val RECONNECT = prefs.getStringInt("bt.reconnect", 30)
+	
 	private val SERVICE_UUID = UUID.fromString("00000001-ba2a-46c9-ae49-01b0961f68bb")
 	private val CHARACTERISTIC_UUID_RX = UUID.fromString("00000003-ba2a-46c9-ae49-01b0961f68bb")
 	private val CHARACTERISTIC_UUID_TX = UUID.fromString("00000002-ba2a-46c9-ae49-01b0961f68bb")
@@ -36,8 +38,8 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper) extends AprsBa
 
 	private var conn : BLEReceiveThread = null
 	private var retries = 1
-	private var reconnect = false
 
+	private var reconnect = false
 	private var mtu = 20 // Default BLE MTU (-3)
 
 	private def info(id : Integer, args : Object*) {
@@ -81,9 +83,9 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper) extends AprsBa
 				retries -= 1
 			} else { // reconnect == true
 				// Same reconnect logic as BluetoothTnc code.
-				info(R.string.bt_reconnecting)
+				info(R.string.bt_reconnecting, RECONNECT.asInstanceOf[Object])
 				try {
-					Thread.sleep(3 * 1000) // It *should* be safe to sleeo here since the connection is closed.
+					Thread.sleep(RECONNECT * 1000) // It *should* be safe to sleep here since the connection is closed.
 				} catch {
 					case _:InterruptedException =>
 						return false
@@ -290,6 +292,19 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper) extends AprsBa
 		txCharacteristic = null
 		conn = new BLEReceiveThread()
 		connect()
+		
+		if (!reconnect) {
+			try {
+				// Attempt to start the poster (with exception handling)
+				service.postPosterStarted()
+				Log.d("ProtoTNC", "Started postPosterStarted: ")
+				
+			} catch {
+				case e: Exception =>
+					Log.d("ProtoTNC", "Exception in postPosterStarted: " + e.getMessage)
+			}
+		}
+		
 	}
 
 	override def update(packet: APRSPacket): String = {
@@ -364,14 +379,6 @@ class BluetoothLETnc(service : AprsService, prefs : PrefsWrapper) extends AprsBa
 			}
 
 			Log.d(TAG, "BLEReceiveThread.run()")
-
-			try {
-				// Attempt to start the poster (with exception handling)
-				service.postPosterStarted()
-			} catch {
-				case e: Exception =>
-					Log.d("ProtoTNC", "Exception in postPosterStarted: " + e.getMessage)
-			}
 
 			while (running) {
 				try {
