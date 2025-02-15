@@ -9,7 +9,7 @@ import _root_.android.bluetooth.BluetoothGattCallback
 import _root_.android.bluetooth.BluetoothGatt
 import _root_.android.bluetooth.BluetoothDevice
 import _root_.net.ab0oo.aprs.parser._
-import android.os.Build
+import _root_.android.os.Build
 
 import java.io._
 import java.util.concurrent.Semaphore
