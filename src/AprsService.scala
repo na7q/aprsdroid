@@ -23,6 +23,7 @@ object AprsService {
 	val SERVICE_STARTED = PACKAGE + ".SERVICE_STARTED"
 	val SERVICE_STOPPED = PACKAGE + ".SERVICE_STOPPED"
 	val POSITION = PACKAGE + ".POSITION"
+	val HUD = PACKAGE + ".HUD"
 	val MICLEVEL = PACKAGE + ".MICLEVEL" // internal volume event intent
 	val LINK_ON = PACKAGE + ".LINK_ON"
 	val LINK_OFF = PACKAGE + ".LINK_OFF"
@@ -546,6 +547,7 @@ class AprsService extends Service {
 	def addPosition(ts : Long, ap : APRSPacket, field : InformationField, pos : Position, objectname : String) {
 		val cse = getCSE(field)
 		db.addPosition(ts, ap, pos, cse, objectname)
+		hudOutput(ts, ap, pos, cse, objectname)
 
 		sendBroadcast(new Intent(POSITION)
 			.putExtra(SOURCE, ap.getSourceCall())
@@ -554,6 +556,81 @@ class AprsService extends Service {
 			.putExtra(PACKET, ap.toString())
 		)
 	}
+
+	def hudOutput(ts: Long, ap: APRSPacket, pos: Position, cse: CourseAndSpeedExtension, objectname: String) {
+
+	  // Define constants using the PACKAGE prefix
+	  val LOCATION_LAT = PACKAGE + ".LOCATION_LAT"
+	  val LOCATION_LON = PACKAGE + ".LOCATION_LON"
+	  val COMMENT = PACKAGE + ".COMMENT"
+	  val SYMBOL = PACKAGE + ".SYMBOL"
+	  val SPEED = PACKAGE + ".SPEED"
+	  val COURSE = PACKAGE + ".COURSE"
+	  val SOURCE = PACKAGE + ".SOURCE"
+	  val CALLSIGN = PACKAGE + ".CALLSIGN"
+	  val PACKET = PACKAGE + ".PACKET"	
+
+	  Log.d("HUD_OUTPUT", s"packet: $ap")
+
+	  val call = ap.getSourceCall()
+	  Log.d("HUD_OUTPUT", s"call: $call")
+	  
+	  val lat = (pos.getLatitude() * 1000000).asInstanceOf[Int]
+	  Log.d("HUD_OUTPUT", s"lat: $lat")
+	  
+	  val lon = (pos.getLongitude() * 1000000).asInstanceOf[Int]
+	  Log.d("HUD_OUTPUT", s"lon: $lon")
+	  
+	  val sym = "%s%s".format(pos.getSymbolTable(), pos.getSymbolCode())
+	  Log.d("HUD_OUTPUT", s"sym: $sym")
+	  
+	  val comment = ap.getAprsInformation().getComment()
+	  Log.d("HUD_OUTPUT", s"comment: $comment")
+	  
+	  val qrg = AprsPacket.parseQrg(comment)
+	  Log.d("HUD_OUTPUT", s"qrg: $qrg")
+
+	  val station = if (objectname != null) objectname else call
+	  Log.d("HUD_OUTPUT", s"station: $station")
+
+	  // Handle null speed and course values
+	  val speedOption: Option[Int] = Option(cse).flatMap(s => Option(s.getSpeed()).map(_.asInstanceOf[Int]))
+	  Log.d("HUD_OUTPUT", s"speedOption: $speedOption")
+
+	  val courseOption: Option[Int] = Option(cse).flatMap(s => Option(s.getCourse()).map(_.asInstanceOf[Int]))
+	  Log.d("HUD_OUTPUT", s"courseOption: $courseOption")
+
+	  // Convert speed to mph if it's not null, else set speedmph to None
+	  val speedmph: Option[Double] = speedOption.map(speed => speed * 1.15078)
+	  Log.d("HUD_OUTPUT", s"speedmph: $speedmph")
+
+	  // Broadcast the information, checking for null values
+	  val intent = new Intent(HUD)
+		.putExtra(SOURCE, call)
+		.putExtra(LOCATION_LAT, lat)
+		.putExtra(LOCATION_LON, lon)
+		.putExtra(CALLSIGN, station)
+		.putExtra(PACKET, ap.toString())
+		.putExtra(COMMENT, comment.toString())
+		.putExtra(SYMBOL, sym.toString())
+
+	  // Add SPEED only if it's not null
+	  speedmph.foreach(mph => {
+		intent.putExtra(SPEED, mph)
+		Log.d("HUD_OUTPUT", s"added SPEED: $mph")
+	  })
+
+	  // Add COURSE only if it's not null and is a valid Integer
+	  courseOption.foreach(course => {
+		intent.putExtra(COURSE, course.asInstanceOf[Integer])
+		Log.d("HUD_OUTPUT", s"added COURSE: $course")
+	  })
+
+	  // Send the broadcast with all the extras
+	  sendBroadcast(intent)
+	  Log.d("HUD_OUTPUT", "Broadcast sent.")
+	}
+
 
 	def addPost(t : Int, status : String, message : String) {
 		val ts = System.currentTimeMillis()
