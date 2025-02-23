@@ -602,7 +602,7 @@ class AprsService extends Service {
 	  Log.d("HUD_OUTPUT", s"courseOption: $courseOption")
 
 	  // Convert speed to mph if it's not null, else set speedmph to None
-	  val speedmph: Option[Double] = speedOption.map(speed => speed * 1.15078)
+	  val speedmph: Option[Int] = speedOption.map(speed => (speed * 115078) / 100000)
 	  Log.d("HUD_OUTPUT", s"speedmph: $speedmph")
 
 	  // Broadcast the information, checking for null values
@@ -618,8 +618,8 @@ class AprsService extends Service {
 
 	  // Add SPEED only if it's not null
 	  speedmph.foreach(mph => {
-		intent.putExtra(SPEED, mph.toInt) // Convert Double to Int
-		Log.d("HUD_OUTPUT", s"added SPEED: ${mph.toInt}")
+		intent.putExtra(SPEED, mph.asInstanceOf[Integer])
+		Log.d("HUD_OUTPUT", s"added SPEED mom: ${mph}")
 	  })
 
 	  // Add COURSE only if it's not null and is a valid Integer
