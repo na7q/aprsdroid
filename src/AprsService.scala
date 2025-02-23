@@ -569,6 +569,7 @@ class AprsService extends Service {
 	  val SOURCE = PACKAGE + ".SOURCE"
 	  val CALLSIGN = PACKAGE + ".CALLSIGN"
 	  val PACKET = PACKAGE + ".PACKET"	
+	  val QRG = PACKAGE + ".QRG"	
 
 	  Log.d("HUD_OUTPUT", s"packet: $ap")
 
@@ -587,7 +588,7 @@ class AprsService extends Service {
 	  val comment = ap.getAprsInformation().getComment()
 	  Log.d("HUD_OUTPUT", s"comment: $comment")
 	  
-	  val qrg = AprsPacket.parseQrg(comment)
+	  val qrg = Option(AprsPacket.parseQrg(comment)).getOrElse("")
 	  Log.d("HUD_OUTPUT", s"qrg: $qrg")
 
 	  val station = if (objectname != null) objectname else call
@@ -613,6 +614,7 @@ class AprsService extends Service {
 		.putExtra(PACKET, ap.toString())
 		.putExtra(COMMENT, comment.toString())
 		.putExtra(SYMBOL, sym.toString())
+		.putExtra(QRG, qrg.toString())
 
 	  // Add SPEED only if it's not null
 	  speedmph.foreach(mph => {
