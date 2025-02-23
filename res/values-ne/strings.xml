@@ -471,6 +471,7 @@
 <string name="p_reconnect">TCP ले टाइमआउट बन्द गर्नुहोस्</string>
 <string name="p_digipeating">Digiping प्राथमिकताहरु</string>
 <string name="sort_newest">सबैभन्दा नयाँ द्वारा क्रमबद्ध गर्नुहोस्</string>
+<string name="sort_callsign">कलसाइन अनुसार क्रमबद्ध गर्नुहोस्</string>
 <string name="p_mbtiles_file_picker_summary">कुनै फाईल चयन गरिएको छैन</string>
 <string name="p_units_title">दूरी एकाइहरु</string>
 <string name="p_bt_reconnect_summary">सेकेन्डमा टाइमआउट मान</string>

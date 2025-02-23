@@ -469,6 +469,7 @@
 <string name="p_reconnect">TCP ühendage aegumine</string>
 <string name="p_digipeating">Digipeegeerivad eelistused</string>
 <string name="sort_newest">Sorteerida uusim</string>
+<string name="sort_callsign">Sorteeri kutsungi järgi</string>
 <string name="p_mbtiles_file_picker_summary">Pole faili valitud</string>
 <string name="p_units_title">Kaugüksused</string>
 <string name="p_bt_reconnect_summary">Aegumisväärtus sekundites</string>

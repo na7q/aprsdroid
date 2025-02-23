@@ -450,6 +450,7 @@
 <string name="p_reconnect">Tcp conconnect Timeout</string>
 <string name="p_digipeating">Digipéierend Virléiften</string>
 <string name="sort_newest">Zortéieren duerch neiste</string>
+<string name="sort_callsign">Sortéiert no Ruffzeechen</string>
 <string name="p_mbtiles_file_picker_summary">Keng Datei ausgewielt</string>
 <string name="p_units_title">Distanzunitéiten</string>
 <string name="p_bt_reconnect_summary">Timeout Wäert a Sekonnen</string>

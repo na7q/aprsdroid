@@ -353,7 +353,13 @@ class StorageDatabase(context : Context) extends
 	def getNeighbors(mycall: String, lat: Int, lon: Int, ts: Long, limit: String): Cursor = {
 		val corr = (cos(Pi * lat / 180000000.0) * cos(Pi * lat / 180000000.0) * 100).toInt
 		val newcols = Station.COLUMNS :+ Station.COL_DIST.formatLocal(null, lat, lat, lon, lon, corr)
-		val sortOrder = if (prefs.getSortByHubDistance) "dist" else "ts DESC" // Sort hub by preference	
+		// Sort hub by preference
+		val sortOrder = prefs.getHubSortOrder match {
+				case "distance" => "dist"
+				case "newest" => "ts DESC"
+				case "callsign" => "call, _id"
+				case _ => "dist"
+			}
 		getReadableDatabase().query(
 			Station.TABLE,
 			newcols,
@@ -361,7 +367,7 @@ class StorageDatabase(context : Context) extends
 			Array(ts.toString, mycall),
 			null,
 			null,
-			sortOrder,   // Changed from "dist" to "ts DESC"
+			sortOrder,   // May be "dist", "ts DESC", or "call, _id"
 			limit
 		)
 	}
@@ -370,7 +376,13 @@ class StorageDatabase(context : Context) extends
 	def getNeighborsLike(call: String, lat: Int, lon: Int, ts: Long, limit: String): Cursor = {
 		val corr = (cos(Pi * lat / 180000000.0) * cos(Pi * lat / 180000000.0) * 100).toInt
 		val newcols = Station.COLUMNS :+ Station.COL_DIST.formatLocal(null, lat, lat, lon, lon, corr)
-		val sortOrder = if (prefs.getSortByHubDistance) "dist" else "ts DESC" // Sort hub by preference	
+		// Sort hub by preference
+		val sortOrder = prefs.getHubSortOrder match {
+				case "distance" => "dist"
+				case "newest" => "ts DESC"
+				case "callsign" => "call, _id"
+				case _ => "dist"
+			}
 		getReadableDatabase().query(
 			Station.TABLE,
 			newcols,

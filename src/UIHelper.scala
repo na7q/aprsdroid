@@ -292,17 +292,31 @@ trait UIHelper extends Activity
 	}
 
 	def sortDialog() {
-		val currentPref = prefs.getBoolean("sort_by_hub_distance", true)
-		val selected = if (currentPref) 0 else 1
+		val currentPref = prefs.getHubSortOrder()
+		val selected = currentPref match {
+				case "distance" => 0
+				case "newest" => 1
+				case "callsign" => 2
+				case _ => 0
+			}
 
-	    val sortOptions = Array(getString(R.string.sort_distance), getString(R.string.sort_newest)).map(_.asInstanceOf[CharSequence])
+		val sortOptions = Array(
+				getString(R.string.sort_distance),
+				getString(R.string.sort_newest),
+				getString(R.string.sort_callsign)
+			).map(_.asInstanceOf[CharSequence])
 	  
 		new AlertDialog.Builder(this)
 			.setTitle(R.string.p_sortby)
 			.setSingleChoiceItems(sortOptions, selected, new DialogInterface.OnClickListener() {
 				override def onClick(dialog: DialogInterface, which: Int) {
-					val isDistance = (which == 0)
-					prefs.prefs.edit().putBoolean("sort_by_hub_distance", isDistance).commit()
+					val newPref = which match {
+							case 0 => "distance"
+							case 1 => "newest"
+							case 2 => "callsign"
+							case _ => "distance"
+						}
+					prefs.setHubSortOrder(newPref)
 					sendBroadcast(new Intent(AprsService.UPDATE))
 					onStartLoading()
 					dialog.dismiss()

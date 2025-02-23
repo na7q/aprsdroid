@@ -472,6 +472,7 @@
 <string name="p_reconnect">TCP Reconnect Timeout</string>
 <string name="p_digipeating">Preferencias dixitalizadoras</string>
 <string name="sort_newest">Ordena por máis novo</string>
+<string name="sort_callsign">Ordenar por indicativo</string>
 <string name="p_mbtiles_file_picker_summary">Sen ficheiro seleccionado</string>
 <string name="p_units_title">Unidades de distancia</string>
 <string name="p_bt_reconnect_summary">Valor do tempo de espera en segundos</string>

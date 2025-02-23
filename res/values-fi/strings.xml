@@ -456,6 +456,7 @@
 <string name="p_reconnect">TCP yhdistää aikakatkaisu</string>
 <string name="p_digipeating">Digipeating Aferences</string>
 <string name="sort_newest">Lajitella uusimmalla</string>
+<string name="sort_callsign">Lajittele kutsumerkin mukaan</string>
 <string name="p_mbtiles_file_picker_summary">Ei tiedostoa valittu</string>
 <string name="p_units_title">Etäisyysyksiköt</string>
 <string name="p_bt_reconnect_summary">Aikakatkaisu sekunneissa</string>

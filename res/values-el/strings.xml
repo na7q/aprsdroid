@@ -453,6 +453,7 @@
 <string name="p_reconnect">Το TCP επανασυνδέστε το χρονικό όριο</string>
 <string name="p_digipeating">Προτιμήσεις digipeating</string>
 <string name="sort_newest">Ταξινόμηση από το νεότερο</string>
+<string name="sort_callsign">Ταξινόμηση κατά διακριτικό</string>
 <string name="p_mbtiles_file_picker_summary">Δεν επιλέχθηκε αρχείο</string>
 <string name="p_units_title">Μονάδες απόστασης</string>
 <string name="p_bt_reconnect_summary">Τιμή χρονικού ορίου σε δευτερόλεπτα</string>

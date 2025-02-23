@@ -525,6 +525,7 @@
 <string name="p_ratelimit1">TX -koerslimiet 1 min</string>
 <string name="p_digipeating_entry">Digipeater</string>
 <string name="sort_newest">Sorteer volgens nuutste</string>
+<string name="sort_callsign">Sorteer volgens roepsein</string>
 <string name="p_bt_reconnect_summary">Timeoutwaarde in sekondes</string>
 <string name="p_igpath_entry">Stel RF Digi Path in</string>
 <string name="p_ratelimit1_entry">Pakketlimiet met 1 min interval</string>

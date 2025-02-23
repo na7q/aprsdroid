@@ -548,6 +548,7 @@
 <string name="p_ratelimit1">حد معدل تكساس 1 دقيقة</string>
 <string name="p_digipeating_entry">Digipeater</string>
 <string name="sort_newest">فرز حسب الأحدث</string>
+<string name="sort_callsign">فرز حسب إشارة النداء</string>
 <string name="p_bt_reconnect_summary">قيمة المهلة بالثواني</string>
 <string name="p_igpath_entry">تعيين مسار RF Digi</string>
 <string name="p_ratelimit1_entry">حد الحزمة في 1 دقيقة فاصل</string>
