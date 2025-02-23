@@ -618,8 +618,8 @@ class AprsService extends Service {
 
 	  // Add SPEED only if it's not null
 	  speedmph.foreach(mph => {
-		intent.putExtra(SPEED, mph)
-		Log.d("HUD_OUTPUT", s"added SPEED: $mph")
+		intent.putExtra(SPEED, mph.toInt) // Convert Double to Int
+		Log.d("HUD_OUTPUT", s"added SPEED: ${mph.toInt}")
 	  })
 
 	  // Add COURSE only if it's not null and is a valid Integer
