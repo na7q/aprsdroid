@@ -534,6 +534,7 @@ class AprsService extends Service {
 		} catch {
 		case e : Exception =>
 			Log.d(TAG, "parsePacket() unsupported packet: " + message)
+			hudOutputPacket(message)
 			e.printStackTrace()
 		}
 	}
@@ -556,6 +557,18 @@ class AprsService extends Service {
 			.putExtra(PACKET, ap.toString())
 		)
 	}
+
+	def hudOutputPacket(message: String) {
+
+	  val PACKET = PACKAGE + ".PACKET"	
+	  
+	  val intent = new Intent(HUD)
+		.putExtra(PACKET, message.toString())
+		
+	  sendBroadcast(intent)
+	  Log.d("HUD_OUTPUT", "Broadcast sent.")
+	}
+
 
 	def hudOutput(ts: Long, ap: APRSPacket, pos: Position, cse: CourseAndSpeedExtension, objectname: String) {
 
