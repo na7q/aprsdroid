@@ -151,6 +151,8 @@
 <string name="p_igpath_entry">Set RF Digi Path</string>
 <string name="p_igpath_summary">APRS-IS to RF Digi Path</string>
 
+<string name="p_message_id_title">Disable Message ID</string>
+<string name="p_message_id_summary">Removes message ID from outgoing packets</string>
 <!-- map view -->
 <string name="map_overlays">Overlays</string>
 <string name="map_google">Google: Map</string>
@@ -337,10 +339,12 @@
 <string name="p_smartbeaconing">SmartBeaconing™</string>
 <string name="p_sb_help">SmartBeaconing™ help</string>
 <string name="p_sb_fast_speed">Fast Speed [km/h]</string>
+<string name="p_sb_fast_speed_imperial">Fast Speed [mph]</string>
 <string name="p_sb_fast_speed_summary">Minimum speed for fast position updates</string>
 <string name="p_sb_fast_rate">Fast Rate [s]</string>
 <string name="p_sb_fast_rate_summary">Beacon rate at fast speed</string>
 <string name="p_sb_slow_speed">Slow Speed [km/h]</string>
+<string name="p_sb_slow_speed_imperial">Slow Speed [mph]</string>
 <string name="p_sb_slow_speed_summary">Maximum speed for slow position updates</string>
 <string name="p_sb_slow_rate">Slow Rate [s]</string>
 <string name="p_sb_slow_rate_summary">Beacon rate at slow speed</string>
@@ -358,7 +362,9 @@
 <string name="p_interval_entry">Enter the update interval [min]</string>
 <string name="p_distance">Minimum update distance</string>
 <string name="p_distance_summary">Kilometers before beacon transmission (set to 0 for time-only)</string>
+<string name="p_distance_summary_imperial">Miles before beacon transmission (set to 0 for time-only)</string>
 <string name="p_distance_entry">Enter the update distance [km]</string>
+<string name="p_distance_entry_imperial">Enter the update distance [mi]</string>
 <string name="p_speedbrg">Await speed &amp; bearing</string>
 <string name="p_speedbrg_summary">Keep GPS on longer to get more precise data</string>
 <string name="p_netloc">Use network location</string>
@@ -555,6 +561,8 @@
 <string name="bt_connected">Connected to TNC.</string>
 <string name="bt_reconnecting">Reconnecting in %s seconds…</string>
 
+<string name="ble_connecting">Connecting to BLE service on %s…</string>
+<string name="ble_disconnect">Unexpected BLE disconnect (status = %s)</string>
 <string name="afsk_info_sco_req">Requesting bluetooth SCO link...</string>
 <string name="afsk_info_sco_est">Bluetooth SCO link established.</string>
 

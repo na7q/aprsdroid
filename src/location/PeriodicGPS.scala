@@ -25,6 +25,8 @@ class PeriodicGPS(service : AprsService, prefs : PrefsWrapper) extends LocationS
 		with LocationListener {
 	val TAG = "APRSdroid.PeriodicGPS"
 
+	val isMetric = prefs.getString("p.units", "1") == "1"
+
 	val FAST_LANE_ACT = 30000
 
 	lazy val locMan = service.getSystemService(Context.LOCATION_SERVICE).asInstanceOf[LocationManager]
@@ -43,7 +45,9 @@ class PeriodicGPS(service : AprsService, prefs : PrefsWrapper) extends LocationS
 	def requestLocations(stay_on : Boolean) {
 		// get update interval and distance
 		val upd_int = prefs.getStringInt("interval", 10)
-		val upd_dist = prefs.getStringInt("distance", 10)
+		val upd_dist = if (isMetric) prefs.getStringInt("distance", 10) else (prefs.getStringInt("distance", 10) * 0.621371).toFloat
+
+
 		val gps_act = prefs.getString("gps_activation", "med")
 		try {
 		if (stay_on || (gps_act == "always")) {
@@ -113,7 +117,7 @@ class PeriodicGPS(service : AprsService, prefs : PrefsWrapper) extends LocationS
 	// LocationListener interface
 	override def onLocationChanged(location : Location) {
 		val upd_int = prefs.getStringInt("interval", 10) * 60000
-		val upd_dist = prefs.getStringInt("distance", 10) * 1000
+		val upd_dist = if (isMetric) prefs.getStringInt("distance", 10) else (prefs.getStringInt("distance", 10) * 0.621371).toFloat
 		if (lastLoc != null &&
 		    (location.getTime - lastLoc.getTime < (upd_int  - getGpsInterval()) ||
 		     location.distanceTo(lastLoc) < upd_dist)) {

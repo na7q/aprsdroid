@@ -491,11 +491,16 @@ class StorageDatabase(context : Context) extends
 		getWritableDatabase().execSQL("DELETE FROM %s".format(Message.TABLE))
 	}
 
-	def getConversations() = {
-		getReadableDatabase().query("(SELECT * FROM messages ORDER BY _id DESC)", Message.COLUMNS,
-			null, null,
-			"call", null,
-			"_id DESC", null)
+	def getConversations(): Cursor = {
+		getReadableDatabase().query(
+			"messages",
+			Message.COLUMNS,
+			"_id IN (SELECT MAX(_id) FROM messages GROUP BY call)",  // Ensures we pick the latest message per `call`
+			null,
+			"call",
+			null,
+			"_id DESC"
+		)
 	}
 
 }

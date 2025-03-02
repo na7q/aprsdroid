@@ -14,9 +14,10 @@ object LocationSource {
 		
 	}
 	def instanciatePrefsAct(prefs : PrefsWrapper) = {
+		val isMetric = prefs.getString("p.units", "1") == "1"
 		prefs.getString("loc_source", DEFAULT_CONNTYPE) match {
-			case "smartbeaconing" => R.xml.location_smartbeaconing
-			case "periodic" => R.xml.location_periodic
+			case "smartbeaconing" => if (isMetric) R.xml.location_smartbeaconing else R.xml.location_smartbeaconing_imperial
+			case "periodic" => if (isMetric) R.xml.location_periodic else R.xml.location_periodic_imperial
 			case "manual" => R.xml.location_manual
 		}
 	}
