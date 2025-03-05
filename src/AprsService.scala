@@ -508,6 +508,17 @@ class AprsService extends Service {
 				fap = Parser.parse(inner.substring(1, inner.length()))
 			}
 
+			// **Process the packet for HUD before any returns**
+			if (fap.getAprsInformation() != null) {
+				if (fap.hasFault()) throw new Exception("FAP fault")
+
+				fap.getAprsInformation() match {
+					case pp: PositionPacket => hudParsedPackets(ts, fap, pp, pp.getPosition(), null)
+					case op: ObjectPacket => hudParsedPackets(ts, fap, op, op.getPosition(), op.getObjectName())
+					//case msg: MessagePacket => msgService.handleMessage(ts, fap, msg, digiPathCheck)
+				}
+			}
+
 			val callssid = prefs.getCallSsid()
 			if (source == StorageDatabase.Post.TYPE_INCMG &&
 			    fap.getSourceCall().equalsIgnoreCase(callssid) &&
@@ -548,7 +559,6 @@ class AprsService extends Service {
 	def addPosition(ts : Long, ap : APRSPacket, field : InformationField, pos : Position, objectname : String) {
 		val cse = getCSE(field)
 		db.addPosition(ts, ap, pos, cse, objectname)
-		hudOutput(ts, ap, pos, cse, objectname)
 
 		sendBroadcast(new Intent(POSITION)
 			.putExtra(SOURCE, ap.getSourceCall())
@@ -558,6 +568,11 @@ class AprsService extends Service {
 		)
 	}
 
+	def hudParsedPackets(ts : Long, ap : APRSPacket, field : InformationField, pos : Position, objectname : String) {
+		val cse = getCSE(field)		
+		hudOutput(ts, ap, pos, cse, objectname)
+	}
+	
 	def hudOutputPacket(message: String) {
 
 	  val PACKET = PACKAGE + ".PACKET"	
@@ -568,7 +583,6 @@ class AprsService extends Service {
 	  sendBroadcast(intent)
 	  Log.d("HUD_OUTPUT", "Broadcast sent.")
 	}
-
 
 	def hudOutput(ts: Long, ap: APRSPacket, pos: Position, cse: CourseAndSpeedExtension, objectname: String) {
 
