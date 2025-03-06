@@ -508,17 +508,6 @@ class AprsService extends Service {
 				fap = Parser.parse(inner.substring(1, inner.length()))
 			}
 
-			// **Process the packet for HUD before any returns**
-			if (fap.getAprsInformation() != null) {
-				if (fap.hasFault()) throw new Exception("FAP fault")
-
-				fap.getAprsInformation() match {
-					case pp: PositionPacket => hudParsedPackets(ts, fap, pp, pp.getPosition(), null)
-					case op: ObjectPacket => hudParsedPackets(ts, fap, op, op.getPosition(), op.getObjectName())
-					//case msg: MessagePacket => msgService.handleMessage(ts, fap, msg, digiPathCheck)
-				}
-			}
-
 			val callssid = prefs.getCallSsid()
 			if (source == StorageDatabase.Post.TYPE_INCMG &&
 			    fap.getSourceCall().equalsIgnoreCase(callssid) &&
@@ -545,7 +534,6 @@ class AprsService extends Service {
 		} catch {
 		case e : Exception =>
 			Log.d(TAG, "parsePacket() unsupported packet: " + message)
-			hudOutputPacket(message)
 			e.printStackTrace()
 		}
 	}
@@ -666,6 +654,7 @@ class AprsService extends Service {
 		db.addPost(ts, t, status, message)
 		if ((t == StorageDatabase.Post.TYPE_POST || t == StorageDatabase.Post.TYPE_INCMG) || (prefs.getBoolean("p.positiontois", false) && t == StorageDatabase.Post.TYPE_IG)) {
 			parsePacket(ts, message, t)
+			parseHudPackets(ts, message)			
 		} else {
 			// only log status messages
 			Log.d(TAG, "addPost: " + status + " - " + message)
@@ -691,6 +680,7 @@ class AprsService extends Service {
 				stopSelf()
 		}
 	}
+
 	def postSubmit(post : String) {
 		// Log the incoming post message for debugging
 		Log.d("APRSdroid.Service", s"Incoming post: $post")	
@@ -701,8 +691,29 @@ class AprsService extends Service {
 
 		if (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK"))) {			
 			igateService.handlePostSubmitData(post)
-		}
+		}	
+	}
 
+	def parseHudPackets(ts : Long, message : String) {
+		try {
+			var fap = Parser.parse(message)
+
+			// **Process the packet for HUD before any returns**
+			if (fap.getAprsInformation() != null) {
+				if (fap.hasFault()) throw new Exception("FAP fault")
+
+				fap.getAprsInformation() match {
+					case pp: PositionPacket => hudParsedPackets(ts, fap, pp, pp.getPosition(), null)
+					case op: ObjectPacket => hudParsedPackets(ts, fap, op, op.getPosition(), op.getObjectName())
+					//case msg: MessagePacket => msgService.handleMessage(ts, fap, msg, digiPathCheck)
+				}
+			}
+
+		} catch {
+		case e : Exception =>
+			Log.d(TAG, "parseHudPacket() unsupported packet: " + message)
+			hudOutputPacket(message)
+		}
 	}
 
 	def postAbort(post : String) {
