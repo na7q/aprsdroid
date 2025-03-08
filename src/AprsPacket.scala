@@ -369,30 +369,26 @@ object AprsPacket {
 
 	def parseComment(comment: String): String = {
 	  var modifiedComment = comment
-	  Log.d("StationListAdapter", s"Original comment: $comment")
 
 	  // Step 1: Check if it ends with micetocall characters (last 2 characters)
 	  if (modifiedComment.length >= 2 && AprsPacket.micetocall(modifiedComment.takeRight(2)).isDefined) {
-		Log.d("StationListAdapter", s"Micetocall match found, stripping last 2 characters: ${modifiedComment.takeRight(2)}")
-		return modifiedComment.dropRight(2) // Strip last 2 characters and return immediately
+		modifiedComment = modifiedComment.dropRight(2) // Strip last 2 characters and return immediately
 	  }
 
 	  // Step 2: Check if it ends with kenwoodtocall (last 1 character)
 	  if (modifiedComment.nonEmpty && AprsPacket.kenwoodtocall(modifiedComment.takeRight(1)).isDefined) {
-		Log.d("StationListAdapter", s"Kenwoodtocall match found, stripping last character: ${modifiedComment.takeRight(1)}")
 		modifiedComment = modifiedComment.dropRight(1) // Strip last 1 character
 	  }
 
 	  // Step 3: Remove `}` and everything before it if it appears within the first 4 characters
 	  val bracketIndex = modifiedComment.indexOf("}")
 	  if (bracketIndex >= 0 && bracketIndex <= 3) {
-		Log.d("StationListAdapter", s"Bracket found at index $bracketIndex, removing preceding characters")
 		modifiedComment = modifiedComment.substring(bracketIndex + 1).trim
 	  }
 
 	  // Step 4: Remove specific prefixes ("PHGxxxx", "RNGxxxx", "DFSxxxx")
 	  val prefixPatterns = Seq(
-		"PHG\\d{4}/?", // Matches PHG followed by exactly 4 digits, with an optional trailing slash
+		"PHG\\d{4,5}/?", // Matches PHG followed by exactly 4 digits, with an optional trailing slash
 		"RNG\\d{4}/?", // Matches RNG followed by exactly 4 digits, with an optional trailing slash
 		"DFS\\d{4}/?"  // Matches DFS followed by exactly 4 digits, with an optional trailing slash
 	  )
@@ -400,20 +396,17 @@ object AprsPacket {
 	  for (pattern <- prefixPatterns) {
 		val before = modifiedComment
 		modifiedComment = modifiedComment.replaceFirst(pattern.r.regex, "").trim
-		if (before != modifiedComment) Log.d("StationListAdapter", s"Removed prefix pattern: $pattern")
 	  }
 
 	  // Step 5: Remove altitude format "/A=XXXXX" where X can be positive or negative digits
 	  val altitudePattern = "/?A=(-\\d{5}|\\d{6})".r
 	  if (altitudePattern.findFirstIn(modifiedComment).isDefined) {
-		Log.d("StationListAdapter", "Removing altitude format")
 		modifiedComment = altitudePattern.replaceAllIn(modifiedComment, "").trim
 	  }
 
 	  // Step 6: Remove "XXX/YYY" or "XXX/YYY/A=ZZZZZ" format
 	  val courseSpeedPattern = "^\\d{3}/\\d{3}(/A=(-?\\d{5}|\\d{6}))?/?".r
 	  if (courseSpeedPattern.findFirstIn(modifiedComment).isDefined) {
-		Log.d("StationListAdapter", "Removing course/speed format")
 		modifiedComment = courseSpeedPattern.replaceAllIn(modifiedComment, "").trim
 	  }
 
@@ -439,7 +432,7 @@ object AprsPacket {
 		"h\\d{2,3}", // Humidity (hXX or hXXX)
 		"h\\.{2,3}",  // Humidity missing (h.. or h...)
 		"b\\d{5}",  // Barometric Pressure (bXXXXX)
-		"b\\.\\.\\.\\.\\.",  // Barometric Pressure missing (b.....)
+		"b\\.{3,5}",		
 		"L\\d{3}",  // Luminosity (LXXX)
 		"L\\.\\.\\."   // Luminosity missing (L...)
 	  )
@@ -447,11 +440,19 @@ object AprsPacket {
 	  for (pattern <- weatherPatterns) {
 		val before = modifiedComment
 		modifiedComment = modifiedComment.replaceAll(pattern.r.regex, "").trim
-		if (before != modifiedComment) Log.d("StationListAdapter", s"Removed weather pattern: $pattern")
+	  }
+	  
+	  // Step 8: Remove Base91 telemetry if present
+	  val base91TelemetryRegex = """\|[^|]{2,12}\|""".r
+	  if (base91TelemetryRegex.findFirstIn(modifiedComment).isDefined) {
+	    modifiedComment = base91TelemetryRegex.replaceAllIn(modifiedComment, "").trim
 	  }
 
-	  // Final log to show processed comment
-	  Log.d("StationListAdapter", s"Final processed comment: $modifiedComment")
+	  // Step 9: Remove APRS `!data!` segments (e.g., "!wF$!")
+	  val exclamationData = """![!-~]+!""".r
+	  if (exclamationData.findFirstIn(modifiedComment).isDefined) {
+	    modifiedComment = exclamationData.replaceAllIn(modifiedComment, "").trim
+	  }
 
 	  // Return the modified comment after all transformations
 	  modifiedComment
