@@ -55,7 +55,9 @@ class DigiRig(service : AprsService, prefs : PrefsWrapper) extends AfskUploader(
 	var con : UsbDeviceConnection = null
 	var ser : UsbSerialInterface = null
 	var alreadyRunning = false
-
+	var dtrState: Boolean = false
+	var rtsState: Boolean = false
+	
 	val intent = new Intent(USB_PERM_ACTION)
 	val pendingIntent = PendingIntent.getBroadcast(service, 0, intent, PendingIntent.FLAG_MUTABLE)
 
@@ -166,6 +168,18 @@ class DigiRig(service : AprsService, prefs : PrefsWrapper) extends AfskUploader(
 		service.postAbort(service.getString(R.string.p_serial_notfound))
 	}
 
+	def setDTR(state: Boolean): Unit = {
+		dtrState = state
+		ser.setDTR(state)
+		Log.d(TAG, "DTR set to: " + dtrState)
+	}
+
+	def setRTS(state: Boolean): Unit = {
+		rtsState = state
+		ser.setRTS(state)
+		Log.d(TAG, "RTS set to: " + rtsState)
+	}
+
 	override def update(packet: APRSPacket): String = {
 		// Need to "parse" the packet in order to replace the Digipeaters
 		val digipathlist = if (packet.getDigiString().nonEmpty) packet.getDigiString().substring(1) else ""
@@ -176,13 +190,15 @@ class DigiRig(service : AprsService, prefs : PrefsWrapper) extends AfskUploader(
 		val msg = new APRSFrame(from,to,digipathlist,data,FrameLength).getMessage()
 		Log.d(TAG, "update(): From: " + from +" To: "+ to +" Via: " + digipathlist + " telling " + data)
 
-		ser.setRTS(true)
+		setDTR(true)
+		setRTS(false)
 		audioPlaying = true
 		val result = sendMessage(msg)
 		while (audioPlaying) {
 			Thread.sleep(10)
 		}
-		ser.setRTS(false)
+		setDTR(false)
+		setRTS(false)
 
 		if (result)
 			"AFSK OK"
