@@ -459,6 +459,7 @@ http://www.gnu.de/documents/gpl-2.0.de.html</string>
 <string name="p_reconnect">TCP Verbindung nach Zeitüberschreitung wieder herstellen</string>
 <string name="p_digipeating">Digipeater Einstellungen</string>
 <string name="sort_newest">Neueste zuerst</string>
+<string name="sort_callsign">Rufzeichen zuerst</string>
 <string name="p_mbtiles_file_picker_summary">Keine Datei ausgewählt</string>
 <string name="p_units_title">Entfernungseinheiten</string>
 <string name="p_bt_reconnect_summary">Reconnect Zeit in Sekunden</string>

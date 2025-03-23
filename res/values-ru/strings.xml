@@ -458,6 +458,7 @@
 <string name="p_reconnect">TCP Reconnect Timeout</string>
 <string name="p_digipeating">Предпочтения в отношении дигипаата</string>
 <string name="sort_newest">Сортировка по новым</string>
+<string name="sort_callsign">Сортировать по позывной</string>
 <string name="p_mbtiles_file_picker_summary">Файл не выбран</string>
 <string name="p_units_title">Дистанционные единицы</string>
 <string name="p_bt_reconnect_summary">Стоимость тайм -аута за секунды</string>

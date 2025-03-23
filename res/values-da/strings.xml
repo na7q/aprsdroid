@@ -457,6 +457,7 @@
 <string name="p_reconnect">TCP -forbindelse igen timeout</string>
 <string name="p_digipeating">Digipeating -præferencer</string>
 <string name="sort_newest">Sorter efter nyeste</string>
+<string name="sort_callsign">Sorter efter kaldesignal</string>
 <string name="p_mbtiles_file_picker_summary">Ingen fil valgt</string>
 <string name="p_units_title">Afstandsenheder</string>
 <string name="p_bt_reconnect_summary">Timeout -værdi på få sekunder</string>

@@ -455,6 +455,7 @@
 <string name="p_reconnect">TCP ponovno povezava časovna omejitev</string>
 <string name="p_digipeating">Digipeating Nastavitve</string>
 <string name="sort_newest">Razvrsti najnovejše</string>
+<string name="sort_callsign">Razvrsti na pozivni znak</string>
 <string name="p_mbtiles_file_picker_summary">Nobena datoteka ni izbrana</string>
 <string name="p_units_title">Enote na daljavo</string>
 <string name="p_bt_reconnect_summary">Vrednost časovne omejitve v sekundah</string>

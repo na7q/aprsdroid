@@ -471,6 +471,7 @@
 <string name="p_reconnect">TCP เชื่อมต่อการหมดเวลาอีกครั้ง</string>
 <string name="p_digipeating">การตั้งค่า Digipeating</string>
 <string name="sort_newest">จัดเรียงใหม่ล่าสุด</string>
+<string name="sort_callsign">จัดเรียงตามสัญญาณเรียกขาน</string>
 <string name="p_mbtiles_file_picker_summary">ไม่มีการเลือกไฟล์</string>
 <string name="p_units_title">หน่วยระยะไกล</string>
 <string name="p_bt_reconnect_summary">ค่าหมดเวลาในไม่กี่วินาที</string>

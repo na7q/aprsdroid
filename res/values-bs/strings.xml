@@ -472,6 +472,7 @@
 <string name="p_reconnect">TCP Reconnect IstekEout</string>
 <string name="p_digipeating">Digipeating Preferences</string>
 <string name="sort_newest">Poredaj po najnovijim</string>
+<string name="sort_callsign">Poredaj po pozivnom znaku</string>
 <string name="p_mbtiles_file_picker_summary">Nije odabrana datoteka</string>
 <string name="p_units_title">Udaljenost</string>
 <string name="p_bt_reconnect_summary">Vrijednost vremena u sekundi</string>

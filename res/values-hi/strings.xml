@@ -472,6 +472,7 @@
 <string name="p_reconnect">टीसीपी टाइमआउट को फिर से जोड़ें</string>
 <string name="p_digipeating">वरीयताएँ</string>
 <string name="sort_newest">नवीनतम द्वारा क्रमबद्ध करें</string>
+<string name="sort_callsign">कॉलसाइन के अनुसार क्रमबद्ध करेंं</string>
 <string name="p_mbtiles_file_picker_summary">कोई फ़ाइल चयनित नहीं</string>
 <string name="p_units_title">दूरस्थ इकाइयाँ</string>
 <string name="p_bt_reconnect_summary">सेकंड में टाइमआउट मूल्य</string>

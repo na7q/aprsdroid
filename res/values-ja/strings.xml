@@ -455,6 +455,7 @@
 <string name="p_reconnect">TCPはタイムアウトを再接続します</string>
 <string name="p_digipeating">デジタイング設定</string>
 <string name="sort_newest">最新のソート</string>
+<string name="sort_callsign">コールサインのソート</string>
 <string name="p_mbtiles_file_picker_summary">選択されたファイルはありません</string>
 <string name="p_units_title">距離ユニット</string>
 <string name="p_bt_reconnect_summary">秒単位のタイムアウト値</string>

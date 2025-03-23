@@ -459,6 +459,7 @@ Je kan ook je voorkeuren aanpassen via het menu.</string>
 <string name="p_reconnect">TCP Time -out opnieuw verbinden</string>
 <string name="p_digipeating">DigiPeating -voorkeuren</string>
 <string name="sort_newest">Sorteer door nieuwste</string>
+<string name="sort_callsign">Sorteren op roepnaam</string>
 <string name="p_mbtiles_file_picker_summary">Geen bestand geselecteerd</string>
 <string name="p_units_title">Afstandseenheden</string>
 <string name="p_bt_reconnect_summary">Time -outwaarde in seconden</string>

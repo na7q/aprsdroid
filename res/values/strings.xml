@@ -183,6 +183,7 @@
 <string name="sortby">Sort by...</string>
 <string name="sort_distance">Sort by Distance</string>
 <string name="sort_newest">Sort by Newest</string>
+<string name="sort_callsign">Sort by Callsign</string>
 <string name="quit">Quit</string>
 <string name="preferences">Preferences</string>
 <!-- preferences -->
