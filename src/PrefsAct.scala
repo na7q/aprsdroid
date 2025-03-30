@@ -2,6 +2,7 @@ package org.na7q.app
 
 import _root_.android.content.{Context, Intent, SharedPreferences}
 import _root_.android.net.Uri
+import _root_.android.content.ContentUris
 import _root_.android.os.{Build, Bundle, Environment}
 import _root_.android.preference.Preference.OnPreferenceClickListener
 import _root_.android.preference.{Preference, PreferenceActivity, PreferenceManager}
@@ -11,7 +12,8 @@ import java.text.SimpleDateFormat
 import java.io.{File, PrintWriter}
 import java.util.Date
 import android.provider.Settings
-
+import android.provider.DocumentsContract
+import android.provider.MediaStore
 
 import org.json.JSONObject
 
@@ -88,21 +90,81 @@ class PrefsAct extends PreferenceActivity {
 		findPreference("p_symbol").setSummary(getString(R.string.p_symbol_summary) + ": " + prefs.getString("symbol", "/$"))
 	}
 
-	def resolveContentUri(uri : Uri) = {
-		val Array(storage, path) = uri.getPath().replace("/document/", "").split(":", 2)
-		android.util.Log.d("PrefsAct", "resolveContentUri s=" + storage + " p=" + path)
-		
-		val resolvedPath = if (storage == "primary")
-			Environment.getExternalStorageDirectory() + "/" + path
-		else
-			"/storage/" + storage + "/" + path
-		
-		// Remove "/storage/raw//" if present on Fire Tablet devices
-		val fixedPath = resolvedPath.replace("/storage/raw//", "")
+	def resolveContentUri(uri: Uri): String = {
+		val contentResolver = getContentResolver()
+		val documentId = DocumentsContract.getDocumentId(uri)
 
-		android.util.Log.d("PrefsAct", s"Fixed path: $fixedPath")
-		fixedPath
-		
+		// Handle msf: (Downloads provider document ID)
+		if (documentId.startsWith("msf:")) {
+			try {
+				val idStr = documentId.split(":")(1) // Extract numeric ID
+				val downloadsUri = ContentUris.withAppendedId(
+					MediaStore.Downloads.EXTERNAL_CONTENT_URI, idStr.toLong
+				)
+
+				// Query the MediaStore for the file path
+				val cursor = contentResolver.query(downloadsUri, 
+					Array(MediaStore.MediaColumns.DATA), null, null, null)
+
+				if (cursor != null && cursor.moveToFirst()) {
+					val columnIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
+					if (columnIndex != -1) {
+						val filePath = cursor.getString(columnIndex)
+						cursor.close()
+
+						if (filePath != null && filePath.nonEmpty) {
+							return filePath // ✅ Successfully resolved real path
+						}
+					}
+					cursor.close()
+				}
+			} catch {
+				case e: Exception =>
+					android.util.Log.e("PrefsAct", "Error resolving msf URI: " + e.getMessage)
+			}
+		}
+
+		// Attempt alternative resolution for normal content URIs
+		try {
+			val parts = documentId.replace("/document/", "").split(":", 2)
+			var resolvedPath: String = null
+
+			if (parts.length == 2) {
+				val storage = parts(0)
+				val path = parts(1)
+				resolvedPath = if (storage == "primary") {
+					Environment.getExternalStorageDirectory() + "/" + path
+				} else {
+					"/storage/" + storage + "/" + path
+				}
+			}
+
+			return resolvedPath.replace("/storage/raw//", "")
+		} catch {
+			case _: Exception => android.util.Log.e("PrefsAct", "Failed to resolve content URI: " + uri)
+		}
+
+		// 🛑 If we reach here, fallback to /proc trick (last resort, works for large files)
+		return resolvePathFromFileDescriptor(uri)
+	}
+
+	def resolvePathFromFileDescriptor(uri: Uri): String = {
+		try {
+			val parcelFileDescriptor = getContentResolver().openFileDescriptor(uri, "r")
+			if (parcelFileDescriptor != null) {
+				val fd = parcelFileDescriptor.getFileDescriptor().hashCode()
+				val realPath = "/proc/self/fd/" + fd
+
+				// Ensure the file exists before returning
+				if (new File(realPath).exists()) {
+					return realPath
+				}
+			}
+		} catch {
+			case e: Exception =>
+				android.util.Log.e("PrefsAct", "Error resolving path from file descriptor: " + e.getMessage)
+		}
+		return null
 	}
 
 	def parseFilePickerResult(data : Intent, pref_name : String, error_id : Int) {

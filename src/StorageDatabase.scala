@@ -240,7 +240,7 @@ class StorageDatabase(context : Context) extends
 		val lat = (pos.getLatitude()*1000000).asInstanceOf[Int]
 		val lon = (pos.getLongitude()*1000000).asInstanceOf[Int]
 		val sym = "%s%s".format(pos.getSymbolTable(), pos.getSymbolCode())
-		val comment = ap.getAprsInformation().getComment()
+		val comment = AprsPacket.parseComment(ap.getAprsInformation().getComment())
 		val qrg = AprsPacket.parseQrg(comment)
 		cv.put(TS, ts.asInstanceOf[java.lang.Long])
 		cv.put(CALL, if (objectname != null) objectname else call)
