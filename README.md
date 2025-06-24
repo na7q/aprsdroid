@@ -163,46 +163,30 @@ APRSdroid is crafted in **Scala** using the [gradle-android-scala-plugin](https:
 ### 🚀 **Complete Build Instructions**
 
 ```bash
-# 📦 Install required dependencies
 sudo apt-get install -y git openjdk-8-jdk vim-nox wget unzip
 
-# 🔧 Setup Android SDK
 cmdline_tool_file="commandlinetools-linux-6609375_latest.zip"
 export ANDROID_SDK_ROOT="$(pwd)/android"
 mkdir -p "${ANDROID_SDK_ROOT}"
-
-# 📥 Download and setup Android command-line tools
 wget "https://dl.google.com/android/repository/${cmdline_tool_file}"
 unzip "${cmdline_tool_file}" -d "${ANDROID_SDK_ROOT}/cmdline-tools"
 rm -f "${cmdline_tool_file}"
-
-# 🛤️ Configure PATH variables
 export PATH="${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin:${PATH}"
 export PATH="${ANDROID_SDK_ROOT}/platform-tools:${PATH}"
 export PATH="${ANDROID_SDK_ROOT}/emulator:${PATH}"
-
-# 📄 Accept Android SDK licenses
 mkdir "${ANDROID_SDK_ROOT}/licenses"
 echo 24333f8a63b6825ea9c5514f83c2829b004d1fee > "${ANDROID_SDK_ROOT}/licenses/android-sdk-license"
 echo 84831b9409646a918e30573bab4c9c91346d8abd > "${ANDROID_SDK_ROOT}/licenses/android-sdk-preview-license"
-
-# 📱 Install required Android components
 sdkmanager --install emulator 'system-images;android-24;default;armeabi-v7a'
 
-# 🔗 Clone the repository
 git clone https://github.com/na7q/aprsdroid/
 cd aprsdroid
 git submodule update --init --recursive
-
-# 🗝️ Configure Google Maps API key (OPTIONAL - only if you want Google Maps)
-# Replace AI... with your actual API key, or skip this step for offline maps only:
-# echo "mapsApiKey=AI..." > local.properties
-
-# 🔨 Build APK
-# For debug build:
+# replace AI... with your API key:
+echo "mapsApiKey=AI..." > local.properties
+# for a debug build:
 ./gradlew assembleDebug
-
-# For release build:
+# for a release build:
 ./gradlew assembleRelease
 ```
 
