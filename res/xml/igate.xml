@@ -6,7 +6,8 @@
 	<CheckBoxPreference
 		android:key="p.igating"
 		android:title="@string/p_igating_entry"
-		android:summary="@string/p_igating_summary"
+		android:summaryOff="@string/p_igating_disabled_summary"
+		android:summaryOn="@string/p_igating_enabled_summary"		
 		android:defaultValue="false" />
 
 	<CheckBoxPreference
@@ -52,6 +53,13 @@
 		android:title="@string/p_igconnectretry"
 		android:summary="@string/p_igconnectretry_summary"
 		android:dialogTitle="@string/p_igconnectretry_entry" />
+
+	<CheckBoxPreference
+		android:key="p.positiontois"
+		android:title="@string/p_positiontois_title"
+		android:summary="@string/p_positiontois_summary"
+		android:defaultValue="false" />	
+
 	</PreferenceCategory>
 
     <PreferenceCategory

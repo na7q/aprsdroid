@@ -129,7 +129,7 @@ android {
 			renderscript.srcDirs = ['src']
 			res.srcDirs = ['res']
 			assets.srcDirs = ['assets']
-			jniLibs.srcDirs = ['libs']
+			jniLibs.srcDirs = ['libs', 'lib']
 		}
 		androidTest {
 			java.srcDirs = ['androidTest/java']
@@ -156,7 +156,8 @@ dependencies {
 	implementation 'com.google.android.gms:play-services-maps:17.0.0'
 	implementation 'com.google.maps.android:android-maps-utils:0.5'
 	implementation 'androidx.core:core:1.6.0'
-
+    implementation 'org.eclipse.jetty:jetty-server:9.4.43.v20210629'
+    implementation 'org.eclipse.jetty:jetty-servlet:9.4.43.v20210629'
 
 	implementation 'com.squareup.okio:okio:2.1.0'
 	androidTestImplementation 'com.android.support.test:runner:1.0.2'

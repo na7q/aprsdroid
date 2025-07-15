@@ -15,6 +15,8 @@ import _root_.android.widget.Toast
 import _root_.org.mapsforge.v3.android.maps._
 import _root_.org.mapsforge.v3.core.{GeoPoint, Tile}
 import _root_.org.mapsforge.v3.android.maps.overlay.{ItemizedOverlay, OverlayItem}
+import android.os.PowerManager
+import android.content.Context
 
 import _root_.scala.collection.mutable.ArrayBuffer
 import _root_.java.io.File
@@ -23,6 +25,7 @@ import java.lang.UnsupportedOperationException
 
 import org.mapsforge.v3.android.maps.mapgenerator.{MapGeneratorFactory, MapGeneratorInternal}
 import org.mapsforge.v3.map.reader.header.FileOpenResult
+import android.view.WindowManager
 
 // to make scala-style iterating over arraylist possible
 import scala.collection.JavaConversions._
@@ -40,15 +43,40 @@ class MapAct extends MapActivity with MapMenuHelper {
 	lazy val locReceiver = new LocationReceiver2[ArrayList[OSMStation]](staoverlay.load_stations,
 			staoverlay.replace_stations, staoverlay.cancel_stations)
 
-	override def onCreate(savedInstanceState: Bundle) {
-		super.onCreate(savedInstanceState)
-		setContentView(R.layout.mapview)
-		mapview.setBuiltInZoomControls(true)
-		mapview.getOverlays().add(staoverlay)
-		mapview.setTextScale(getResources().getDisplayMetrics().density)
-
-		startLoading()
+	// Function to apply hardware acceleration based on user preference
+	def applyHardwareAcceleration(useHardwareAcceleration: Boolean, mapview: MapView): Unit = {
+	  if (useHardwareAcceleration) {
+		// Enable hardware acceleration globally
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+							 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
+		Log.d("Map", "Hardware acceleration enabled globally.")
+	  } else {
+		// Disable hardware acceleration globally and for the MapView
+		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
+		mapview.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+		Log.d("Map", "Hardware acceleration disabled for MapView.")
+	  }
 	}
+
+	override def onCreate(savedInstanceState: Bundle) {
+	  super.onCreate(savedInstanceState)
+	  setContentView(R.layout.mapview)
+
+	  // Retrieve user preference for hardware acceleration
+	  val useHardwareAcceleration = prefs.getBoolean("hardware_acceleration", true)
+
+	  // Initialize map view settings
+	  val mapview = findViewById(R.id.mapview).asInstanceOf[MapView]
+	  mapview.setBuiltInZoomControls(true)
+	  mapview.getOverlays.add(staoverlay)
+	  mapview.setTextScale(getResources.getDisplayMetrics.density)
+
+	  // Apply the hardware acceleration settings
+	  applyHardwareAcceleration(useHardwareAcceleration, mapview)
+
+	  startLoading()
+	}
+
 
 	override def onResume() {
 		super.onResume()
@@ -78,6 +106,18 @@ class MapAct extends MapActivity with MapMenuHelper {
 		if (pos == null || pos.geoPoint == null)
 			return
 		saveMapViewPosition(pos.geoPoint.latitudeE6/1000000.0f, pos.geoPoint.longitudeE6/1000000.0f, pos.zoomLevel)
+
+	  // Check if the screen is off
+	  val powerManager = getSystemService(Context.POWER_SERVICE).asInstanceOf[PowerManager]
+	  val isScreenOn = powerManager.isInteractive  // Check if the screen is on
+
+	  // Only navigate to HubActivity if the screen was off
+	  if (!isScreenOn && !isFinishing) {
+		val intent = new Intent(this, classOf[HubActivity])
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+		startActivity(intent)
+		finish()  // Finish the current activity so it's removed from the activity stack
+	  }
 	}
 
 	override def onDestroy() {
@@ -119,35 +159,65 @@ class MapAct extends MapActivity with MapMenuHelper {
         }
 
 	def reloadMapAndTheme() {
-		val mapfile = new File(prefs.getString("mapfile", android.os.Environment.getExternalStorageDirectory() + "/aprsdroid.map"))
-		var error = if (mapfile.exists() && mapfile.canRead()) {
-			val result = mapview.setMapFile(mapfile)
-			// output map loader's error if loading failed
-			if (result.isSuccess) null else result.getErrorMessage
-		} else if (prefs.getString("mapfile", null) != null) {
-			// output generic error if file was configured but is not loadable
-			getString(R.string.mapfile_error, mapfile)
-		} else {
-			// do not output error if no map file was configured, silently load online osm
-			null
-		}
-		if (error != null)
-			Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
-		// all map file attempts failed, fall back to online
-		try {
-			if (mapview.getMapFile == null) {
-				val map_source = MapGeneratorInternal.MAPNIK
-				val map_gen = OsmTileDownloader.create(this)
-				map_gen.setUserAgent(getString(R.string.build_version))
-				mapview.setMapGenerator(map_gen)
+		val mapfilePath = prefs.getString("tilepath", android.os.Environment.getExternalStorageDirectory() + "")
+		var mapfile = new File(mapfilePath)
+		
+		val isMapFileValid = mapfilePath.endsWith(".map") && mapfile.exists() && mapfile.canRead()
+
+		// If offline mode is enabled, we attempt to load the map file
+		if (prefs.isOfflineMap()) {
+		  try { //Temp fix for mapfile null on mapsforge
+			if (isMapFileValid) {
+			  val result = mapview.setMapFile(mapfile)
+			  // Output map loader's error if loading failed
+			  var error = if (result.isSuccess) null else result.getErrorMessage
+			  if (error != null) {
+				Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+			  }
+			} else {
+			  // If offline mode is enabled, but the .map file isn't valid, fall back to online
+			  loadOnlineMap()
+			  }
+			} catch {
+			  case e: Exception =>
+			  Log.e("MapAct", "Unexpected error during map reload", e)
+			  // Navigate to HubActivity if there's a general error
+			  navigateToHubActivity()
 			}
-		} catch {
-		case _ : UnsupportedOperationException =>  /* ignore, this is thrown by online map generator */
+		} else {
+		  // Offline mode is not enabled, fall back to online map
+		  loadOnlineMap()
 		}
-		val themefile = new File(prefs.getString("themefile", android.os.Environment.getExternalStorageDirectory() + "/aprsdroid.xml"))
-		if (themefile.exists())
-			mapview.setRenderTheme(themefile)
+
+		// Load the theme if it exists
+		//val themefile = new File(prefs.getString("themefile", android.os.Environment.getExternalStorageDirectory() + "/aprsdroid.xml"))
+		//if (themefile.exists())
+		//	mapview.setRenderTheme(themefile)
+
+		// Load the saved map view position
 		loadMapViewPosition()
+	}
+	
+	// Navigate to HubActivity to reset state
+	def navigateToHubActivity(): Unit = {
+	  val intent = new Intent(this, classOf[HubActivity])
+	  intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+	  startActivity(intent)
+	  finish()
+	}
+
+	// Helper function to load online map
+	def loadOnlineMap() {
+		try {
+			// Set the map generator to Mapnik (or any other online tile source)
+			val map_source = MapGeneratorInternal.MAPNIK
+			val map_gen = OsmTileDownloader.create(this)
+			map_gen.setUserAgent(getString(R.string.build_version))
+			mapview.setMapGenerator(map_gen)
+		} catch {
+			case _: UnsupportedOperationException => 
+				// Ignore if thrown by online map generator
+		}
 	}
 
 	override def onKeyDown(keyCode : Int, event : KeyEvent) : Boolean = {

@@ -240,7 +240,7 @@ class StorageDatabase(context : Context) extends
 		val lat = (pos.getLatitude()*1000000).asInstanceOf[Int]
 		val lon = (pos.getLongitude()*1000000).asInstanceOf[Int]
 		val sym = "%s%s".format(pos.getSymbolTable(), pos.getSymbolCode())
-		val comment = ap.getAprsInformation().getComment()
+		val comment = AprsPacket.parseComment(ap.getAprsInformation().getComment())
 		val qrg = AprsPacket.parseQrg(comment)
 		cv.put(TS, ts.asInstanceOf[java.lang.Long])
 		cv.put(CALL, if (objectname != null) objectname else call)
@@ -350,26 +350,37 @@ class StorageDatabase(context : Context) extends
 			"call = ? OR call LIKE ? OR origin = ? OR origin LIKE ?", Array(barecall, wildcard, barecall, wildcard),
 			null, null, null, null)
 	}
-	def getNeighbors(mycall : String, lat : Int, lon : Int, ts : Long, limit : String) : Cursor = {
-		// calculate latitude correction
-		val corr = (cos(Pi*lat/180000000.0)*cos(Pi*lat/180000000.0)*100).toInt
-		//Log.d(TAG, "getNeighbors: correcting by %d".formatLocal(null, corr))
-		// add a distance column to the query
+	def getNeighbors(mycall: String, lat: Int, lon: Int, ts: Long, limit: String): Cursor = {
+		val corr = (cos(Pi * lat / 180000000.0) * cos(Pi * lat / 180000000.0) * 100).toInt
 		val newcols = Station.COLUMNS :+ Station.COL_DIST.formatLocal(null, lat, lat, lon, lon, corr)
-		getReadableDatabase().query(Station.TABLE, newcols,
-			"ts > ? or call = ?", Array(ts.toString, mycall),
-			null, null, "dist", limit)
+		val sortOrder = if (prefs.getSortByHubDistance) "dist" else "ts DESC" // Sort hub by preference	
+		getReadableDatabase().query(
+			Station.TABLE,
+			newcols,
+			"ts > ? or call = ?",
+			Array(ts.toString, mycall),
+			null,
+			null,
+			sortOrder,   // Changed from "dist" to "ts DESC"
+			limit
+		)
 	}
 
-	def getNeighborsLike(call : String, lat : Int, lon : Int, ts : Long, limit : String) : Cursor = {
-		// calculate latitude correction
-		val corr = (cos(Pi*lat/180000000.0)*cos(Pi*lat/180000000.0)*100).toInt
-		Log.d(TAG, "getNeighborsLike: correcting by %d".formatLocal(null, corr))
-		// add a distance column to the query
+
+	def getNeighborsLike(call: String, lat: Int, lon: Int, ts: Long, limit: String): Cursor = {
+		val corr = (cos(Pi * lat / 180000000.0) * cos(Pi * lat / 180000000.0) * 100).toInt
 		val newcols = Station.COLUMNS :+ Station.COL_DIST.formatLocal(null, lat, lat, lon, lon, corr)
-		getReadableDatabase().query(Station.TABLE, newcols,
-			"call like ?", Array(call),
-			null, null, "dist", limit)
+		val sortOrder = if (prefs.getSortByHubDistance) "dist" else "ts DESC" // Sort hub by preference	
+		getReadableDatabase().query(
+			Station.TABLE,
+			newcols,
+			"call like ?",
+			Array(call),
+			null,
+			null,
+			sortOrder,
+			limit
+		)
 	}
 
 	def addPost(ts : Long, posttype : Int, status : String, message : String) {
@@ -480,11 +491,16 @@ class StorageDatabase(context : Context) extends
 		getWritableDatabase().execSQL("DELETE FROM %s".format(Message.TABLE))
 	}
 
-	def getConversations() = {
-		getReadableDatabase().query("(SELECT * FROM messages ORDER BY _id DESC)", Message.COLUMNS,
-			null, null,
-			"call", null,
-			"_id DESC", null)
+	def getConversations(): Cursor = {
+		getReadableDatabase().query(
+			"messages",
+			Message.COLUMNS,
+			"_id IN (SELECT MAX(_id) FROM messages GROUP BY call)",  // Ensures we pick the latest message per `call`
+			null,
+			"call",
+			null,
+			"_id DESC"
+		)
 	}
 
 }

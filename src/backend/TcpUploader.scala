@@ -17,7 +17,7 @@ class TcpUploader(service : AprsService, prefs : PrefsWrapper) extends AprsBacke
 	val TAG = "APRSdroid.TcpUploader"
 	val hostport = prefs.getString("tcp.server", "euro.aprs2.net")
 	val so_timeout = prefs.getStringInt("tcp.sotimeout", 120)
-	val RECONNECT = 30
+	val RECONNECT = prefs.getStringInt("tcp.reconnect", 30)
 	var conn : TcpSocketThread = null
 
 	def start() = {

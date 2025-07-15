@@ -1,17 +1,19 @@
 package org.aprsdroid.app
 
-import _root_.android.content.Intent
+import _root_.android.content.{Context, Intent, SharedPreferences}
 import _root_.android.net.Uri
+import _root_.android.content.ContentUris
 import _root_.android.os.{Build, Bundle, Environment}
-import _root_.android.preference.Preference
 import _root_.android.preference.Preference.OnPreferenceClickListener
-import _root_.android.preference.PreferenceActivity
-import _root_.android.preference.PreferenceManager
+import _root_.android.preference.{Preference, PreferenceActivity, PreferenceManager}
 import _root_.android.view.{Menu, MenuItem}
 import _root_.android.widget.Toast
 import java.text.SimpleDateFormat
 import java.io.{File, PrintWriter}
 import java.util.Date
+import android.provider.Settings
+import android.provider.DocumentsContract
+import android.provider.MediaStore
 
 import org.json.JSONObject
 
@@ -43,7 +45,8 @@ class PrefsAct extends PreferenceActivity {
 		findPreference(pref_name).setOnPreferenceClickListener(new OnPreferenceClickListener() {
 			def onPreferenceClick(preference : Preference) = {
 				val get_file = new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("*/*")
-				startActivityForResult(Intent.createChooser(get_file,
+					.addCategory(Intent.CATEGORY_OPENABLE)
+				startActivityForResult(Intent.createChooser(get_file, 
 					getString(titleId)), reqCode)
 				true
 			}
@@ -52,23 +55,116 @@ class PrefsAct extends PreferenceActivity {
 	override def onCreate(savedInstanceState: Bundle) {
 		super.onCreate(savedInstanceState)
 		addPreferencesFromResource(R.xml.preferences)
-		//fileChooserPreference("mapfile", 123456, R.string.p_mapfile_choose)
+
+        // Set the click listener for the "Manage All Files Access" preference
+        val allFilesAccessPref = findPreference("all_files_access")
+        if (allFilesAccessPref != null) {
+            allFilesAccessPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                def onPreferenceClick(preference: Preference) = {
+                    openAllFilesAccessSettings()  // Call the method to handle the access settings
+                    true  // Return true to indicate the click was handled
+                }
+            })
+        }
+		fileChooserPreference("tilepath", 123456, R.string.p_mbtiles_file_picker_title)
 		//fileChooserPreference("themefile", 123457, R.string.p_themefile_choose)
 	}
 	override def onResume() {
 		super.onResume()
+		// Get the 'tilepath' value from SharedPreferences
+		val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+		val tilepath = sharedPreferences.getString("tilepath", null)
+
+		// Update the summary of 'tilepath' if a valid path is set
+		if (tilepath != null && tilepath.nonEmpty) {
+			val tilepathPref = findPreference("tilepath")
+			val filename = new File(tilepath).getName() // Extract the file name from the path
+			tilepathPref.setSummary(s"$tilepath")
+		} else {
+			// If no tilepath is set, show the default summary
+			val tilepathPref = findPreference("tilepath")
+		}
+			
 		findPreference("p_connsetup").setSummary(prefs.getBackendName())
 		findPreference("p_location").setSummary(prefs.getLocationSourceName())
 		findPreference("p_symbol").setSummary(getString(R.string.p_symbol_summary) + ": " + prefs.getString("symbol", "/$"))
 	}
 
-	def resolveContentUri(uri : Uri) = {
-		val Array(storage, path) = uri.getPath().replace("/document/", "").split(":", 2)
-		android.util.Log.d("PrefsAct", "resolveContentUri s=" + storage + " p=" + path)
-		if (storage == "primary")
-			Environment.getExternalStorageDirectory() + "/" + path
-		else
-			"/storage/" + storage + "/" + path
+	def resolveContentUri(uri: Uri): String = {
+		val contentResolver = getContentResolver()
+		val documentId = DocumentsContract.getDocumentId(uri)
+
+		// Handle msf: (Downloads provider document ID)
+		if (documentId.startsWith("msf:")) {
+			try {
+				val idStr = documentId.split(":")(1) // Extract numeric ID
+				val downloadsUri = ContentUris.withAppendedId(
+					MediaStore.Downloads.EXTERNAL_CONTENT_URI, idStr.toLong
+				)
+
+				// Query the MediaStore for the file path
+				val cursor = contentResolver.query(downloadsUri, 
+					Array(MediaStore.MediaColumns.DATA), null, null, null)
+
+				if (cursor != null && cursor.moveToFirst()) {
+					val columnIndex = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
+					if (columnIndex != -1) {
+						val filePath = cursor.getString(columnIndex)
+						cursor.close()
+
+						if (filePath != null && filePath.nonEmpty) {
+							return filePath // ✅ Successfully resolved real path
+						}
+					}
+					cursor.close()
+				}
+			} catch {
+				case e: Exception =>
+					android.util.Log.e("PrefsAct", "Error resolving msf URI: " + e.getMessage)
+			}
+		}
+
+		// Attempt alternative resolution for normal content URIs
+		try {
+			val parts = documentId.replace("/document/", "").split(":", 2)
+			var resolvedPath: String = null
+
+			if (parts.length == 2) {
+				val storage = parts(0)
+				val path = parts(1)
+				resolvedPath = if (storage == "primary") {
+					Environment.getExternalStorageDirectory() + "/" + path
+				} else {
+					"/storage/" + storage + "/" + path
+				}
+			}
+
+			return resolvedPath.replace("/storage/raw//", "")
+		} catch {
+			case _: Exception => android.util.Log.e("PrefsAct", "Failed to resolve content URI: " + uri)
+		}
+
+		// 🛑 If we reach here, fallback to /proc trick (last resort, works for large files)
+		return resolvePathFromFileDescriptor(uri)
+	}
+
+	def resolvePathFromFileDescriptor(uri: Uri): String = {
+		try {
+			val parcelFileDescriptor = getContentResolver().openFileDescriptor(uri, "r")
+			if (parcelFileDescriptor != null) {
+				val fd = parcelFileDescriptor.getFileDescriptor().hashCode()
+				val realPath = "/proc/self/fd/" + fd
+
+				// Ensure the file exists before returning
+				if (new File(realPath).exists()) {
+					return realPath
+				}
+			}
+		} catch {
+			case e: Exception =>
+				android.util.Log.e("PrefsAct", "Error resolving path from file descriptor: " + e.getMessage)
+		}
+		return null
 	}
 
 	def parseFilePickerResult(data : Intent, pref_name : String, error_id : Int) {
@@ -95,10 +191,10 @@ class PrefsAct extends PreferenceActivity {
 			null
 		}
 		if (file != null) {
-			PreferenceManager.getDefaultSharedPreferences(this)
-				.edit().putString(pref_name, file).commit()
-			Toast.makeText(this, file, Toast.LENGTH_SHORT).show()
-			// reload prefs
+			val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+			sharedPreferences.edit()
+				.putString(pref_name, file)
+				.commit()
 			finish()
 			startActivity(getIntent())
 		} else {
@@ -111,23 +207,38 @@ class PrefsAct extends PreferenceActivity {
 
 	override def onActivityResult(reqCode : Int, resultCode : Int, data : Intent) {
 		android.util.Log.d("PrefsAct", "onActResult: request=" + reqCode + " result=" + resultCode + " " + data)
-		if (resultCode == android.app.Activity.RESULT_OK && reqCode == 123456) {
-			//parseFilePickerResult(data, "mapfile", R.string.mapfile_error)
-			val takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-			getContentResolver.takePersistableUriPermission(data.getData(), takeFlags)
-			PreferenceManager.getDefaultSharedPreferences(this)
-				//.edit().putString("mapfile", data.getDataString()).commit()
-			finish()
-			startActivity(getIntent())
-		} else
-		if (resultCode == android.app.Activity.RESULT_OK && reqCode == 123457) {
-			parseFilePickerResult(data, "themefile", R.string.themefile_error)
-		} else
-		if (resultCode == android.app.Activity.RESULT_OK && reqCode == 123458) {
-			data.setClass(this, classOf[ProfileImportActivity])
-			startActivity(data)
-		} else
+		if (resultCode == android.app.Activity.RESULT_OK) {
+			reqCode match {
+				case 123456 =>
+					//parseFilePickerResult(data, "mapfile", R.string.mapfile_error)
+					val takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+					getContentResolver.takePersistableUriPermission(data.getData(), takeFlags)
+					val resolvedPath = data.getData().getScheme match {
+						case "file" => data.getData().getPath
+						case "content" => resolveContentUri(data.getData())
+						case _ => null
+					}
+
+					if (resolvedPath != null) {
+					PreferenceManager.getDefaultSharedPreferences(this)
+							.edit().putString("tilepath", resolvedPath).commit()
+						Toast.makeText(this, getString(R.string.selected_file, new File(resolvedPath).getName()), Toast.LENGTH_SHORT).show()
+					} else {
+						Toast.makeText(this, R.string.mapfile_error, Toast.LENGTH_SHORT).show()
+					}
+					finish()
+					startActivity(getIntent())
+				//case 123457 =>
+					//parseFilePickerResult(data, "themefile", R.string.themefile_error)					
+				case 123458 =>
+					data.setClass(this, classOf[ProfileImportActivity])
+					startActivity(data)
+				case _ =>
+					super.onActivityResult(reqCode, resultCode, data)
+			}
+		} else {
 			super.onActivityResult(reqCode, resultCode, data)
+		}
 	}
 
 	override def onCreateOptionsMenu(menu : Menu) : Boolean = {
@@ -148,4 +259,23 @@ class PrefsAct extends PreferenceActivity {
 		case _ => super.onOptionsItemSelected(mi)
 		}
 	}
+
+    def openAllFilesAccessSettings(): Unit = {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // For Android 13+ (API 33 and above): open All Files Access settings
+            val intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            intent.setData(Uri.parse("package:" + getPackageName()))
+            startActivity(intent)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // For Android 11 (API 30) and above but below Android 13, open App Info page directly
+            val intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.setData(Uri.parse("package:" + getPackageName()))
+            startActivity(intent)
+        } else {
+            // For older versions (Android 10 and below), open the App Info page
+            val intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.setData(Uri.parse("package:" + getPackageName()))
+            startActivity(intent)
+        }
+    }
 }

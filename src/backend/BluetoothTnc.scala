@@ -19,6 +19,7 @@ class BluetoothTnc(service : AprsService, prefs : PrefsWrapper) extends AprsBack
 	val tncmac = prefs.getString("bt.mac", null)
 	val tncchannel = prefs.getStringInt("bt.channel", -1)
 	var conn : BtSocketThread = null
+	val RECONNECT = prefs.getStringInt("bt.reconnect", 30)
 
 	def start() = {
 		if (conn == null)
@@ -139,9 +140,9 @@ class BluetoothTnc(service : AprsService, prefs : PrefsWrapper) extends AprsBack
 			while (running) {
 				try {
 					if (need_reconnect) {
-						log(R.string.bt_reconnecting)
+						log(service.getString(R.string.bt_reconnecting, RECONNECT.asInstanceOf[AnyRef]))						
 						try {
-							Thread.sleep(3*1000)
+							Thread.sleep(RECONNECT*1000)
 						} catch { case _ : InterruptedException => }
 						init_socket()
 						need_reconnect = false

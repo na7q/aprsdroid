@@ -79,6 +79,7 @@ class MessageService(s : AprsService) {
 					// No recent ACK, we need to send an ACK
 					val ack = s.newPacket(new MessagePacket(ap.getSourceCall(), "ack", msg.getMessageNumber()))
 					s.sendPacket(ack)
+					s.sendIsPacket(ack.toString)
 
 					// Update the last ACK timestamp for this source call and message number
 					lastAckTimestamps((ap.getSourceCall(), msg.getMessageNumber())) = System.currentTimeMillis()
@@ -95,8 +96,17 @@ class MessageService(s : AprsService) {
 	}
 
 	// return 2^n * 30s, at most 32min
-	def getRetryDelayMS(retrycnt : Int) = (RETRY_INTERVAL * 1000) * (1 << math.min(retrycnt - 1, NUM_OF_RETRIES))
-
+	def getRetryDelayMS(retrycnt: Int): Long = {	 
+	  if (retrycnt >= NUM_OF_RETRIES) {
+		val finalDelay = 15 * 1000
+		Log.d(TAG, s"Final retry delay: $finalDelay seconds")
+		return finalDelay  // Explicit return
+	  } else {
+		val backoffDelay = (RETRY_INTERVAL * 1000) * (1 << math.min(retrycnt - 1, NUM_OF_RETRIES - 1))
+		Log.d(TAG, s"Retry interval for attempt $retrycnt: $backoffDelay ms")
+		return backoffDelay  // Explicit return
+	  }
+	}
 
 	def scheduleNextSend(delay : Long) {
 		// add some time to prevent fast looping
@@ -127,17 +137,19 @@ class MessageService(s : AprsService) {
 			val msgid = c.getString(COLUMN_MSGID)
 			val msgtype = c.getInt(COLUMN_TYPE)
 			val text = c.getString(COLUMN_TEXT)
-			val t_send = ts + getRetryDelayMS(retrycnt) - System.currentTimeMillis()
+			val t_send = ts + getRetryDelayMS(retrycnt) - System.currentTimeMillis()			
 			Log.d(TAG, "pending message: %d/%d (%ds) ->%s '%s'".format(retrycnt, NUM_OF_RETRIES,
 				t_send/1000, call, text))
 			if (retrycnt == NUM_OF_RETRIES && t_send <= 0) {
-				// this message timed out
-				s.db.updateMessageType(c.getLong(/* COLUMN_ID */ 0), TYPE_OUT_ABORTED)
+				s.db.updateMessageType(c.getLong(0), TYPE_OUT_ABORTED)
 				s.sendBroadcast(AprsService.MSG_PRIV_INTENT)
 			} else if (retrycnt < NUM_OF_RETRIES && t_send <= 0) {
 				// this message needs to be transmitted
-				val msg = s.newPacket(new MessagePacket(call, text, msgid))
+				val msg = s.newPacket(new MessagePacket(call, text, Option(msgid).getOrElse("")))
 				s.sendPacket(msg)
+				s.sendIsPacket(msg.toString)								
+				if (msgid == null || msgid.isEmpty) 
+					s.db.updateMessageType(c.getLong(0), TYPE_OUT_ACKED)
 				val cv = new ContentValues()
 				cv.put(RETRYCNT, (retrycnt + 1).asInstanceOf[java.lang.Integer])
 				cv.put(TS, System.currentTimeMillis.asInstanceOf[java.lang.Long])

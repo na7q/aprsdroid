@@ -19,5 +19,14 @@
                 android:targetClass="com.android.settings.bluetooth.BluetoothSettings" />
         </Preference>
 
+		<de.duenndns.EditTextPreferenceWithValue
+			android:key="bt.reconnect"
+			android:defaultValue="3"
+			android:hint="3"
+			android:inputType="number"
+			android:title="@string/p_bt_reconnect"
+			android:summary="@string/p_bt_reconnect_summary"
+			android:dialogTitle="@string/p_bt_reconnect_entry" />
+
     </PreferenceCategory>
 </PreferenceScreen>

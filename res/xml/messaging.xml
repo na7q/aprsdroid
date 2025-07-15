@@ -49,5 +49,11 @@
 		android:summary="@string/p_msgdupetime_summary"
 		android:dialogTitle="@string/p_msgdupetime_entry" />
 
+	<CheckBoxPreference
+		android:key="p.msgidoff"
+		android:title="@string/p_message_id_title"
+		android:summary="@string/p_message_id_summary"
+		android:defaultValue="false" />
+
 
 </PreferenceScreen>

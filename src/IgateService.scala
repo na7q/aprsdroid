@@ -1,7 +1,7 @@
 package org.aprsdroid.app
 import _root_.android.content.Context
 
-import _root_.java.io.{BufferedReader, InputStreamReader, OutputStream, PrintWriter, IOException}
+import _root_.java.io.{BufferedReader, BufferedWriter, InputStreamReader, OutputStream, OutputStreamWriter, PrintWriter, IOException}
 import _root_.java.net.{Socket, SocketException}
 import _root_.android.util.Log
 import _root_.net.ab0oo.aprs.parser._
@@ -62,7 +62,10 @@ class IgateService(service: AprsService, prefs: PrefsWrapper) extends Connection
       Log.d(TAG, "stop() - Waiting for connection thread to join.")
       conn.join(50)
       conn.shutdown()  // Make sure the socket is cleanly closed
+	  conn = null	  
       Log.d(TAG, "stop() - Connection shutdown.")
+	  service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", "IGate Stopped")
+	  
     } else {
       Log.d(TAG, "stop() - No connection to stop.")
     }
@@ -87,7 +90,7 @@ class IgateService(service: AprsService, prefs: PrefsWrapper) extends Connection
 	val service_running = prefs.getBoolean("service_running", false) // Default to false if not set
 	  
 	// If the service is already running, don't proceed
-	if (!service_running) {
+	if (!service_running || !prefs.isIgateEnabled) {
 	  Log.d(TAG, "start() - Service is not running, skipping connection.")
 	  reconnecting = false
 	  return
@@ -115,6 +118,10 @@ class IgateService(service: AprsService, prefs: PrefsWrapper) extends Connection
     reconnecting = false
   }
 
+  def isConnectionRunning: Boolean = {
+    conn != null && conn.running
+  }
+
   // Callback implementation when the connection is lost
   override def onConnectionLost(): Unit = {
     Log.d(TAG, "onConnectionLost() - Connection lost, attempting to reconnect.")
@@ -138,6 +145,7 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
 
   override def run(): Unit = {
     Log.d("IgateService", s"run() - Starting TCP connection to $host with timeout $timeout")
+	service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", "Starting IGate...")	
 	service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", s"Connecting to $host:$port")
 
     while (running) {
@@ -272,13 +280,19 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
 
   // Send data to the server
   def sendData(data: String): Unit = {
-    Log.d("IgateService", s"sendData() - Sending data: $data")
-    if (writer != null) {
-      writer.println(data)
-      writer.flush()
-    } else {
-      Log.e("IgateService", "sendData() - Writer is null, cannot send data.")
-    }
+	Log.d("IgateService", s"sendData() - Sending data: $data")
+	  
+	// Run the task in a new thread
+	new Thread(new Runnable {
+	  override def run(): Unit = {
+		if (writer != null) {
+		  writer.println(data)
+		  writer.flush()
+		} else {
+		  Log.e("IgateService", "sendData() - Writer is null, cannot send data.")
+		}
+	  }
+	}).start()
   }
 
   // Clean up resources

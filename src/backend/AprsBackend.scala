@@ -128,7 +128,7 @@ object AprsBackend {
 			R.xml.proto_afsk, "afsk"),
 		"kiss" -> new ProtoInfo(
 			(s, is, os) => new KissProto(s, is, os),
-			R.xml.proto_kiss, "link"),
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) R.xml.proto_kiss_ble else R.xml.proto_kiss, "link"),
 		"tnc2" -> new ProtoInfo(
 			(s, is, os) => new Tnc2Proto(is, os),
 			R.xml.proto_tnc2, "link"),

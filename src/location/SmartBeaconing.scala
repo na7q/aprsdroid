@@ -10,6 +10,8 @@ class SmartBeaconing(service : AprsService, prefs : PrefsWrapper) extends Locati
 		with LocationListener {
 	val TAG = "APRSdroid.SmartBeaconing"
 	
+	val isMetric = prefs.getString("p.units", "1") == "1"
+	
 	lazy val locMan = service.getSystemService(Context.LOCATION_SERVICE).asInstanceOf[LocationManager]
 
 	var lastLoc : Location = null
@@ -36,18 +38,30 @@ class SmartBeaconing(service : AprsService, prefs : PrefsWrapper) extends Locati
 		started = false
 	}
 
-	def smartBeaconSpeedRate(speed : Float) : Int = {
-		val SB_FAST_SPEED = prefs.getStringInt("sb.fastspeed", 100)/3.6 // [m/s]
+	def convertSpeed(speed: Float, isMetric: Boolean): Float = {
+		if (isMetric) speed / 3.6f   // Convert from km/h to m/s
+		else speed / 2.23694f        // Convert from mph to m/s
+	}
+
+	def smartBeaconSpeedRate(speed: Float): Int = {
+		// Convert the provided speed value
+		val convertedSpeed = convertSpeed(speed, isMetric)
+
+		// Retrieve and convert the threshold values based on unit preference
+		val SB_FAST_SPEED = convertSpeed(prefs.getStringInt("sb.fastspeed", 100).toFloat, isMetric)
 		val SB_FAST_RATE = prefs.getStringInt("sb.fastrate", 60)
-		val SB_SLOW_SPEED = prefs.getStringInt("sb.slowspeed", 5)/3.6 // [m/s]
+		val SB_SLOW_SPEED = convertSpeed(prefs.getStringInt("sb.slowspeed", 5).toFloat, isMetric)
 		val SB_SLOW_RATE = prefs.getStringInt("sb.slowrate", 1200)
-		if (speed <= SB_SLOW_SPEED)
+
+		// Calculate and return the appropriate rate
+		if (convertedSpeed <= SB_SLOW_SPEED)
 			SB_SLOW_RATE
-		else if (speed >= SB_FAST_SPEED)
+		else if (convertedSpeed >= SB_FAST_SPEED)
 			SB_FAST_RATE
 		else
-			(SB_FAST_RATE + (SB_SLOW_RATE - SB_FAST_RATE) * (SB_FAST_SPEED - speed) / (SB_FAST_SPEED-SB_SLOW_SPEED)).toInt
+			(SB_FAST_RATE + (SB_SLOW_RATE - SB_FAST_RATE) * (SB_FAST_SPEED - convertedSpeed) / (SB_FAST_SPEED - SB_SLOW_SPEED)).toInt
 	}
+
 
 	// returns the angle between two bearings
 	def getBearingAngle(alpha : Float, beta : Float) : Float = {
@@ -79,7 +93,8 @@ class SmartBeaconing(service : AprsService, prefs : PrefsWrapper) extends Locati
 			return (t_diff/1000 >= SB_TURN_TIME)
 
 		// threshold depends on slope/speed [mph]
-		val threshold = SB_TURN_MIN + SB_TURN_SLOPE/(speed*2.23693629)
+		//val threshold = SB_TURN_MIN + SB_TURN_SLOPE/(speed*2.23693629)
+		val threshold = SB_TURN_MIN + SB_TURN_SLOPE / (speed * (if (isMetric) 3.6 else 2.23693629))
 
 		Log.d(TAG, "smartBeaconCornerPeg: %1.0f < %1.0f %d/%d".format(turn, threshold,
 			t_diff/1000, SB_TURN_TIME))

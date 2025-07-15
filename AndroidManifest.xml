@@ -26,6 +26,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
     <application android:label="@string/app_name" android:icon="@drawable/icon"
 	    android:name=".APRSdroidApplication"
@@ -94,6 +95,7 @@
 		android:parentActivityName=".PrefsAct"
 		android:launchMode="singleTop"
 		android:configChanges="orientation|keyboardHidden|screenSize" />
+		
 	<activity android:name=".IgatePrefs"
 		android:label="@string/p__igating"
 		android:parentActivityName=".PrefsAct"
@@ -109,6 +111,18 @@
 	<activity android:name=".MessagingPrefs"
 		android:label="@string/p__messaging"
 		android:parentActivityName=".PrefsAct"
+		android:launchMode="singleTop"
+		android:configChanges="orientation|keyboardHidden|screenSize" />		
+		
+	<activity android:name=".NotificationPrefs"
+		android:label="@string/p__notification"
+		android:parentActivityName=".NotificationPrefs"
+		android:launchMode="singleTop"
+		android:configChanges="orientation|keyboardHidden|screenSize" />		
+		
+	<activity android:name=".PrivacyPrefs"
+		android:label="@string/p__location"
+		android:parentActivityName=".PrivacyPrefs"
 		android:launchMode="singleTop"
 		android:configChanges="orientation|keyboardHidden|screenSize" />		
 		

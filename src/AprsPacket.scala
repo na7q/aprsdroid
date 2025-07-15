@@ -2,10 +2,46 @@ package org.aprsdroid.app
 
 import _root_.android.location.Location
 import _root_.net.ab0oo.aprs.parser._
+import _root_.android.util.Log
 
 import scala.math.abs
 
 object AprsPacket {
+
+	// Define KENWOOD_COMMENT_DATA as an immutable Map
+	val KENWOOD_COMMENT_DATA: Map[String, Map[String, String]] = Map(
+	  ">" -> Map("vendor" -> "Kenwood", "model" -> "TH-D7A", "class" -> "ht"),
+	  "=" -> Map("vendor" -> "Kenwood", "model" -> "TM-D710", "class" -> "rig"),
+	  "^" -> Map("vendor" -> "Kenwood", "model" -> "TH-D74", "class" -> "ht"),
+	  "&" -> Map("vendor" -> "Kenwood", "model" -> "TH-D75", "class" -> "ht"),
+	  "]" -> Map("vendor" -> "Kenwood", "model" -> "TM-D700", "class" -> "rig")
+	)
+
+	// Define COMMENT_DATA as an immutable Map
+	val COMMENT_DATA: Map[String, Map[String, String]] = Map(
+	  "_ " -> Map("vendor" -> "Yaesu", "model" -> "VX-8", "class" -> "ht"),
+	  "_\"" -> Map("vendor" -> "Yaesu", "model" -> "FTM-350", "class" -> "rig"),
+	  "_#" -> Map("vendor" -> "Yaesu", "model" -> "VX-8G", "class" -> "ht"),
+	  "_$" -> Map("vendor" -> "Yaesu", "model" -> "FT1D", "class" -> "ht"),
+	  "_(" -> Map("vendor" -> "Yaesu", "model" -> "FT2D", "class" -> "ht"),
+	  "_0" -> Map("vendor" -> "Yaesu", "model" -> "FT3D", "class" -> "ht"),
+	  "_3" -> Map("vendor" -> "Yaesu", "model" -> "FT5D", "class" -> "ht"),
+	  "_1" -> Map("vendor" -> "Yaesu", "model" -> "FTM-300D", "class" -> "rig"),
+	  "_2" -> Map("vendor" -> "Yaesu", "model" -> "FTM-200D", "class" -> "rig"),
+	  "_4" -> Map("vendor" -> "Yaesu", "model" -> "FTM-500D", "class" -> "rig"),
+	  "_)" -> Map("vendor" -> "Yaesu", "model" -> "FTM-100D", "class" -> "rig"),
+	  "_%" -> Map("vendor" -> "Yaesu", "model" -> "FTM-400DR", "class" -> "rig"),
+	  "(5" -> Map("vendor" -> "Anytone", "model" -> "D578UV", "class" -> "ht"),
+	  "(8" -> Map("vendor" -> "Anytone", "model" -> "D878UV", "class" -> "ht"),
+	  "|3" -> Map("vendor" -> "Byonics", "model" -> "TinyTrak3", "class" -> "tracker"),
+	  "|4" -> Map("vendor" -> "Byonics", "model" -> "TinyTrak4", "class" -> "tracker"),
+	  "^v" -> Map("vendor" -> "HinzTec", "model" -> "anyfrog"),
+	  "*v" -> Map("vendor" -> "KissOZ", "model" -> "Tracker", "class" -> "tracker"),
+	  ":2" -> Map("vendor" -> "SQ8L", "model" -> "VP-Tracker", "class" -> "tracker"),
+	  " X" -> Map("vendor" -> "SainSonic", "model" -> "AP510", "class" -> "tracker"),
+	  "[1" -> Map("vendor" -> "NA7Q", "model" -> "APRSdroid", "class" -> "software")
+	)
+
 	val QRG_RE = ".*?(\\d{2,3}[.,]\\d{3,4}).*?".r
 	  val characters = Array(
 		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D",
@@ -301,6 +337,125 @@ object AprsPacket {
 		case QRG_RE(qrg) => qrg
 		case _ => null
 		}
+	}
+
+	// Function to check if the last 2 characters of the comment match anything in COMMENT_DATA
+	def micetocall(comment: String): Option[String] = {
+	  val lastTwoChars = comment.takeRight(2) // Get the last 2 characters of the comment
+	  COMMENT_DATA.get(lastTwoChars).flatMap(_.get("model"))
+	}
+
+	// Function to check if the last character of the comment matches anything in KENWOOD_COMMENT_DATA
+	def kenwoodtocall(comment: String): Option[String] = {
+	  val lastChar = comment.takeRight(1) // Get the last character of the comment
+	  KENWOOD_COMMENT_DATA.get(lastChar).flatMap(_.get("model"))
+	}
+
+	// Function to check old Kenwood calls
+	def oldkenwoodtocall(packet: String): Option[String] = {
+	  val colonIndex = packet.indexOf(':')
+	  
+	  if (colonIndex == -1 || colonIndex + 10 >= packet.length) {
+		None
+	  } else {
+		if (packet(colonIndex + 1) == '\'') {
+		  val keyChar = packet(colonIndex + 10).toString
+		  KENWOOD_COMMENT_DATA.get(keyChar).flatMap(_.get("model"))
+		} else {
+		  None
+		}
+	  }
+	}
+
+	def parseComment(comment: String): String = {
+	  var modifiedComment = comment
+
+	  // Step 1: Check if it ends with micetocall characters (last 2 characters)
+	  if (modifiedComment.length >= 2 && AprsPacket.micetocall(modifiedComment.takeRight(2)).isDefined) {
+		modifiedComment = modifiedComment.dropRight(2) // Strip last 2 characters and return immediately
+	  }
+
+	  // Step 2: Check if it ends with kenwoodtocall (last 1 character)
+	  if (modifiedComment.nonEmpty && AprsPacket.kenwoodtocall(modifiedComment.takeRight(1)).isDefined) {
+		modifiedComment = modifiedComment.dropRight(1) // Strip last 1 character
+	  }
+
+	  // Step 3: Remove `}` and everything before it if it appears within the first 4 characters
+	  val bracketIndex = modifiedComment.indexOf("}")
+	  if (bracketIndex >= 0 && bracketIndex <= 3) {
+		modifiedComment = modifiedComment.substring(bracketIndex + 1).trim
+	  }
+
+	  // Step 4: Remove specific prefixes ("PHGxxxx", "RNGxxxx", "DFSxxxx")
+	  val prefixPatterns = Seq(
+		"PHG\\d{4,5}/?", // Matches PHG followed by exactly 4 digits, with an optional trailing slash
+		"RNG\\d{4}/?", // Matches RNG followed by exactly 4 digits, with an optional trailing slash
+		"DFS\\d{4}/?"  // Matches DFS followed by exactly 4 digits, with an optional trailing slash
+	  )
+
+	  for (pattern <- prefixPatterns) {
+		val before = modifiedComment
+		modifiedComment = modifiedComment.replaceFirst(pattern.r.regex, "").trim
+	  }
+
+	  // Step 5: Remove altitude format "/A=XXXXX" where X can be positive or negative digits
+	  val altitudePattern = "/?A=(-\\d{5}|\\d{6})".r
+	  if (altitudePattern.findFirstIn(modifiedComment).isDefined) {
+		modifiedComment = altitudePattern.replaceAllIn(modifiedComment, "").trim
+	  }
+
+	  // Step 6: Remove "XXX/YYY" or "XXX/YYY/A=ZZZZZ" format
+	  val courseSpeedPattern = "^\\d{3}/\\d{3}(/A=(-?\\d{5}|\\d{6}))?/?".r
+	  if (courseSpeedPattern.findFirstIn(modifiedComment).isDefined) {
+		modifiedComment = courseSpeedPattern.replaceAllIn(modifiedComment, "").trim
+	  }
+
+	  // Step 7: Remove weather-related patterns
+	  val weatherPatterns = Seq(
+		"\\.\\.\\./\\.\\.\\.",  // Matches ".../..." (Direction/Speed missing)
+		"\\.\\.\\./\\d{3}",    // Matches ".../XXX" (Speed missing)
+		"\\d{3}/\\.\\.\\.",    // Matches "XXX/..." (Direction missing)
+		"c\\d{3}",  // Course (cXXX)
+		"c[ .]{3}",  // Course missing (c...)
+		"s\\d{3}",  // Speed (sXXX)
+		"s[ .]{3}",  // Speed missing (s...)
+		"g\\d{3}",  // Wind Gust (gXXX)
+		"g[ .]{3}",  // Wind Gust missing (g...)
+		"t\\d{3}",  // Temperature (tXXX)
+		"t[ .]{3}",  // Temperature missing (t...)
+		"r\\d{3}",  // Rainfall in last hour (rXXX)
+		"r[ .]{3}",  // Rainfall missing (r...)
+		"p\\d{3}",  // Rainfall in last 24 hours (pXXX)
+		"p[ .]{3}",  // Rainfall missing (p...)
+		"P\\d{3}",  // Rainfall since midnight (PXXX)
+		"P[ .]{3}",  // Rainfall missing (P...)
+		"h\\d{2,3}", // Humidity (hXX or hXXX)
+		"h[ .]{2,3}",  // Humidity missing (h.. or h...)
+		"b\\d{5}",  // Barometric Pressure (bXXXXX)
+		"b[ .]{3,5}",		
+		"L\\d{3}",  // Luminosity (LXXX)
+		"L[ .]{3}"   // Luminosity missing (L...)
+	  )
+
+	  for (pattern <- weatherPatterns) {
+		val before = modifiedComment
+		modifiedComment = modifiedComment.replaceAll(pattern.r.regex, "").trim
+	  }
+	  
+	  // Step 8: Remove Base91 telemetry if present
+	  val base91TelemetryRegex = """\|[^|]{2,12}\|""".r
+	  if (base91TelemetryRegex.findFirstIn(modifiedComment).isDefined) {
+	    modifiedComment = base91TelemetryRegex.replaceAllIn(modifiedComment, "").trim
+	  }
+
+	  // Step 9: Remove APRS `!data!` segments (e.g., "!wF$!")
+	  val exclamationData = """![!-~]+!""".r
+	  if (exclamationData.findFirstIn(modifiedComment).isDefined) {
+	    modifiedComment = exclamationData.replaceAllIn(modifiedComment, "").trim
+	  }
+
+	  // Return the modified comment after all transformations
+	  modifiedComment
 	}
 
 	def parseHostPort(hostport : String, defaultport : Int) : (String, Int) = {

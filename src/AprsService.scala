@@ -23,6 +23,7 @@ object AprsService {
 	val SERVICE_STARTED = PACKAGE + ".SERVICE_STARTED"
 	val SERVICE_STOPPED = PACKAGE + ".SERVICE_STOPPED"
 	val POSITION = PACKAGE + ".POSITION"
+	val HUD = PACKAGE + ".HUD"
 	val MICLEVEL = PACKAGE + ".MICLEVEL" // internal volume event intent
 	val LINK_ON = PACKAGE + ".LINK_ON"
 	val LINK_OFF = PACKAGE + ".LINK_OFF"
@@ -46,7 +47,9 @@ object AprsService {
 	//  +- SOURCE
 	val DEST = "dest"			// destination callsign
 	val BODY = "body"			// body of the message
-
+	val IGATE_START = PACKAGE + ".IGATE_START"
+	val IGATE_STOP = PACKAGE + ".IGATE_STOP"
+	
 	// APRSdroid API version
 	val API_VERSION_CODE = 1
 
@@ -59,6 +62,7 @@ object AprsService {
 	}
 
 	var running = false
+	var igaterunning = false	
 	var link_error = 0
 
 	implicit def block2runnable[F](f: => F) = new Runnable() { def run() { f } }
@@ -107,6 +111,14 @@ class AprsService extends Service {
 			if (running)
 				stopSelf()
 			return
+		} else 
+			if (i.getAction() == IGATE_START) {
+				igateStart()
+			return
+		} else 
+			if (i.getAction() == IGATE_STOP) {
+				igateStop()
+			return			
 		} else
 		if (i.getAction() == SERVICE_SEND_PACKET) {
 			if (!running) {
@@ -178,9 +190,18 @@ class AprsService extends Service {
 		poster = AprsBackend.instanciateUploader(this, prefs)
 		if (poster.start())
 			onPosterStarted()
-			if (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK"))) {
-				igateService.start()
-			}
+	}
+
+	def igateStart() {
+		if (prefs.getBoolean("service_running", false) && (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK")))) {
+		igateService.start()
+		igaterunning = true
+		}
+	}
+
+	def igateStop() {
+		igateService.stop()
+		igaterunning = false
 	}
 
 	def onPosterStarted() {
@@ -199,8 +220,13 @@ class AprsService extends Service {
 			.putExtra(CALLSIGN, callssid))
 
 		// startup completed, remember state
-		if (!singleShot)
+		if (!singleShot) {
 			prefs.setBoolean("service_running", true)
+		}
+		
+		if (!igaterunning && prefs.isIgateEnabled()) {
+			igateStart()
+		}
 	}
 
 	override def onBind(i : Intent) : IBinder = null
@@ -218,14 +244,12 @@ class AprsService extends Service {
 		// catch FC when service is killed from outside
 		if (poster != null) {
 			poster.stop()
-			if (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK"))) {			
-				igateService.stop()
-			}
 			showToast(getString(R.string.service_stop))
 
 			sendBroadcast(new Intent(SERVICE_STOPPED))
 		}
 		msgService.stop()
+		igateStop()
 		locSource.stop()
 		scala.util.control.Exception.ignoring(classOf[IllegalArgumentException]) {
 			unregisterReceiver(msgNotifier)
@@ -363,6 +387,13 @@ class AprsService extends Service {
 	}
 	def sendPacket(packet : APRSPacket) { sendPacket(packet, "") }
 
+	def sendIsPacket(packet : String): Unit = {
+	  if (igateService.isConnectionRunning && prefs.getBoolean("p.positiontois", false)) {
+	    Log.d("AprsService", "Connection is active")
+	    igateService.handlePostSubmitData(packet)
+	  }
+	}
+
 	def formatLocMice(symbol : String, status : String, location : Location) = {
 		val privambiguity = 5 - prefs.getStringInt("priv_ambiguity", 0)
 		val ambiguity = if (privambiguity == 5) 0 else privambiguity
@@ -413,8 +444,9 @@ class AprsService extends Service {
 		 formatLoc(symbol, status, location)
 	   }
 		  
-		Log.d(TAG, "packet: " + packet)
-		sendPacket(packet, " (±%dm)".format(location.getAccuracy.asInstanceOf[Int]))
+		Log.d(TAG, "packet: " + packet)	
+		sendPacket(packet, " (±%dm)".format(location.getAccuracy.asInstanceOf[Int]))	
+		sendIsPacket(packet.toString)
 	}
 
 	def sendPacketFinished(result : String) {
@@ -524,11 +556,105 @@ class AprsService extends Service {
 		)
 	}
 
+	def hudParsedPackets(ts : Long, ap : APRSPacket, field : InformationField, pos : Position, objectname : String) {
+		val cse = getCSE(field)		
+		hudOutput(ts, ap, pos, cse, objectname)
+	}
+	
+	def hudOutputPacket(message: String) {
+
+	  val PACKET = PACKAGE + ".PACKET"	
+	  
+	  val intent = new Intent(HUD)
+		.putExtra(PACKET, message.toString())
+		
+	  sendBroadcast(intent)
+	  Log.d("HUD_OUTPUT", "Broadcast sent.")
+	}
+
+	def hudOutput(ts: Long, ap: APRSPacket, pos: Position, cse: CourseAndSpeedExtension, objectname: String) {
+
+	  // Define constants using the PACKAGE prefix
+	  val LOCATION_LAT = PACKAGE + ".LOCATION_LAT"
+	  val LOCATION_LON = PACKAGE + ".LOCATION_LON"
+	  val COMMENT = PACKAGE + ".COMMENT"
+	  val SYMBOL = PACKAGE + ".SYMBOL"
+	  val SPEED = PACKAGE + ".SPEED"
+	  val COURSE = PACKAGE + ".COURSE"
+	  val SOURCE = PACKAGE + ".SOURCE"
+	  val CALLSIGN = PACKAGE + ".CALLSIGN"
+	  val PACKET = PACKAGE + ".PACKET"	
+	  val QRG = PACKAGE + ".QRG"	
+
+	  Log.d("HUD_OUTPUT", s"packet: $ap")
+
+	  val call = ap.getSourceCall()
+	  Log.d("HUD_OUTPUT", s"call: $call")
+	  
+	  val lat = (pos.getLatitude() * 1000000).asInstanceOf[Int]
+	  Log.d("HUD_OUTPUT", s"lat: $lat")
+	  
+	  val lon = (pos.getLongitude() * 1000000).asInstanceOf[Int]
+	  Log.d("HUD_OUTPUT", s"lon: $lon")
+	  
+	  val sym = "%s%s".format(pos.getSymbolTable(), pos.getSymbolCode())
+	  Log.d("HUD_OUTPUT", s"sym: $sym")
+	  
+	  val comment = ap.getAprsInformation().getComment()
+	  Log.d("HUD_OUTPUT", s"comment: $comment")
+	  
+	  val qrg = Option(AprsPacket.parseQrg(comment)).getOrElse("")
+	  Log.d("HUD_OUTPUT", s"qrg: $qrg")
+
+	  val station = if (objectname != null) objectname else call
+	  Log.d("HUD_OUTPUT", s"station: $station")
+
+	  // Handle null speed and course values
+	  val speedOption: Option[Int] = Option(cse).flatMap(s => Option(s.getSpeed()).map(_.asInstanceOf[Int]))
+	  Log.d("HUD_OUTPUT", s"speedOption: $speedOption")
+
+	  val courseOption: Option[Int] = Option(cse).flatMap(s => Option(s.getCourse()).map(_.asInstanceOf[Int]))
+	  Log.d("HUD_OUTPUT", s"courseOption: $courseOption")
+
+	  // Convert speed to mph if it's not null, else set speedmph to None
+	  val speedmph: Option[Int] = speedOption.map(speed => (speed * 115078) / 100000)
+	  Log.d("HUD_OUTPUT", s"speedmph: $speedmph")
+
+	  // Broadcast the information, checking for null values
+	  val intent = new Intent(HUD)
+		.putExtra(SOURCE, call)
+		.putExtra(LOCATION_LAT, lat)
+		.putExtra(LOCATION_LON, lon)
+		.putExtra(CALLSIGN, station)
+		.putExtra(PACKET, ap.toString())
+		.putExtra(COMMENT, comment.toString())
+		.putExtra(SYMBOL, sym.toString())
+		.putExtra(QRG, qrg.toString())
+
+	  // Add SPEED only if it's not null
+	  speedmph.foreach(mph => {
+		intent.putExtra(SPEED, mph.asInstanceOf[Integer])
+		Log.d("HUD_OUTPUT", s"added SPEED mom: ${mph}")
+	  })
+
+	  // Add COURSE only if it's not null and is a valid Integer
+	  courseOption.foreach(course => {
+		intent.putExtra(COURSE, course.asInstanceOf[Integer])
+		Log.d("HUD_OUTPUT", s"added COURSE: $course")
+	  })
+
+	  // Send the broadcast with all the extras
+	  sendBroadcast(intent)
+	  Log.d("HUD_OUTPUT", "Broadcast sent.")
+	}
+
+
 	def addPost(t : Int, status : String, message : String) {
 		val ts = System.currentTimeMillis()
 		db.addPost(ts, t, status, message)
-		if (t == StorageDatabase.Post.TYPE_POST || t == StorageDatabase.Post.TYPE_INCMG) {
+		if ((t == StorageDatabase.Post.TYPE_POST || t == StorageDatabase.Post.TYPE_INCMG) || (prefs.getBoolean("p.positiontois", false) && t == StorageDatabase.Post.TYPE_IG)) {
 			parsePacket(ts, message, t)
+			parseHudPackets(ts, message)			
 		} else {
 			// only log status messages
 			Log.d(TAG, "addPost: " + status + " - " + message)
@@ -554,6 +680,7 @@ class AprsService extends Service {
 				stopSelf()
 		}
 	}
+
 	def postSubmit(post : String) {
 		// Log the incoming post message for debugging
 		Log.d("APRSdroid.Service", s"Incoming post: $post")	
@@ -564,8 +691,29 @@ class AprsService extends Service {
 
 		if (prefs.isIgateEnabled() && (prefs.getBackendName().contains("KISS") || prefs.getBackendName().contains("AFSK"))) {			
 			igateService.handlePostSubmitData(post)
-		}
+		}	
+	}
 
+	def parseHudPackets(ts : Long, message : String) {
+		try {
+			var fap = Parser.parse(message)
+
+			// **Process the packet for HUD before any returns**
+			if (fap.getAprsInformation() != null) {
+				if (fap.hasFault()) throw new Exception("FAP fault")
+
+				fap.getAprsInformation() match {
+					case pp: PositionPacket => hudParsedPackets(ts, fap, pp, pp.getPosition(), null)
+					case op: ObjectPacket => hudParsedPackets(ts, fap, op, op.getPosition(), op.getObjectName())
+					//case msg: MessagePacket => msgService.handleMessage(ts, fap, msg, digiPathCheck)
+				}
+			}
+
+		} catch {
+		case e : Exception =>
+			Log.d(TAG, "parseHudPacket() unsupported packet: " + message)
+			hudOutputPacket(message)
+		}
 	}
 
 	def postAbort(post : String) {

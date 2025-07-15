@@ -105,6 +105,7 @@
 <string name="ad_thanks_4">Matti, OH2MQK and John, AB0OO: Java APRS</string>
 <string name="ad_thanks_5">Sivan, 4X6IZ: AFSK demodulator, https://github.com/sivantoledo/javAX25</string>
 <string name="ad_thanks_6">SmartBeaconing™ by HamHUD Nichetronix, LLC, http://hamhud.net</string>
+<string name="ad_thanks_7">Mike, NA7Q: Digipeating, IGating, Mbtiles Mapping, and more!</string>
 <string name="ad_trans">\n\nTranslation:</string>
 <string name="ad_homepage">Home Page</string>
 
@@ -120,7 +121,8 @@
 
 <string name="p_igating">IGating Preferences</string>
 <string name="p_igating_entry">IGate</string>
-<string name="p_igating_summary">Enable IGate</string>
+<string name="p_igating_enabled_summary">IGate Currently Enabled</string>
+<string name="p_igating_disabled_summary">IGate Currently Disabled</string>
 <string name="p_igating_preferences">IGate Settings</string>
 
 <string name="p_aprsistraffic_entry">Suppress APRS-IS Traffic Log</string>
@@ -131,11 +133,15 @@
 
 <string name="p_offlinemap">OSM Maps</string>
 <string name="p_offlinemap_entry">Enable offline mapping</string>
-<string name="p_offlinemap_summary">Uses locally hosted tile server</string>
+<string name="p_offlinemap_summary">Uses local maps files</string>
 
 <string name="p_dedupe">Dedupe Timeout</string>
 <string name="p_dedupe_entry">Timeout in seconds</string>
 <string name="p_dedupe_summary">Digipeat timeout for duplicate packets</string>
+
+<string name="p_bt_reconnect">BT reconnect timeout</string>
+<string name="p_bt_reconnect_entry">Time before reconnecting</string>
+<string name="p_bt_reconnect_summary">Timeout value in seconds</string>
 
 <string name="p_digipeaterpath">Digipeater Path</string>
 <string name="p_digipeaterpath_entry">Set Digi Path</string>
@@ -145,6 +151,8 @@
 <string name="p_igpath_entry">Set RF Digi Path</string>
 <string name="p_igpath_summary">APRS-IS to RF Digi Path</string>
 
+<string name="p_message_id_title">Disable Message ID</string>
+<string name="p_message_id_summary">Removes message ID from outgoing packets</string>
 <!-- map view -->
 <string name="map_overlays">Overlays</string>
 <string name="map_google">Google: Map</string>
@@ -172,10 +180,13 @@
 <string name="export_empty">Nothing to export</string>
 <string name="clear_log">Clear Log</string>
 <string name="clearallmessages">Clear Messages</string>
-
+<string name="sortby">Sort by...</string>
+<string name="sort_distance">Sort by Distance</string>
+<string name="sort_newest">Sort by Newest</string>
 <string name="quit">Quit</string>
 <string name="preferences">Preferences</string>
 <!-- preferences -->
+<string name="p_sortby">Sort Options</string>
 <string name="profile_load">Load profile...</string>
 <string name="profile_export">Export profile...</string>
 <string name="p__ham">Amateur Radio</string>
@@ -236,7 +247,6 @@
 <string name="p__igaterf">Bidirectional Settings</string>
 <string name="p__igateserver">Server Settings</string>
 <string name="p__ratelimit">Transmit Rate Limiting</string>
-
 <string name="p_conntype">Connection Protocol</string>
 <string name="p_conntype_entry">Choose the connection protocol</string>
 <string name="p_link">Connection Type</string>
@@ -244,6 +254,8 @@
 <string name="p_connsetup">Connection Preferences</string>
 <string name="p_connlog">Connection Logging</string>
 <string name="p_connlog_summary">Verbose status output in Log</string>
+<string name="p_hwacceleration_summary">Toggle hardware acceleration for the map view</string>
+<string name="p_hwacceleration_title">Enable Hardware Acceleration</string>
 <!-- array of connection types -->
 <string name="p_conn_aprsis">Internet (APRS-IS)</string>
 <string name="p_conn_afsk">Audio (AFSK)</string>
@@ -327,10 +339,12 @@
 <string name="p_smartbeaconing">SmartBeaconing™</string>
 <string name="p_sb_help">SmartBeaconing™ help</string>
 <string name="p_sb_fast_speed">Fast Speed [km/h]</string>
+<string name="p_sb_fast_speed_imperial">Fast Speed [mph]</string>
 <string name="p_sb_fast_speed_summary">Minimum speed for fast position updates</string>
 <string name="p_sb_fast_rate">Fast Rate [s]</string>
 <string name="p_sb_fast_rate_summary">Beacon rate at fast speed</string>
 <string name="p_sb_slow_speed">Slow Speed [km/h]</string>
+<string name="p_sb_slow_speed_imperial">Slow Speed [mph]</string>
 <string name="p_sb_slow_speed_summary">Maximum speed for slow position updates</string>
 <string name="p_sb_slow_rate">Slow Rate [s]</string>
 <string name="p_sb_slow_rate_summary">Beacon rate at slow speed</string>
@@ -348,7 +362,9 @@
 <string name="p_interval_entry">Enter the update interval [min]</string>
 <string name="p_distance">Minimum update distance</string>
 <string name="p_distance_summary">Kilometers before beacon transmission (set to 0 for time-only)</string>
+<string name="p_distance_summary_imperial">Miles before beacon transmission (set to 0 for time-only)</string>
 <string name="p_distance_entry">Enter the update distance [km]</string>
+<string name="p_distance_entry_imperial">Enter the update distance [mi]</string>
 <string name="p_speedbrg">Await speed &amp; bearing</string>
 <string name="p_speedbrg_summary">Keep GPS on longer to get more precise data</string>
 <string name="p_netloc">Use network location</string>
@@ -462,9 +478,8 @@
 <string name="p_ratelimit5_entry">Packet Limit at 5 Min Interval</string>
 
 <string name="p_timelastheard">Recently heard station timeout</string>
-<string name="p_timelastheard_summary">Timeout to pass messages to recently heard stations to RF</string>
+<string name="p_timelastheard_summary">Minutes to pass messages to RF of recently heard stations</string>
 <string name="p_timelastheard_entry">Timeout in minutes</string>
-
 
 <string name="p_filterhelp">Message filter help</string>
 <string name="p_filterhelp_summary">Online reference for APRS-IS filters</string>
@@ -477,6 +492,9 @@
 <string name="p_igsotimeout_summary">Time before resetting the connection</string>
 <string name="p_igsotimeout_entry">Timeout value in seconds (0 = disable)</string>
 
+<string name="p_positiontois_title">Send Packets to RF &amp; APRS-IS</string>
+<string name="p_positiontois_summary">Sends all your packets to RF and APRS-IS.</string>
+
 <string name="p_reconnect">TCP reconnect timeout</string>
 <string name="p_reconnect_summary">Time before reconnecting</string>
 <string name="p_reconnect_entry">Timeout value in seconds</string>
@@ -485,6 +503,14 @@
 <string name="p_mapfile_summary">MapsForge map file for APRSdroid</string>
 <string name="p_mapfile_choose">Choose map file</string>
 <string name="mapfile_error">Error loading map file %s!</string>
+
+<string name="mbtiles_error">mbtiles error</string>
+<string name="selected_file">Selected file: %1$s</string>
+<string name="p_mbtiles_file_picker_title">Select MapsforgeV3 or .mbtiles map</string>
+<string name="p_mbtiles_file_picker_summary">No file selected</string>
+
+<string name="p_all_files_access_title">Grant Storage Permissions</string>
+<string name="p_all_files_access_summary">Tap to manage permissions for all files access.</string>
 
 <string name="p_themefile">Theme file name</string>
 <string name="p_themefile_summary">MapsForge rendering theme (XML)</string>
@@ -533,9 +559,10 @@
 <!-- connecting to [device name] channel [bluetooth channel id] -->
 <string name="bt_connecting_to_channel">Connecting to %s channel %d…</string>
 <string name="bt_connected">Connected to TNC.</string>
-<string name="bt_reconnecting">Reconnecting in 3s…</string>
+<string name="bt_reconnecting">Reconnecting in %s seconds…</string>
 
-
+<string name="ble_connecting">Connecting to BLE service on %s…</string>
+<string name="ble_disconnect">Unexpected BLE disconnect (status = %s)</string>
 <string name="afsk_info_sco_req">Requesting bluetooth SCO link...</string>
 <string name="afsk_info_sco_est">Bluetooth SCO link established.</string>
 

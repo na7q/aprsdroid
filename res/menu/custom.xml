@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<group android:id="@+id/custom">
+	<item android:id="@+id/sortby"
+		android:title="@string/sortby"
+		android:alphabeticShortcut="e"
+		android:icon="@android:drawable/ic_menu_delete" />
+</group>
+</menu>
+

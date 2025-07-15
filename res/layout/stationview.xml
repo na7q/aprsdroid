@@ -1,60 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:orientation="vertical">
-	<LinearLayout
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:gravity="center"
-			android:orientation="horizontal">
-		<org.aprsdroid.app.SymbolView
-		android:id="@+id/station_symbol"
-		android:layout_width="24sp"
-		android:layout_height="24sp"
-		android:layout_marginLeft="1sp"
-		android:layout_marginRight="3sp"
-		android:layout_marginTop="1sp"
-		android:layout_marginBottom="1sp"
-		/>
-		<TextView
-		android:id="@+id/station_call"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginRight="3sp"
-		android:textColor="#b0b080"
-		android:textSize="23sp"
-		android:typeface="monospace"
-		/>
-		<TextView
-		android:id="@+id/station_distage"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginRight="3sp"
-		android:layout_weight="1"
-		android:gravity="center"
-		android:textStyle="bold"
-		android:textColor="#d0d0b0"
-		android:textSize="13sp"
-		/>
-		<TextView
-		android:id="@+id/station_qrg"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginRight="5sp"
-		android:textColor="#b0b080"
-		android:textSize="23sp"
-		android:typeface="monospace"
-		/>
-	</LinearLayout>
-	<TextView
-	android:id="@+id/listmessage"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:textColor="#8080b0"
-	android:textSize="17sp"
-	android:typeface="monospace"
-	android:focusable="false"
-	/>
-</LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="5sp">
 
+    <!-- Symbol on the left -->
+    <org.aprsdroid.app.SymbolView
+        android:id="@+id/station_symbol"
+        android:layout_width="24sp"
+        android:layout_height="24sp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="1sp"
+        android:layout_marginRight="3sp"
+		android:layout_marginTop="3sp" />
+
+    <!-- Callsign next to symbol -->
+    <TextView
+        android:id="@+id/station_call"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#b0b080"
+        android:textSize="23sp"
+        android:typeface="monospace"
+        android:layout_toEndOf="@id/station_symbol"
+        android:layout_marginRight="3sp" />
+
+    <!-- Distance fixed at the top and centered horizontally -->
+    <TextView
+        android:id="@+id/station_distage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold"
+        android:textColor="#d0d0b0"
+        android:textSize="13sp"
+		android:gravity="center_horizontal|center_vertical"
+        android:layout_marginRight="25sp" />
+		
+    <!-- QRG on the far right (can be GONE if not needed) -->
+    <TextView
+        android:id="@+id/station_qrg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#b0b080"
+        android:textSize="23sp"
+        android:typeface="monospace"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5sp"
+        android:visibility="gone"/> <!-- Set visibility based on condition -->
+
+    <!-- Speed and Course (both can be hidden based on condition) -->
+    <TextView
+        android:id="@+id/station_speed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/station_distage"
+        android:layout_marginTop="0sp"
+        android:textColor="#b0b080"
+        android:textSize="14sp"
+        android:typeface="monospace"
+        android:visibility="gone"/> <!-- Set visibility based on condition -->
+
+    <TextView
+        android:id="@+id/station_course"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/station_speed"
+        android:layout_marginTop="0sp"
+        android:textColor="#b0b080"
+        android:textSize="14sp"
+        android:typeface="monospace"
+        android:visibility="gone"/> <!-- Set visibility based on condition -->
+
+    <!-- List message below Speed and Course (should always be visible) -->
+    <TextView
+        android:id="@+id/listmessage"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#8080b0"
+        android:textSize="17sp"
+        android:typeface="monospace"
+        android:focusable="false"
+        android:layout_below="@id/station_course"
+        android:layout_marginTop="5sp"
+		android:visibility="gone" />
+		
+</RelativeLayout>
