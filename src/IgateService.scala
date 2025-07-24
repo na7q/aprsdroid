@@ -307,23 +307,37 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
   }
   
   def handleAprsTrafficPost(message: String): Unit = {
-    val aprsIstrafficEnabled = prefs.getBoolean("p.aprsistraffic", false)
+    val aprsIstrafficDisabled = prefs.getBoolean("p.aprsistraffic", false)
   	
-    if (!aprsIstrafficEnabled) {
-  	// If the checkbox is enabled, perform the action
+    if (aprsIstrafficDisabled) {
+		Log.d("IgateService", "APRS-IS traffic disabled, skipping the post.")
+
+        try {
+          val fap = Parser.parse(message)
+          val aprsInfo = fap.getAprsInformation
+
+          aprsInfo match {
+            case _: MessagePacket =>
+              service.addPost(StorageDatabase.Post.TYPE_IG, "APRS-IS Received", message)
+              Log.d("IgateService", s"APRS-IS traffic disabled but message packet, post added: $message")
+            case _ =>
+              Log.d("IgateService", "APRS-IS traffic disabled, non-message packet skipped.")
+          }
+        } catch {
+          case e: Exception =>
+            Log.e("IgateService", s"Failed to parse APRS-IS message: $message", e)
+        }
+        return
+    }
+
   	if (message.startsWith("#")) {
   		service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", message)
   		Log.d("IgateService", s"APRS-IS traffic enabled, post added: $message")
   	} else {
   		service.addPost(StorageDatabase.Post.TYPE_IG, "APRS-IS Received", message)
-  		Log.d("IgateService", s"APRS-IS traffic enabled, post added: $message")	
-  	}
-    } else {
-  	// If the checkbox is not enabled, skip the action
-  	Log.d("IgateService", "APRS-IS traffic disabled, skipping the post.")
-  	return
+  		Log.d("IgateService", s"APRS-IS traffic enabled, post added: $message")
     }
-  }	 
+  }  
   
   def processMessage(payloadString: String): String = {
 	//Check if payload is actually a message and not telemetry
