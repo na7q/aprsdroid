@@ -48,6 +48,7 @@ class DigiRig(service : AprsService, prefs : PrefsWrapper) extends AfskUploader(
 	val USB_PERM_ACTION = "org.aprsdroid.app.DigiRig.PERM"
 	val ACTION_USB_ATTACHED = "android.hardware.usb.action.USB_DEVICE_ATTACHED"
 	val ACTION_USB_DETACHED = "android.hardware.usb.action.USB_DEVICE_DETACHED"
+	val pttTailTimeMS = prefs.getStringInt("ptt.tail", 200);
 
 	val usbManager = service.getSystemService(Context.USB_SERVICE).asInstanceOf[UsbManager];
 	var thread : UsbThread = null
@@ -182,6 +183,7 @@ class DigiRig(service : AprsService, prefs : PrefsWrapper) extends AfskUploader(
 		while (audioPlaying) {
 			Thread.sleep(10)
 		}
+		Thread.sleep(pttTailTimeMS)
 		ser.setRTS(false)
 
 		if (result)
