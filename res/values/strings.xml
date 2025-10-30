@@ -602,4 +602,9 @@
 <string name="freq_control_title">Set Frequency</string>
 <string name="freq_control_hint">144.390</string>
 
+<!-- Digirig PTT Tail Setting -->
+<string name="p_ptt_tail">PTT Tail</string>
+<string name="p_ptt_tail_summary">Extends PTT to ensure full packet TX</string>
+<string name="p_ptt_tail_entry">Enter the tail time [ms]</string>
+
 </resources>

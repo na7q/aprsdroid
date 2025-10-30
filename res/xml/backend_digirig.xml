@@ -14,5 +14,14 @@
 		android:defaultValue="115200"
 		android:dialogTitle="@string/p_serial_baudrate" />
 
+        <de.duenndns.EditTextPreferenceWithValue
+                android:key="ptt.tail"
+		android:inputType="number"
+		android:defaultValue="100"
+		android:hint="100"
+		android:title="@string/p_ptt_tail"
+		android:summary="@string/p_ptt_tail_summary"
+		android:dialogTitle="@string/p_ptt_tail_entry" />
+
     </PreferenceCategory>
 </PreferenceScreen>
