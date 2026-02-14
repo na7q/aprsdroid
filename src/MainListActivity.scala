@@ -5,6 +5,7 @@ import _root_.android.graphics.PorterDuff
 import _root_.android.view.View.OnClickListener
 import _root_.android.view.{ContextMenu, Menu, MenuItem, View, Window}
 import _root_.android.widget.Button
+import _root_.androidx.core.content.ContextCompat
 
 class MainListActivity(actname : String, menuid : Int) extends LoadingListActivity
 		with OnClickListener {
@@ -39,10 +40,10 @@ class MainListActivity(actname : String, menuid : Int) extends LoadingListActivi
 		setupButtons(AprsService.running)
 		makeLaunchActivity(actname)
 
-		registerReceiver(miclReceiver, new IntentFilter(AprsService.MICLEVEL))
-		registerReceiver(linkOnOffReceiver, new IntentFilter(AprsService.SERVICE_STOPPED))
-		registerReceiver(linkOnOffReceiver, new IntentFilter(AprsService.LINK_OFF))
-		registerReceiver(linkOnOffReceiver, new IntentFilter(AprsService.LINK_ON))
+		ContextCompat.registerReceiver(this, miclReceiver, new IntentFilter(AprsService.MICLEVEL), Context.RECEIVER_NOT_EXPORTED)
+		ContextCompat.registerReceiver(this, linkOnOffReceiver, new IntentFilter(AprsService.SERVICE_STOPPED), Context.RECEIVER_EXPORTED)
+		ContextCompat.registerReceiver(this, linkOnOffReceiver, new IntentFilter(AprsService.LINK_OFF), Context.RECEIVER_EXPORTED)
+		ContextCompat.registerReceiver(this, linkOnOffReceiver, new IntentFilter(AprsService.LINK_ON), Context.RECEIVER_EXPORTED)
 	}
 	override def onPause() {
 		super.onPause()

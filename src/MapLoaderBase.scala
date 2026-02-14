@@ -3,10 +3,11 @@ package org.aprsdroid.app
 
 import java.util.ArrayList
 
-import android.content.{Intent, IntentFilter}
+import android.content.{Context, Intent, IntentFilter}
 import android.graphics.{Bitmap, Canvas, Color, Rect}
 import android.graphics.drawable.BitmapDrawable
 import android.text.TextUtils
+import androidx.core.content.ContextCompat
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -35,7 +36,7 @@ trait MapLoaderBase extends MapMenuHelper {
 
     def startLoading() {
         locReceiver.startTask(null)
-        registerReceiver(locReceiver, new IntentFilter(AprsService.UPDATE))
+        ContextCompat.registerReceiver(this, locReceiver, new IntentFilter(AprsService.UPDATE), Context.RECEIVER_EXPORTED)
     }
 
     def load_stations(i : Intent) = {

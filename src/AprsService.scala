@@ -7,6 +7,7 @@ import _root_.android.os.{Bundle, IBinder, Handler}
 import _root_.android.preference.PreferenceManager
 import _root_.android.util.Log
 import _root_.android.widget.Toast
+import _root_.androidx.core.content.ContextCompat
 
 import _root_.net.ab0oo.aprs.parser._
 import scala.collection.mutable
@@ -179,7 +180,7 @@ class AprsService extends Service {
 			startPoster()
 
 			// register for outgoing message notifications
-			registerReceiver(msgNotifier, new IntentFilter(AprsService.MESSAGETX))
+			ContextCompat.registerReceiver(this, msgNotifier, new IntentFilter(AprsService.MESSAGETX), Context.RECEIVER_EXPORTED)
 		} else
 			onPosterStarted()
 	}

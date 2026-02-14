@@ -9,6 +9,7 @@ import _root_.android.util.Log
 import _root_.android.view.{Menu, MenuItem, View, Window}
 import _root_.android.view.View.OnClickListener
 import _root_.android.widget.{ListView,SimpleCursorAdapter}
+import _root_.androidx.core.content.ContextCompat
 
 class StationActivity extends StationHelper(R.string.app_sta)
 		with OnClickListener {
@@ -29,7 +30,7 @@ class StationActivity extends StationHelper(R.string.app_sta)
 		onStartLoading()
 		setListAdapter(pla)
 		postlist.setAdapter(la)
-		registerReceiver(locReceiver, new IntentFilter(AprsService.UPDATE))
+		ContextCompat.registerReceiver(this, locReceiver, new IntentFilter(AprsService.UPDATE), Context.RECEIVER_EXPORTED)
 		locReceiver.startTask(null)
 
 		Array(R.id.map, R.id.qrzcom, R.id.aprsfi).foreach((id) => {

@@ -3,6 +3,7 @@ package org.aprsdroid.app
 import _root_.android.content.{BroadcastReceiver, Context, Intent, IntentFilter}
 import _root_.android.media.{AudioManager, AudioTrack}
 import _root_.android.util.Log
+import _root_.androidx.core.content.ContextCompat
 import _root_.java.net.{InetAddress, DatagramSocket, DatagramPacket}
 import _root_.net.ab0oo.aprs.parser.{APRSPacket, Digipeater, Parser}
 import com.nogy.afu.soundmodem.{Message, APRSFrame, Afsk}
@@ -55,7 +56,7 @@ class AfskUploader(service : AprsService, prefs : PrefsWrapper) extends AprsBack
 			log(service.getString(R.string.afsk_info_sco_req))
 			service.getSystemService(Context.AUDIO_SERVICE)
 				.asInstanceOf[AudioManager].startBluetoothSco()
-			service.registerReceiver(btScoReceiver, new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_CHANGED))
+			ContextCompat.registerReceiver(service, btScoReceiver, new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_CHANGED), Context.RECEIVER_EXPORTED)
 			false
 		} else {
 			aw.start()
@@ -110,6 +111,7 @@ class AfskUploader(service : AprsService, prefs : PrefsWrapper) extends AprsBack
 
 	def notifyMicLevel(level : Int) {
 		val i = new Intent(AprsService.MICLEVEL)
+		i.setPackage(service.getPackageName())
 		i.putExtra("level", level)
 		service.sendBroadcast(i)
 	}

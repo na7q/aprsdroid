@@ -9,6 +9,7 @@ import _root_.android.content.IntentFilter
 import _root_.android.location.Location
 import _root_.android.os.{Bundle, Handler}
 import _root_.android.util.Log
+import _root_.androidx.core.content.ContextCompat
 
 class FixedPosition(service : AprsService, prefs : PrefsWrapper) extends LocationSource {
 	val TAG = "APRSdroid.FixedPosition"
@@ -34,7 +35,7 @@ class FixedPosition(service : AprsService, prefs : PrefsWrapper) extends Locatio
 	override def start(singleShot : Boolean) = {
 		stop()
 
-		service.registerReceiver(receiver, new IntentFilter(ALARM_ACTION))
+		ContextCompat.registerReceiver(service, receiver, new IntentFilter(ALARM_ACTION), Context.RECEIVER_EXPORTED)
 		val periodic = prefs.getBoolean("periodicposition", true)
 		Log.d(TAG, "start: periodic=" + periodic + " single=" + singleShot)
 

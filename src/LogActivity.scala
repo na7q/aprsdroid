@@ -15,6 +15,7 @@ import _root_.android.widget.SimpleCursorAdapter
 import _root_.android.widget.TextView
 import _root_.android.widget.Toast
 import _root_.java.util.Date
+import _root_.androidx.core.content.ContextCompat
 
 class LogActivity extends MainListActivity("log", R.id.log) {
 	val TAG = "APRSdroid.Log"
@@ -45,7 +46,7 @@ class LogActivity extends MainListActivity("log", R.id.log) {
 
 	override def onResume() {
 		super.onResume()
-		registerReceiver(locReceiver, new IntentFilter(AprsService.UPDATE))
+		ContextCompat.registerReceiver(this, locReceiver, new IntentFilter(AprsService.UPDATE), Context.RECEIVER_EXPORTED)
 		locReceiver.startTask(null)
 
 		postlist.requestFocus()

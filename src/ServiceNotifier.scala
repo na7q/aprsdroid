@@ -1,11 +1,15 @@
 package org.aprsdroid.app
 
+import _root_.android.Manifest
 import _root_.android.app.{Notification, NotificationChannel, NotificationManager, PendingIntent, Service}
 import _root_.android.content.{Context, Intent}
+import _root_.android.content.pm.ServiceInfo
 import _root_.android.net.Uri
 import _root_.android.os.Build
 import _root_.android.os.Vibrator
 import _root_.android.graphics.Color
+import _root_.androidx.core.content.ContextCompat
+import _root_.androidx.core.app.ServiceCompat
 
 
 object ServiceNotifier {
@@ -116,7 +120,13 @@ class ServiceNotifier {
 	}
 
 	def start(ctx : Service, status : String) = {
-		ctx.startForeground(SERVICE_NOTIFICATION, newNotification(ctx, status))
+                // try set the right service type - AFSK needs microphone, GPS needs location, fallback to "special use"
+                var service_type = ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.RECORD_AUDIO) > -1)
+                        service_type = ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
+                else if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) > -1)
+                        service_type = ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+		ServiceCompat.startForeground(ctx, SERVICE_NOTIFICATION, newNotification(ctx, status), service_type)
 	}
 
 	def stop(ctx : Service) = {

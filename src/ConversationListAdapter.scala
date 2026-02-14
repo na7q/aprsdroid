@@ -8,6 +8,7 @@ import _root_.android.text.format.DateUtils
 import _root_.android.util.Log
 import _root_.android.view.View
 import _root_.android.widget.{SimpleCursorAdapter, TextView}
+import _root_.androidx.core.content.ContextCompat
 
 object ConversationListAdapter {
 	import StorageDatabase.Message._
@@ -29,7 +30,7 @@ class ConversationListAdapter(context : Context, prefs : PrefsWrapper)
 	lazy val locReceiver = new LocationReceiver2(load_cursor,
 		replace_cursor, cancel_cursor)
 
-	context.registerReceiver(locReceiver, new IntentFilter(AprsService.MESSAGE))
+	ContextCompat.registerReceiver(context, locReceiver, new IntentFilter(AprsService.MESSAGE), Context.RECEIVER_EXPORTED)
 
 	override def bindView(view : View, context : Context, cursor : Cursor) {
 		import StorageDatabase.Message._

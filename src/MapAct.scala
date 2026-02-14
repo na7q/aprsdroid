@@ -2,7 +2,7 @@ package org.aprsdroid.app
 
 import _root_.android.Manifest
 import _root_.android.app.AlertDialog
-import _root_.android.content.{DialogInterface, Intent, IntentFilter}
+import _root_.android.content.{Context, DialogInterface, Intent, IntentFilter}
 import _root_.android.content.pm.PackageManager
 import _root_.android.content.res.Configuration
 import _root_.android.database.Cursor
@@ -12,6 +12,7 @@ import _root_.android.os.{Build, Bundle}
 import _root_.android.util.Log
 import _root_.android.view.{KeyEvent, Menu, MenuItem, View}
 import _root_.android.widget.Toast
+import _root_.androidx.core.content.ContextCompat
 import _root_.org.mapsforge.v3.android.maps._
 import _root_.org.mapsforge.v3.core.{GeoPoint, Tile}
 import _root_.org.mapsforge.v3.android.maps.overlay.{ItemizedOverlay, OverlayItem}
@@ -131,7 +132,7 @@ class MapAct extends MapActivity with MapMenuHelper {
         }
 
 	def startLoading() {
-		registerReceiver(locReceiver, new IntentFilter(AprsService.UPDATE))
+		ContextCompat.registerReceiver(this, locReceiver, new IntentFilter(AprsService.UPDATE), Context.RECEIVER_EXPORTED)
 		locReceiver.startTask(null)
 	}
 
