@@ -471,6 +471,7 @@
 <string name="p_reconnect">TCP Reconect Timeout</string>
 <string name="p_digipeating">Preferințe digipeating</string>
 <string name="sort_newest">Sortează după cele mai noi</string>
+<string name="sort_callsign">Sortează după indicativ</string>
 <string name="p_mbtiles_file_picker_summary">Nu există niciun fișier selectat</string>
 <string name="p_units_title">Unități de distanță</string>
 <string name="p_bt_reconnect_summary">Valoarea de timp în câteva secunde</string>

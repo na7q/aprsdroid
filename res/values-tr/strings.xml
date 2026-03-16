@@ -458,6 +458,7 @@
 <string name="p_reconnect">TCP Zaman Aşımını Yeniden Bağlayın</string>
 <string name="p_digipeating">Digipeating Tercihleri</string>
 <string name="sort_newest">En yenisine göre sıralayın</string>
+<string name="sort_callsign">Çağrı işaretine göre sırala</string>
 <string name="p_mbtiles_file_picker_summary">Dosya seçilmedi</string>
 <string name="p_units_title">Mesafe birimleri</string>
 <string name="p_bt_reconnect_summary">Saniyeler cinsinden zaman aşımı değeri</string>

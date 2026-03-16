@@ -83,7 +83,18 @@ class PrefsWrapper(val context : Context) {
 
 	def getShowAge() = getStringInt("show_age", 30)*60L*1000
 	
-	def getSortByHubDistance() = getBoolean("sort_by_hub_distance", false)
+	def getHubSortOrder() = {
+		if (prefs.contains("sort_by_hub_distance")) {
+			if (prefs.getBoolean("sort_by_hub_distance", true)) "distance" else "newest"
+		} else prefs.getString("hub_sort_order", "distance")
+	}
+	def setHubSortOrder(order : String) = {
+		val editor = prefs.edit()
+		editor.remove("sort_by_hub_distance")
+		editor.putString("hub_sort_order", order)
+		editor.commit()
+		order
+	}
 
 	// get the array index for a given list pref
 	def getListItemIndex(pref : String, default : String, values : Int) = {

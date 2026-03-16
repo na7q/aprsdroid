@@ -473,6 +473,7 @@
 <string name="p_reconnect">Tcp dema nûvekirinê</string>
 <string name="p_digipeating">Vebijarkên digipeating</string>
 <string name="sort_newest">Ji hêla nûtirîn ve hatî çêkirin</string>
+<string name="sort_callsign">Li gorî nîşana bangê rêz bikin</string>
 <string name="p_mbtiles_file_picker_summary">Pelê nehat hilbijartin</string>
 <string name="p_units_title">Yekîneyên dûr</string>
 <string name="p_bt_reconnect_summary">Nirxa demê di nav seconds</string>

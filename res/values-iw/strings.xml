@@ -457,6 +457,7 @@
 <string name="p_reconnect">TCP חיבור מחדש פסק זמן</string>
 <string name="p_digipeating">העדפות Digipeating</string>
 <string name="sort_newest">למיין לפי החדש ביותר</string>
+<string name="sort_callsign">למיין לפי callsign</string>
 <string name="p_mbtiles_file_picker_summary">לא נבחר קובץ</string>
 <string name="p_units_title">יחידות מרחק</string>
 <string name="p_bt_reconnect_summary">ערך פסק זמן בשניות</string>

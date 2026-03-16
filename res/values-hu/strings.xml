@@ -474,6 +474,7 @@
 <string name="p_reconnect">A TCP újracsatlakoztatja az időtúllépést</string>
 <string name="p_digipeating">Digipeating preferenciák</string>
 <string name="sort_newest">Válasszon a legújabb</string>
+<string name="sort_callsign">Rendezés hívójel szerint</string>
 <string name="p_mbtiles_file_picker_summary">Nincs kiválasztott fájl</string>
 <string name="p_units_title">Távolsági egységek</string>
 <string name="p_bt_reconnect_summary">Időtúllépési érték másodpercek alatt</string>

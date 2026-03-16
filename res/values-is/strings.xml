@@ -472,6 +472,7 @@
 <string name="p_reconnect">TCP Tengdu aftur tímamörk</string>
 <string name="p_digipeating">Digipeating óskir</string>
 <string name="sort_newest">Raða eftir nýjasta</string>
+<string name="sort_callsign">Raða eftir kallmerki</string>
 <string name="p_mbtiles_file_picker_summary">Engin skrá valin</string>
 <string name="p_units_title">Fjarlægðareiningar</string>
 <string name="p_bt_reconnect_summary">Tímamörk á sekúndum</string>

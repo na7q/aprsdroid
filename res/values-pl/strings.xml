@@ -461,6 +461,7 @@ z późniejszych wersji. \n\n Niniejszy program rozpowszechniany jest z nadziej�
 <string name="p_reconnect">TCP ponownie łączą limit czasu</string>
 <string name="p_digipeating">Preferencje digipeating</string>
 <string name="sort_newest">Sortuj według najnowszego</string>
+<string name="sort_callsign">Sortuj według znak wywoławczy</string>
 <string name="p_mbtiles_file_picker_summary">Brak pliku</string>
 <string name="p_units_title">Jednostki odległości</string>
 <string name="p_bt_reconnect_summary">Wartość limitu czasu w sekundach</string>

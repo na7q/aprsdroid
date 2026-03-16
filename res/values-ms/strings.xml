@@ -455,6 +455,7 @@
 <string name="p_reconnect">TCP menyambung semula masa tamat</string>
 <string name="p_digipeating">Keutamaan digipeating</string>
 <string name="sort_newest">Disusun dengan yang terbaru</string>
+<string name="sort_callsign">Susun mengikut tanda panggil</string>
 <string name="p_mbtiles_file_picker_summary">Tiada fail yang dipilih</string>
 <string name="p_units_title">Unit Jarak</string>
 <string name="p_bt_reconnect_summary">Nilai tamat tempoh dalam beberapa saat</string>

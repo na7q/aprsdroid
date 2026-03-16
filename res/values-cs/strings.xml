@@ -457,6 +457,7 @@
 <string name="p_reconnect">TCP znovu připojte časový limit</string>
 <string name="p_digipeating">Digipeating preference</string>
 <string name="sort_newest">Třídit nejnovější</string>
+<string name="sort_callsign">Seřadit volací značky</string>
 <string name="p_mbtiles_file_picker_summary">Žádný vybrán soubor</string>
 <string name="p_units_title">Distanční jednotky</string>
 <string name="p_bt_reconnect_summary">Hodnota časového limitu za sekundy</string>

@@ -466,6 +466,7 @@
 <string name="p_reconnect">TCP reconnecter le délai d\'expiration</string>
 <string name="p_digipeating">Préférences de digipeat</string>
 <string name="sort_newest">Trier par le plus récent</string>
+<string name="sort_callsign">Trier par indicatif</string>
 <string name="p_mbtiles_file_picker_summary">Aucun fichier sélectionné</string>
 <string name="p_units_title">Unités de distance</string>
 <string name="p_bt_reconnect_summary">Valeur de temps mort en secondes</string>

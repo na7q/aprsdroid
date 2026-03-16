@@ -461,6 +461,7 @@
 <string name="p_reconnect">Tiempo de espera de reconectación de TCP</string>
 <string name="p_digipeating">Preferencias de digpeling</string>
 <string name="sort_newest">Ordenar por lo más nuevo</string>
+<string name="sort_callsign">Ordenar por distintivo de llamada</string>
 <string name="p_mbtiles_file_picker_summary">No hay archivo seleccionado</string>
 <string name="p_units_title">Unidades de distancia</string>
 <string name="p_bt_reconnect_summary">Valor de tiempo de espera en segundos</string>

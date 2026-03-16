@@ -473,6 +473,7 @@
 <string name="p_reconnect">TCP는 시간 초과를 다시 연결합니다</string>
 <string name="p_digipeating">환경 설정</string>
 <string name="sort_newest">최신으로 정렬하십시오</string>
+<string name="sort_callsign">호출부호로 정렬하십시오</string>
 <string name="p_mbtiles_file_picker_summary">선택된 파일이 없습니다</string>
 <string name="p_units_title">원격 단위</string>
 <string name="p_bt_reconnect_summary">시간 초과 값은 초입니다</string>

@@ -473,6 +473,7 @@
 <string name="p_reconnect">TCP Tireu el temps d\'espera</string>
 <string name="p_digipeating">Preferències de Digipeating</string>
 <string name="sort_newest">Ordena per més recent</string>
+<string name="sort_callsign">Ordena per indicatiu</string>
 <string name="p_mbtiles_file_picker_summary">No hi ha cap fitxer seleccionat</string>
 <string name="p_units_title">Unitats de distància</string>
 <string name="p_bt_reconnect_summary">Valor de temps d\'espera en segons</string>

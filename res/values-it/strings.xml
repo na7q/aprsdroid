@@ -460,6 +460,7 @@
 <string name="p_reconnect">Timeout di riconnessione TCP</string>
 <string name="p_digipeating">Preferenze di digipeating</string>
 <string name="sort_newest">Ordina per il più nuovo</string>
+<string name="sort_callsign">Ordina per nominativo</string>
 <string name="p_mbtiles_file_picker_summary">Nessun file selezionato</string>
 <string name="p_units_title">Unità di distanza</string>
 <string name="p_bt_reconnect_summary">Valore del timeout in secondi</string>

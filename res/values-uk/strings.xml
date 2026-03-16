@@ -470,6 +470,7 @@
 <string name="p_reconnect">TCP Відновити тайм -аут</string>
 <string name="p_digipeating">Уподобання DIGIPEATING</string>
 <string name="sort_newest">Сортуйте за новітнім</string>
+<string name="sort_callsign">Сортувати за позивним</string>
 <string name="p_mbtiles_file_picker_summary">Жодного файлу не вибрано</string>
 <string name="p_units_title">Відстань</string>
 <string name="p_bt_reconnect_summary">Значення тайм -ауту за лічені секунди</string>

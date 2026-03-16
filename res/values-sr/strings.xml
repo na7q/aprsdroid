@@ -454,6 +454,7 @@
 <string name="p_reconnect">ТЦП поновно временско време</string>
 <string name="p_digipeating">Преференције дигипирања</string>
 <string name="sort_newest">Поредај по најновијим</string>
+<string name="sort_callsign">Поредај по позивни знак</string>
 <string name="p_mbtiles_file_picker_summary">Није изабрана датотека</string>
 <string name="p_units_title">Јединице за даљину</string>
 <string name="p_bt_reconnect_summary">Временске вредности у секунди</string>

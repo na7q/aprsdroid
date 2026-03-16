@@ -461,6 +461,7 @@
 <string name="p_reconnect">TCP Reconecte o tempo limite</string>
 <string name="p_digipeating">Preferências de digipetagem</string>
 <string name="sort_newest">Classificar por mais novo</string>
+<string name="sort_callsign">Classificar por indicativo</string>
 <string name="p_mbtiles_file_picker_summary">Nenhum arquivo selecionado</string>
 <string name="p_units_title">Unidades de distância</string>
 <string name="p_bt_reconnect_summary">Valor de tempo limite em segundos</string>

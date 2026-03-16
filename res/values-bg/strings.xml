@@ -530,6 +530,7 @@
 <string name="p_ratelimit1">TX лимит на скоростта 1 мин</string>
 <string name="p_digipeating_entry">Digipeater</string>
 <string name="sort_newest">Сортиране от най -новото</string>
+<string name="sort_callsign">Сортиране по позивна</string>
 <string name="p_bt_reconnect_summary">Стойност за изчакване за секунди</string>
 <string name="p_igpath_entry">Задайте RF Digi Path</string>
 <string name="p_ratelimit1_entry">Ограничение на пакета при интервал от 1 минута</string>

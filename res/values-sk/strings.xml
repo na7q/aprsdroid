@@ -472,6 +472,7 @@
 <string name="p_reconnect">Časový limit TCP Opätovný čas</string>
 <string name="p_digipeating">Preferencie digipeatingu</string>
 <string name="sort_newest">Triediť podľa najnovších</string>
+<string name="sort_callsign">Zoradiť podľa volacej značky</string>
 <string name="p_mbtiles_file_picker_summary">Žiadny súbor vybraný</string>
 <string name="p_units_title">Vzdialenosť</string>
 <string name="p_bt_reconnect_summary">Hodnota časového limitu v sekundách</string>
