@@ -519,7 +519,16 @@ class StationOverlay(icons : Drawable, context : MapAct, db : StorageDatabase) e
 
 		val s = new ArrayList[OSMStation]()
 		val age_ts = (System.currentTimeMillis - context.prefs.getShowAge()).toString
-		val filter = if (context.showObjects) "TS > ? OR CALL=?" else "(ORIGIN IS NULL AND TS > ?) OR CALL=?"
+		// base filter for objects and age
+		val baseFilter = if (context.showObjects) "TS > ? OR CALL=?" else "(ORIGIN IS NULL AND TS > ?) OR CALL=?"
+		// source filter: FLAG_IGATE=8; show RF = flags&8=0, show IS = flags&8=8
+		val sourceFilter = (context.showRF, context.showIS) match {
+			case (true, true)   => ""                          // show all
+			case (true, false)  => " AND (flags & 8) = 0"      // RF only
+			case (false, true)  => " AND (flags & 8) = 8"      // APRS-IS only
+			case (false, false) => " AND 1=0"                  // show nothing
+		}
+		val filter = "(" + baseFilter + ")" + sourceFilter
 		val c = db.getStations(filter, Array(age_ts, context.targetcall), null)
 		c.moveToFirst()
 		val pos_c = db.getAllStaPositions(age_ts)

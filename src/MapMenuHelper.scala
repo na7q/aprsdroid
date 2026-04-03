@@ -13,6 +13,8 @@ trait MapMenuHelper extends UIHelper with OnClickListener {
 
 	var targetcall = ""
 	var showObjects = false
+	var showRF = true
+	var showIS = true
 	lazy val isCoordinateChooser = (getCallingActivity() != null)
 	lazy val crosshair = findViewById[ImageView](R.id.crosshair)
 	lazy val infoText = findViewById[TextView](R.id.info)
@@ -25,6 +27,8 @@ trait MapMenuHelper extends UIHelper with OnClickListener {
 		super.onCreate(savedInstanceState)
 		targetcall = getTargetCall()
 		showObjects = prefs.getShowObjects()
+		showRF = prefs.getBoolean("show_rf", true)
+		showIS = prefs.getBoolean("show_is", true)
 		// do not create a preferences loop
 		if (!isCoordinateChooser)
 			checkConfig()
@@ -68,6 +72,8 @@ trait MapMenuHelper extends UIHelper with OnClickListener {
 		if (isCoordinateChooser)
 			return true
 		menu.findItem(R.id.objects).setChecked(prefs.getShowObjects())
+		menu.findItem(R.id.filter_rf).setChecked(prefs.getBoolean("show_rf", true))
+		menu.findItem(R.id.filter_aprs_is).setChecked(prefs.getBoolean("show_is", true))
 		menu.setGroupVisible(R.id.menu_context_call, tracking)
 		menu.setGroupVisible(R.id.menu_options_activities, !tracking)
 		menu.setGroupVisible(R.id.menu_options, !tracking)
@@ -142,6 +148,16 @@ trait MapMenuHelper extends UIHelper with OnClickListener {
 			val newState = prefs.toggleBoolean("show_objects", true)
 				mi.setChecked(newState)
 			showObjects = newState
+			reloadMap()
+			true
+		case R.id.filter_rf =>
+			showRF = prefs.toggleBoolean("show_rf", true)
+			mi.setChecked(showRF)
+			reloadMap()
+			true
+		case R.id.filter_aprs_is =>
+			showIS = prefs.toggleBoolean("show_is", true)
+			mi.setChecked(showIS)
 			reloadMap()
 			true
 		case _ =>

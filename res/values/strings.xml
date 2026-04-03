@@ -464,6 +464,17 @@
 <string name="p_igfilter_hint">b/BUDDY o/OBJECT ...</string>
 <string name="p_igfilter_summary">Filter for incoming packets</string>
 <string name="p_igfilter_entry">Enter a filter for incoming packets</string>
+<string name="p_igfilter_gps_title">Auto-prepend GPS range filter</string>
+<string name="p_igfilter_gps_summary">Prepend r/lat/lon/radius to filter string instead of using last APRS-IS position report, updates dynamically while connected. </string>
+<string name="p_igfilter_gps_radius_title">GPS filter radius (km)</string>
+<string name="p_igfilter_gps_radius_summary">Radius in kilometers for the auto GPS range filter</string>
+<string name="p_igfilter_gps_radius_entry">Enter radius in kilometers</string>
+<string name="filter_rf">Show RF stations</string>
+<string name="filter_aprs_is">Show APRS-IS stations</string>
+<string name="filter_source">Filter source...</string>
+<string name="filter_source_all">All</string>
+<string name="filter_source_rf">RF only</string>
+<string name="filter_source_is">APRS-IS only</string>
 
 <string name="p_igconnectretry">Connection Retry Interval</string>
 <string name="p_igconnectretry_summary">Reconnect to server in seconds</string>

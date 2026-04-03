@@ -291,6 +291,37 @@ trait UIHelper extends Activity
 			.create.show
 	}
 
+	def sourceFilterDialog() {
+		val prefKey = if (menu_id == R.id.log) "log_source_filter" else "station_source_filter"
+		val current = prefs.getString(prefKey, "all")
+		val options = Array(
+			getString(R.string.filter_source_all),
+			getString(R.string.filter_source_rf),
+			getString(R.string.filter_source_is)
+		).map(_.asInstanceOf[CharSequence])
+		val selected = current match {
+			case "rf" => 1
+			case "is" => 2
+			case _    => 0
+		}
+		new AlertDialog.Builder(this)
+			.setTitle(R.string.filter_source)
+			.setSingleChoiceItems(options, selected, new DialogInterface.OnClickListener() {
+				override def onClick(dialog: DialogInterface, which: Int) {
+					val value = which match {
+						case 1 => "rf"
+						case 2 => "is"
+						case _ => "all"
+					}
+					prefs.prefs.edit().putString(prefKey, value).commit()
+					sendBroadcast(new Intent(AprsService.UPDATE))
+					onStartLoading()
+					dialog.dismiss()
+				}
+			})
+			.create().show()
+	}
+
 	def sortDialog() {
 		val currentPref = prefs.getBoolean("sort_by_hub_distance", true)
 		val selected = if (currentPref) 0 else 1
@@ -331,6 +362,7 @@ trait UIHelper extends Activity
 		})
 		menu.findItem(R.id.age).setVisible(R.id.map == menu_id || R.id.hub == menu_id)
 		menu.findItem(R.id.sortby).setVisible(R.id.hub == menu_id)
+		menu.findItem(R.id.filter_source).setVisible(R.id.hub == menu_id || R.id.log == menu_id)
 		menu.findItem(R.id.overlays).setVisible(R.id.map == menu_id)
 		true
 	}
@@ -369,6 +401,9 @@ trait UIHelper extends Activity
 			true
 		case R.id.sortby =>
 			sortDialog()
+			true
+		case R.id.filter_source =>
+			sourceFilterDialog()
 			true			
 		// switch between activities
 		case R.id.hub =>

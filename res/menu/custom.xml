@@ -4,6 +4,10 @@
 		android:title="@string/sortby"
 		android:alphabeticShortcut="e"
 		android:icon="@android:drawable/ic_menu_delete" />
+	<item android:id="@+id/filter_source"
+		android:title="@string/filter_source"
+		android:alphabeticShortcut="f"
+		android:icon="@android:drawable/ic_menu_search" />
 </group>
 </menu>
 

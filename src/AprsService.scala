@@ -526,8 +526,8 @@ class AprsService extends Service {
 			if (fap.hasFault())
 				throw new Exception("FAP fault")
 			fap.getAprsInformation() match {
-				case pp : PositionPacket => addPosition(ts, fap, pp, pp.getPosition(), null)
-				case op : ObjectPacket => addPosition(ts, fap, op, op.getPosition(), op.getObjectName())
+				case pp : PositionPacket => addPosition(ts, fap, pp, pp.getPosition(), null, source)
+				case op : ObjectPacket => addPosition(ts, fap, op, op.getPosition(), op.getObjectName(), source)
 				case msg : MessagePacket => msgService.handleMessage(ts, fap, msg, digiPathCheck)
 
 			}
@@ -544,9 +544,9 @@ class AprsService extends Service {
 			case _ => null
 		}
 	}
-	def addPosition(ts : Long, ap : APRSPacket, field : InformationField, pos : Position, objectname : String) {
+	def addPosition(ts : Long, ap : APRSPacket, field : InformationField, pos : Position, objectname : String, source : Int = 0) {
 		val cse = getCSE(field)
-		db.addPosition(ts, ap, pos, cse, objectname)
+		db.addPosition(ts, ap, pos, cse, objectname, source)
 
 		sendBroadcast(new Intent(POSITION)
 			.putExtra(SOURCE, ap.getSourceCall())
@@ -652,7 +652,7 @@ class AprsService extends Service {
 	def addPost(t : Int, status : String, message : String) {
 		val ts = System.currentTimeMillis()
 		db.addPost(ts, t, status, message)
-		if ((t == StorageDatabase.Post.TYPE_POST || t == StorageDatabase.Post.TYPE_INCMG) || (prefs.getBoolean("p.positiontois", false) && t == StorageDatabase.Post.TYPE_IG)) {
+		if (t == StorageDatabase.Post.TYPE_POST || t == StorageDatabase.Post.TYPE_INCMG || t == StorageDatabase.Post.TYPE_IG) {
 			parsePacket(ts, message, t)
 			parseHudPackets(ts, message)			
 		} else {

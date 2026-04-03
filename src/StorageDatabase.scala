@@ -103,6 +103,7 @@ object StorageDatabase {
 		val FLAG_MSGCAPABLE	= 1
 		val FLAG_OBJECT		= 2
 		val FLAG_MOVING		= 4
+		val FLAG_IGATE		= 8  // packet came from APRS-IS
 	}
 
 	object Position {
@@ -233,7 +234,7 @@ class StorageDatabase(context : Context) extends
 	// default trim filter: 2 days in [ms]
 	def trimPosts() : Unit = trimPosts(System.currentTimeMillis - 2L * 24 * 3600 * 1000)
 
-	def addPosition(ts : Long, ap : APRSPacket, pos : Position, cse : CourseAndSpeedExtension, objectname : String) {
+	def addPosition(ts : Long, ap : APRSPacket, pos : Position, cse : CourseAndSpeedExtension, objectname : String, source : Int = 0) {
 		import Station._
 		val cv = new ContentValues()
 		val call = ap.getSourceCall()
@@ -258,6 +259,9 @@ class StorageDatabase(context : Context) extends
 			cv.put(SPEED, cse.getSpeed().asInstanceOf[java.lang.Integer])
 			cv.put(COURSE, cse.getCourse().asInstanceOf[java.lang.Integer])
 		}
+		// set FLAG_IGATE if packet came from APRS-IS
+		val flags = if (source == Post.TYPE_IG) Station.FLAG_IGATE else 0
+		cv.put(FLAGS, flags.asInstanceOf[java.lang.Integer])
 		Log.d(TAG, "got %s(%d, %d)%s -> %s".formatLocal(null, call, lat, lon, sym, comment))
 		// replace the full station info in stations table
 		getWritableDatabase().replaceOrThrow(TABLE, CALL, cv)
@@ -353,16 +357,18 @@ class StorageDatabase(context : Context) extends
 	def getNeighbors(mycall: String, lat: Int, lon: Int, ts: Long, limit: String): Cursor = {
 		val corr = (cos(Pi * lat / 180000000.0) * cos(Pi * lat / 180000000.0) * 100).toInt
 		val newcols = Station.COLUMNS :+ Station.COL_DIST.formatLocal(null, lat, lat, lon, lon, corr)
-		val sortOrder = if (prefs.getSortByHubDistance) "dist" else "ts DESC" // Sort hub by preference	
+		val sortOrder = if (prefs.getSortByHubDistance) "dist" else "ts DESC"
+		val sourceClause = prefs.getString("station_source_filter", "all") match {
+			case "rf" => " AND (flags & 8) = 0"
+			case "is" => " AND (flags & 8) = 8"
+			case _    => ""
+		}
 		getReadableDatabase().query(
 			Station.TABLE,
 			newcols,
-			"ts > ? or call = ?",
+			"(ts > ? or call = ?)" + sourceClause,
 			Array(ts.toString, mycall),
-			null,
-			null,
-			sortOrder,   // Changed from "dist" to "ts DESC"
-			limit
+			null, null, sortOrder, limit
 		)
 	}
 
@@ -403,6 +409,15 @@ class StorageDatabase(context : Context) extends
 	}
 
 	def getPosts(limit : String) : Cursor = getPosts(null, null, limit)
+	def getPostsFiltered(sourceFilter : String, limit : String) : Cursor = {
+		// TYPE_POST=0, TYPE_INCMG=3 are RF; TYPE_IG=6 is APRS-IS; others always shown
+		val sel = sourceFilter match {
+			case "rf" => "type != 6 AND NOT (type = 1 AND status = 'APRS-IS')" // hide APRS-IS packets + info
+			case "is" => "type != 0 AND type != 3" // hide RF packets
+			case _    => null                  // show all
+		}
+		getPosts(sel, null, limit)
+	}
 
 	def getPosts() : Cursor = getPosts(null)
 

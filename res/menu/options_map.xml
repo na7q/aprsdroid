@@ -13,6 +13,10 @@
 			<group android:checkableBehavior="all">
 				<item android:id="@+id/objects"
 					android:title="@string/map_objects" />
+				<item android:id="@+id/filter_rf"
+					android:title="@string/filter_rf" />
+				<item android:id="@+id/filter_aprs_is"
+					android:title="@string/filter_aprs_is" />
 			</group>
 			<group android:id="@+id/mapmodes" android:checkableBehavior="single">
 				<item android:id="@+id/normal"
