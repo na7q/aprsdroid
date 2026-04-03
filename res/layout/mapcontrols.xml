@@ -38,4 +38,16 @@
 		android:text="ok"
 		/>
 </LinearLayout>
+<ImageButton
+	android:id="@+id/btn_my_location"
+	android:layout_width="48dip"
+	android:layout_height="48dip"
+	android:layout_gravity="bottom|end|right"
+	android:layout_marginBottom="55dip"
+	android:layout_marginEnd="8dip"
+	android:layout_marginRight="8dip"
+	android:src="@android:drawable/ic_menu_mylocation"
+	android:contentDescription="@string/my_location"
+	android:background="@android:drawable/btn_default"
+	/>
 </merge>

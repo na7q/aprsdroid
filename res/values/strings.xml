@@ -464,6 +464,11 @@
 <string name="p_igfilter_hint">b/BUDDY o/OBJECT ...</string>
 <string name="p_igfilter_summary">Filter for incoming packets</string>
 <string name="p_igfilter_entry">Enter a filter for incoming packets</string>
+<string name="p_igfilter_gps_title">Auto-prepend GPS range filter</string>
+<string name="p_igfilter_gps_summary">Prepend r/lat/lon/radius to filter string instead of using last APRS-IS position report, updates dynamically while connected. </string>
+<string name="p_igfilter_gps_radius_title">GPS filter radius (km)</string>
+<string name="p_igfilter_gps_radius_summary">Radius in kilometers for the auto GPS range filter</string>
+<string name="p_igfilter_gps_radius_entry">Enter radius in kilometers</string>
 
 <string name="p_igconnectretry">Connection Retry Interval</string>
 <string name="p_igconnectretry_summary">Reconnect to server in seconds</string>
@@ -527,6 +532,7 @@
 </string-array>
 
 <string name="translator_credits">translator-credits</string>
+<string name="my_location">My location</string>
 
 <!-- Bluetooth TNC settings -->
 <string name="p_bt_client">Client Mode</string>

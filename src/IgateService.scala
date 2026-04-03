@@ -17,7 +17,7 @@ class IgateService(service: AprsService, prefs: PrefsWrapper) extends Connection
 
   val TAG = "IgateService"
   val hostport = prefs.getString("p.igserver", "rotate.aprs2.net")
-  val (host, port) = parseHostPort(hostport)  
+  val (host, port) = parseHostPort(hostport)
   val so_timeout = prefs.getStringInt("p.igsotimeout", 120)
   val connectretryinterval = prefs.getStringInt("p.igconnectretry", 30)
   var conn: TcpSocketThread = _
@@ -62,10 +62,10 @@ class IgateService(service: AprsService, prefs: PrefsWrapper) extends Connection
       Log.d(TAG, "stop() - Waiting for connection thread to join.")
       conn.join(50)
       conn.shutdown()  // Make sure the socket is cleanly closed
-	  conn = null	  
+	  conn = null
       Log.d(TAG, "stop() - Connection shutdown.")
 	  service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", "IGate Stopped")
-	  
+
     } else {
       Log.d(TAG, "stop() - No connection to stop.")
     }
@@ -85,36 +85,36 @@ class IgateService(service: AprsService, prefs: PrefsWrapper) extends Connection
   // External reconnect logic
   def reconnect(): Unit = {
     Log.d(TAG, "reconnect() - Initiating reconnect.")
-    
+
 	// Check if the service is already running (get the value of the "service_running" preference)
 	val service_running = prefs.getBoolean("service_running", false) // Default to false if not set
-	  
+
 	// If the service is already running, don't proceed
 	if (!service_running || !prefs.isIgateEnabled) {
 	  Log.d(TAG, "start() - Service is not running, skipping connection.")
 	  reconnecting = false
 	  return
 	}
-	
+
     if (reconnecting) {
       Log.d(TAG, "reconnect() - Already in reconnecting process, skipping.")
       return
     }
-    
+
     reconnecting = true
-    
+
 	service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", s"Connection lost... Reconnecting in $connectretryinterval seconds")
 
     // Step 1: Stop the current connection
     stop()
-    
+
     // Step 2: Wait for a while before reconnecting
     Thread.sleep(connectretryinterval * 1000) // Wait for 5 seconds before reconnect attempt (can be adjusted)
-    
+
     // Step 3: Create a new connection
     Log.d(TAG, "reconnect() - Attempting to create a new connection.")
     createConnection()
-    
+
     reconnecting = false
   }
 
@@ -134,18 +134,23 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
   private var socket: Socket = _
   private var reader: BufferedReader = _
   private var writer: PrintWriter = _
-  
+
+  // GPS filter tracking
+  private var lastFilterLat: Double = 0.0
+  private var lastFilterLon: Double = 0.0
+  private var filterJustSent: Boolean = false  // prevents double-send on logresp iteration
+
   // Track the time of the last sent packets
   private val sentPackets1Min: mutable.Queue[Long] = mutable.Queue()
   private val sentPackets5Min: mutable.Queue[Long] = mutable.Queue()
-  private val mspMap: mutable.HashMap[String, Int] = mutable.HashMap[String, Int]() 
+  private val mspMap: mutable.HashMap[String, Int] = mutable.HashMap[String, Int]()
 
   // Assuming we have a Map to store the source calls and their last heard timestamps
   val lastHeardCalls: mutable.Map[String, Long] = mutable.Map()
 
   override def run(): Unit = {
     Log.d("IgateService", s"run() - Starting TCP connection to $host with timeout $timeout")
-	service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", "Starting IGate...")	
+	service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", "Starting IGate...")
 	service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", s"Connecting to $host:$port")
 
     while (running) {
@@ -165,10 +170,21 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
           val message = reader.readLine()
           if (message != null) {
             Log.d("IgateService", s"run() - Received message: $message")
-            
+
+            // Send filter after server confirms login (logresp line)
+            if (message.startsWith("# logresp")) {
+              sendFilterCommand()
+              filterJustSent = true
+            }
+
 		    handleMessage(message)
 			handleAprsTrafficPost(message)
-						 
+			if (filterJustSent) {
+			  filterJustSent = false  // skip update check on this iteration
+			} else if (shouldUpdateGpsFilter()) {
+			  sendFilterUpdate()
+			}
+
 		  } else {
             Log.d("IgateService", "run() - Server disconnected. Attempting to reconnect.")
             running = false
@@ -191,30 +207,92 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
     }
   }
 
-  // Send login information to the APRS-IS server
+  // Get best available GPS location
+  private def getBestLocation(): android.location.Location = {
+    try {
+      val lm = service.getSystemService(android.content.Context.LOCATION_SERVICE)
+        .asInstanceOf[android.location.LocationManager]
+      val providers = lm.getProviders(true)
+      var best: android.location.Location = null
+      val it = providers.iterator()
+      while (it.hasNext) {
+        val loc = lm.getLastKnownLocation(it.next())
+        if (loc != null && (best == null || loc.getAccuracy < best.getAccuracy))
+          best = loc
+      }
+      best
+    } catch {
+      case _: SecurityException => null
+    }
+  }
+
+  // Build effective filter string, optionally prepending GPS range filter
+  def buildFilterString(): String = {
+    val custom = prefs.getString("p.igfilter", "")
+    if (!prefs.getBoolean("p.igfilter_gps", false)) return custom
+    val loc = getBestLocation()
+    if (loc == null) {
+      Log.w("IgateService", "buildFilterString() - no GPS fix, using custom filter only")
+      return custom
+    }
+    val lat = loc.getLatitude
+    val lon = loc.getLongitude
+    val radius = prefs.getStringInt("p.igfilter_gps_radius", 100)
+    lastFilterLat = lat
+    lastFilterLon = lon
+    val gps = f"r/$lat%.4f/$lon%.4f/$radius"
+    if (custom.nonEmpty) s"$gps $custom" else gps
+  }
+
+  // Returns true if we've moved far enough (5% of filter radius) to warrant a filter update
+  def shouldUpdateGpsFilter(): Boolean = {
+    if (!prefs.getBoolean("p.igfilter_gps", false)) return false
+    if (lastFilterLat == 0.0 && lastFilterLon == 0.0) return false  // filter not yet established
+    val loc = getBestLocation()
+    if (loc == null) return false
+    val dLat = loc.getLatitude - lastFilterLat
+    val dLon = loc.getLongitude - lastFilterLon
+    val distKm = math.sqrt(dLat * dLat + dLon * dLon) * 111.0
+    val radius = prefs.getStringInt("p.igfilter_gps_radius", 100)
+    val threshold = radius * 0.05  // 5% of configured radius
+    distKm > threshold
+  }
+
+  // Send an updated #filter command on the live connection
+  def sendFilterUpdate(): Unit = {
+    val f = buildFilterString()
+    if (writer != null && socket != null && socket.isConnected) {
+      Log.d("IgateService", s"sendFilterUpdate() - $f")
+      writer.println(s"#filter $f\r")
+      writer.flush()
+      service.addPost(StorageDatabase.Post.TYPE_INFO, "APRS-IS", s"Filter updated: $f")
+    }
+  }
+
+  // Send login information to the APRS-IS server (user line only)
   def sendLogin(): Unit = {
     Log.d("IgateService", "sendLogin() - Sending login information to server.")
     val callsign = prefs.getCallSsid()
-    val passcode = prefs.getPasscode()  // Retrieve passcode from preferences
+    val passcode = prefs.getPasscode()
     val version = s"APRSdroid ${service.APP_VERSION.filter(_.isDigit).takeRight(2).mkString.split("").mkString(".")}"
-    val filter = prefs.getString("p.igfilter", "")
-
-    // Format the login message as per the Python example
     val loginMessage = s"user $callsign pass $passcode vers $version\r\n"
-    val filterMessage = s"#filter $filter\r\n"  // Retrieve filter from preferences
-
     Log.d("IgateService", s"sendLogin() - Sending login: $loginMessage")
-    Log.d("IgateService", s"sendLogin() - Sending filter: $filterMessage")
-
-    // Send the login message to the server
     writer.println(loginMessage)
     writer.flush()
-    Log.d("IgateService", "sendLogin() - Login sent.")
+    Log.d("IgateService", "sendLogin() - Login sent, waiting for logresp before sending filter.")
+  }
 
-    // Send the filter command
-    writer.println(filterMessage)
-    writer.flush()
-    Log.d("IgateService", "sendLogin() - Filter sent.")
+  // Send filter command — must be called AFTER server sends # logresp
+  def sendFilterCommand(): Unit = {
+    val filter = buildFilterString()
+    if (filter.nonEmpty) {
+      Log.d("IgateService", s"sendFilterCommand() - Sending filter: $filter")
+      writer.println(s"#filter $filter\r")
+      writer.flush()
+      Log.d("IgateService", "sendFilterCommand() - Filter sent.")
+    } else {
+      Log.d("IgateService", "sendFilterCommand() - No filter configured, skipping.")
+    }
   }
 
   // Modify data string before sending it
@@ -225,7 +303,7 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
       Log.d("IgateService", s"modifyData() - RFONLY or TCPIP found: $data")
       return null // Return null if the packet contains "RFONLY" or "TCPIP"
     }
-    
+
     // Find the index of the first colon
     val colonIndex = data.indexOf(":")
     Log.d("IgateService", s"modifyData() - Colon index: $colonIndex")
@@ -281,7 +359,7 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
   // Send data to the server
   def sendData(data: String): Unit = {
 	Log.d("IgateService", s"sendData() - Sending data: $data")
-	  
+
 	// Run the task in a new thread
 	new Thread(new Runnable {
 	  override def run(): Unit = {
@@ -305,10 +383,10 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
       }
     }
   }
-  
+
   def handleAprsTrafficPost(message: String): Unit = {
     val aprsIstrafficDisabled = prefs.getBoolean("p.aprsistraffic", false)
-  	
+
     if (aprsIstrafficDisabled) {
 		Log.d("IgateService", "APRS-IS traffic disabled, skipping the post.")
 
@@ -337,20 +415,20 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
   		service.addPost(StorageDatabase.Post.TYPE_IG, "APRS-IS Received", message)
   		Log.d("IgateService", s"APRS-IS traffic enabled, post added: $message")
     }
-  }  
-  
+  }
+
   def processMessage(payloadString: String): String = {
 	//Check if payload is actually a message and not telemetry
 	if (payloadString.startsWith(":")) {
-	  if (payloadString.length < 11 || 
-	  	payloadString.length >= 16 && 
+	  if (payloadString.length < 11 ||
+	  	payloadString.length >= 16 &&
 	  	(payloadString.substring(10).startsWith(":PARM.") ||
 	  	 payloadString.substring(10).startsWith(":UNIT.") ||
 	  	 payloadString.substring(10).startsWith(":EQNS.") ||
 	  	 payloadString.substring(10).startsWith(":BITS."))) {
 		return null // Ignore this payload
 	  }
-	  if (payloadString.length >= 4 && 
+	  if (payloadString.length >= 4 &&
 	  	(payloadString.substring(1, 4) == "BLN" ||
 	  	 payloadString.substring(1, 4) == "NWS" ||
 	  	 payloadString.substring(1, 4) == "SKY" ||
@@ -373,17 +451,17 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
 	  val lastUsedDigi = fap.getDigiString()	// Last used digipeater
 	  val payload = fap.getAprsInformation()	// Payload of the message
 	  val payloadString = if (payload != null) payload.toString else ""
-	  val digipath = prefs.getString("igpath", "WIDE1-1")	 
+	  val digipath = prefs.getString("igpath", "WIDE1-1")
 	  val formattedDigipath = if (digipath.nonEmpty) s",$digipath" else ""
 	  val version = service.APP_VERSION	// Version information
 
 	  // If targetedCallsign is null, check MSP for sourceCall
-	  if (mspMap.getOrElse(sourceCall, 0) == 1) { 
+	  if (mspMap.getOrElse(sourceCall, 0) == 1) {
 	    Log.d("IgateService", s"MSP entry found and is 1 for $sourceCall, pass packet")
-	
+
 	    // If MSP for sourceCall is 1, process the packet and remove the entry
-	    mspMap.remove(sourceCall) 
-	  
+	    mspMap.remove(sourceCall)
+
 	    // Process and create the packet
 	    val igatedPacket = s"$callssid>$version$formattedDigipath:}$sourceCall>$destinationCall,TCPIP,$callssid*:$payload"
 	    Log.d("IgateService", s"Processed packet: $igatedPacket")
@@ -394,23 +472,23 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
 	      Log.d("IgateService", "Rate limit exceeded, skipping this packet.")
 	      return null // Skip sending this packet if rate limit exceeded
 		}
-	    
+
 	    // Handle rate limiting to update the queues
 	    handleRateLimiting()
-    
+
 	    return igatedPacket
-	  
+
 	  } else {
 	    Log.d("IgateService", s"Station not MSP, skipping processing.")
 	    return null
 	  }
-		
+
     } catch {
   	case e: Exception =>
   	  Log.e("IgateService", s"processPacketPostion() - Error processing packet", e)
   	  return null
 	}
-  }		
+  }
 
   def processPacketMessage(fap: APRSPacket): String = {
     //Process APRS-IS Packet for RF destination
@@ -422,13 +500,13 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
 	  val lastUsedDigi = fap.getDigiString()	// Last used digipeater
 	  val payload = fap.getAprsInformation()	// Payload of the message
 	  val payloadString = if (payload != null) payload.toString else ""
-	  val digipath = prefs.getString("igpath", "WIDE1-1")	 
+	  val digipath = prefs.getString("igpath", "WIDE1-1")
 	  val formattedDigipath = if (digipath.nonEmpty) s",$digipath" else ""
 	  val version = service.APP_VERSION	// Version information
-	  
+
 	  val targetedCallsign = processMessage(payloadString)
 	  Log.d("IgateService", s"Targeted Callsign: $targetedCallsign")
-	  
+
 	  // If the targetedCallsign is null, return immediately and skip further processing
       if (targetedCallsign == null) {
         Log.d("IgateService", "Target station not found or not a message packet, skipping packet processing.")
@@ -440,14 +518,14 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
 	  //val lastHeardTime = lastHeardCalls.getOrElse(Option(targetedCallsign).getOrElse(sourceCall), 0L) //Checks RF station first, then checks APRS-IS station
 	  val lastHeardTime = lastHeardCalls.getOrElse(targetedCallsign, 0L)
 	  val timeElapsed = currentTime - lastHeardTime
-	  
+
 	  Log.d("IgateService", s"processPacketMessage() - $targetedCallsign, last heard at $lastHeardTime, time elapsed: $timeElapsed ms.")
-	  
+
 	  if (timeElapsed <= timelastheard * 60 * 1000) { // If it was heard within the last 30 minutes
 		//Set MSP for originating sourceCall that is messaging the targetedCallsign
 		mspMap.getOrElseUpdate(sourceCall, 1)
 	    Log.d("IgateService", s"MSP set to 1 for $sourceCall")
-	    
+
 		// Process and create the packet
 	    val igatedPacket = s"$callssid>$version$formattedDigipath:}$sourceCall>$destinationCall,TCPIP,$callssid*:$payload"
 	    Log.d("IgateService", s"Processed packet: $igatedPacket")
@@ -458,28 +536,28 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
 	      Log.d("IgateService", "Rate limit exceeded, skipping this packet.")
 	      return null // Skip sending this packet if rate limit exceeded
 		}
-	    
+
 	    // Handle rate limiting to update the queues
 	    handleRateLimiting()
-    
+
 	    return igatedPacket
-	  
+
 	  } else {
 	    Log.d("IgateService", s"Station not heard recently, skipping processing.")
 	    return null
 	  }
-		
+
     } catch {
   	case e: Exception =>
   	  Log.e("IgateService", s"processPacketMessage() - Error processing packet", e)
   	  return null
 	}
-  }		
+  }
 
 	// Function to handle adding time to the queues and enforcing rate limits
   def handleRateLimiting(): Unit = {
 	val currentTime = System.currentTimeMillis()
-		
+
 	// Log before adding the current time to the queues
 	Log.d("IgateService", s"Adding current time to queues: $currentTime")
 
@@ -503,7 +581,7 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
 	Log.d("IgateService", s"sentPackets1Min size after enqueue: ${sentPackets1Min.size}")
 	Log.d("IgateService", s"sentPackets5Min size after enqueue: ${sentPackets5Min.size}")
   }
-  
+
   def checkRateLimit(): Boolean = {
 	val currentTime = System.currentTimeMillis() // Get the current time in milliseconds
 
@@ -516,7 +594,7 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
     Log.d("IgateService", s"sentPackets1Min size after cleanup: ${sentPackets1Min.size}")
 
     // Remove packets older than 5 minutes (300,000 ms)
-    sentPackets5Min.dequeueAll(packetTime => currentTime - packetTime > 300000)	  
+    sentPackets5Min.dequeueAll(packetTime => currentTime - packetTime > 300000)
     // Log the size of the queue after dequeuing old packets
     Log.d("IgateService", s"sentPackets5Min size after cleanup: ${sentPackets5Min.size}")
 
@@ -552,30 +630,30 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
     if (message.startsWith("#")) {
   	Log.d("IgateService", "Message starts with '#', skipping processing.")
   	return
-    }		
+    }
     Log.d("IgateService", s"handleMessage() - Handling incoming message: $message")
-  
+
     // Check if bidirectional gate is enabled in preferences
     val bidirectionalGate = prefs.getBoolean("p.aprsistorf", false)
-  
+
     if (!bidirectionalGate) {
-  	Log.d("IgateService", "Bidirectional IGate disabled.")		
+  	Log.d("IgateService", "Bidirectional IGate disabled.")
   	return
-    }	
-  
+    }
+
     // Attempt to parse the message
     try {
   	// Attempt to parse the incoming message using the Parser
-  	val fap = Parser.parse(message) 
+  	val fap = Parser.parse(message)
   	Log.d("IgateService", s"Packet type: ${fap.getAprsInformation.getClass.getSimpleName}")
-  
+
   	// Check the type of the parsed packet
   	fap.getAprsInformation() match {
   	  case msg: MessagePacket =>
   		// Process MessagePacket
   		try {
   		  val igatedPacket = processPacketMessage(fap) // Process and create the igated packet
-  		  
+
   		  if (igatedPacket != null) {
   			Log.d("IgateService", s"Sending igated packet: $igatedPacket")
   			service.sendThirdPartyPacket(igatedPacket) // Send the packet to the third-party service
@@ -586,12 +664,12 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
   		  case e: Exception =>
   			Log.e("IgateService", s"Error processing MessagePacket: ${e.getMessage}")
   		}
-  
+
   	  case msg: PositionPacket =>
   		// Process PositionPacket
   		try {
   		  val igatedPacket = processPacketPosition(fap) // Process and create the igated packet
-  		  
+
   		  if (igatedPacket != null) {
   			Log.d("IgateService", s"Sending igated packet: $igatedPacket")
   			service.sendThirdPartyPacket(igatedPacket) // Send the packet to the third-party service
@@ -602,7 +680,7 @@ class TcpSocketThread(host: String, port: Int, timeout: Int, service: AprsServic
   		  case e: Exception =>
   			Log.e("IgateService", s"Error processing PositionPacket: ${e.getMessage}")
   		}
-  
+
   	  case _ =>
   		// If it's not a MessagePacket or PositionPacket, skip processing
   		Log.d("IgateService", s"handleMessage() - Not a MessagePacket or PositionPacket, skipping processing.")
