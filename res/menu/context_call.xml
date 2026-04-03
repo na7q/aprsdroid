@@ -25,6 +25,9 @@
 	<item android:id="@+id/aprsfi"
 	      android:title="@string/sta_aprsfi"
 	      />
+	<item android:id="@+id/aprsto"
+	      android:title="@string/sta_aprsto"
+	      />
 	<item android:id="@+id/qrzcom"
 	      android:title="@string/sta_qrzcom"
 	      />

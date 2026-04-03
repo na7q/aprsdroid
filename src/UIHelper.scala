@@ -477,6 +477,10 @@ trait UIHelper extends Activity
 			val url = "https://qrz.com/db/%s".format(basecall)
 			UrlOpener.open(this, url)
 			true
+		case R.id.aprsto =>
+			val url = "https://aprs.to/station/%s/".format(targetcall)
+			UrlOpener.open(this, url)
+			true
 		case R.id.sta_export =>
 			new LogExporter(StorageDatabase.open(this), basecall).execute()
 			true
