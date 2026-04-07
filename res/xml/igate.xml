@@ -36,6 +36,21 @@
 		android:hint="@string/p_igfilter_hint"
 		android:dialogTitle="@string/p_igfilter_entry" />
 
+	<CheckBoxPreference
+		android:key="p.igfilter_gps"
+		android:title="@string/p_igfilter_gps_title"
+		android:summary="@string/p_igfilter_gps_summary"
+		android:defaultValue="false" />
+
+	<de.duenndns.EditTextPreferenceWithValue
+		android:key="p.igfilter_gps_radius"
+		android:defaultValue="100"
+		android:hint="100"
+		android:inputType="number"
+		android:title="@string/p_igfilter_gps_radius_title"
+		android:summary="@string/p_igfilter_gps_radius_summary"
+		android:dialogTitle="@string/p_igfilter_gps_radius_entry" />
+
 	<de.duenndns.EditTextPreferenceWithValue
 		android:key="p.igsotimeout"
 		android:defaultValue="120"
