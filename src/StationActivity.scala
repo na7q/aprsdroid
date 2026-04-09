@@ -54,13 +54,18 @@ class StationActivity extends StationHelper(R.string.app_sta)
 		//super.onListItemClick(l, v, position, id)
 		val c = getListView().getItemAtPosition(position).asInstanceOf[Cursor]
 		val call = c.getString(StorageDatabase.Station.COLUMN_CALL)
-		Log.d("StationActivity", "onListItemClick: %s".format(call))
+		val origin = c.getString(StorageDatabase.Station.COLUMN_ORIGIN)
+		Log.d("StationActivity", "onListItemClick: %s origin=%s".format(call, origin))
 
 		if (targetcall == call) {
-			// click on own callssid
+			// click on own callssid or object detail row
 			trackOnMap(call)
 		} else {
-			openDetails(call)
+			// For object/item rows, opening another nested StationActivity can be fragile
+			// because CALL is the object name while ORIGIN is the sender. Prefer the
+			// real station details when origin is present, otherwise fall back to call.
+			val nextTarget = if (origin != null && origin.trim.length() > 0) origin else call
+			openDetails(nextTarget)
 			finish()
 		}
 	}

@@ -220,7 +220,22 @@
     </PreferenceScreen>
     </PreferenceCategory>
 	
-	    <PreferenceCategory 
+    <PreferenceCategory
+	    android:title="@string/p__device_id">
+
+        <PreferenceScreen
+		android:key="p_device_id"
+		android:title="@string/p__device_id"
+		android:summary="@string/p_device_id_summary">
+
+            <intent android:action="android.intent.action.MAIN"
+                    android:targetPackage="org.aprsdroid.app"
+                    android:targetClass="org.aprsdroid.app.DeviceIdPrefs" />
+
+        </PreferenceScreen>
+    </PreferenceCategory>
+
+	    <PreferenceCategory
 			android:title="@string/freq_control">
 
             <CheckBoxPreference

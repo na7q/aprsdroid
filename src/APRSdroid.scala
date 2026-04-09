@@ -21,7 +21,10 @@ class APRSdroid extends Activity {
 		if (UsbTnc.checkDeviceHandle(prefs, getIntent.getParcelableExtra("device")) && prefs.getBoolean("service_running", false))
 			startService(AprsService.intent(this, AprsService.SERVICE))
 
-		val mapmode = MapModes.defaultMapMode(this, new PrefsWrapper(this))
+		val prefsWrapper = new PrefsWrapper(this)
+		DeviceDbUpdater.updateIfAllowed(this, prefsWrapper)
+
+		val mapmode = MapModes.defaultMapMode(this, prefsWrapper)
 		prefs.getString("activity", "log") match {
 		case "hub" => replaceAct(classOf[HubActivity])
 		case "map" => replaceAct(mapmode.viewClass)

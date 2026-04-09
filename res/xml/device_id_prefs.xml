@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:key="device_id_auto_update"
+        android:title="@string/p_device_id_auto_update"
+        android:defaultValue="true" />
+
+    <EditTextPreference
+        android:key="device_id_url"
+        android:title="@string/p_device_id_url"
+        android:summary="@string/p_device_id_url_summary"
+        android:defaultValue="@string/device_id_default_url"
+        android:inputType="textUri"
+        android:singleLine="true" />
+
+    <Preference
+        android:key="device_id_reset_url"
+        android:title="@string/p_device_id_reset_url"
+        android:summary="@string/p_device_id_reset_url_summary" />
+
+    <Preference
+        android:key="device_id_update_now"
+        android:title="@string/p_device_id_update_now"
+        android:summary="@string/p_device_id_update_now_summary" />
+
+</PreferenceScreen>

@@ -124,7 +124,13 @@
 		android:label="@string/p__location"
 		android:parentActivityName=".PrivacyPrefs"
 		android:launchMode="singleTop"
-		android:configChanges="orientation|keyboardHidden|screenSize" />		
+		android:configChanges="orientation|keyboardHidden|screenSize" />
+
+	<activity android:name=".DeviceIdPrefs"
+		android:label="@string/p__device_id"
+		android:parentActivityName=".PrefsAct"
+		android:launchMode="singleTop"
+		android:configChanges="orientation|keyboardHidden|screenSize" />
 		
 	<activity android:name=".GoogleMapAct" android:label="@string/app_map"
 		android:launchMode="singleTop"

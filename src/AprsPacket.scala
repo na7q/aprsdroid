@@ -339,32 +339,40 @@ object AprsPacket {
 		}
 	}
 
+	def micEDeviceInfo(comment: String): Option[Map[String, String]] = {
+	  if (comment == null || comment.length < 2) None
+	  else COMMENT_DATA.get(comment.takeRight(2))
+	}
+
+	def kenwoodDeviceInfo(comment: String): Option[Map[String, String]] = {
+	  if (comment == null || comment.isEmpty) None
+	  else KENWOOD_COMMENT_DATA.get(comment.takeRight(1))
+	}
+
+	def packetKenwoodDeviceInfo(packet: String): Option[Map[String, String]] = {
+	  val colonIndex = packet.indexOf(':')
+	  if (colonIndex == -1 || colonIndex + 10 >= packet.length) {
+		None
+	  } else if (packet(colonIndex + 1) == '\'') {
+		KENWOOD_COMMENT_DATA.get(packet(colonIndex + 10).toString)
+	  } else {
+		None
+	  }
+	}
+
 	// Function to check if the last 2 characters of the comment match anything in COMMENT_DATA
 	def micetocall(comment: String): Option[String] = {
-	  val lastTwoChars = comment.takeRight(2) // Get the last 2 characters of the comment
-	  COMMENT_DATA.get(lastTwoChars).flatMap(_.get("model"))
+	  micEDeviceInfo(comment).flatMap(_.get("model"))
 	}
 
 	// Function to check if the last character of the comment matches anything in KENWOOD_COMMENT_DATA
 	def kenwoodtocall(comment: String): Option[String] = {
-	  val lastChar = comment.takeRight(1) // Get the last character of the comment
-	  KENWOOD_COMMENT_DATA.get(lastChar).flatMap(_.get("model"))
+	  kenwoodDeviceInfo(comment).flatMap(_.get("model"))
 	}
 
 	// Function to check old Kenwood calls
 	def oldkenwoodtocall(packet: String): Option[String] = {
-	  val colonIndex = packet.indexOf(':')
-	  
-	  if (colonIndex == -1 || colonIndex + 10 >= packet.length) {
-		None
-	  } else {
-		if (packet(colonIndex + 1) == '\'') {
-		  val keyChar = packet(colonIndex + 10).toString
-		  KENWOOD_COMMENT_DATA.get(keyChar).flatMap(_.get("model"))
-		} else {
-		  None
-		}
-	  }
+	  packetKenwoodDeviceInfo(packet).flatMap(_.get("model"))
 	}
 
 	def parseComment(comment: String): String = {

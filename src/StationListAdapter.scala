@@ -73,6 +73,7 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		val course = cursor.getFloat(COLUMN_COURSE)
 		val dist = Array[Float](0, 0)
 		val comment = cursor.getString(COLUMN_COMMENT) // Retrieve COMMENT data
+		val tocall = cursor.getString(COLUMN_TOCALL)
 
 		if (call == mycall) {
 			view.setBackgroundColor(0x4020ff20)
@@ -130,7 +131,37 @@ class StationListAdapter(context : Context, prefs : PrefsWrapper,
 		// Set visibility based on the course value (only show if valid)
 		courseTextView.setVisibility(if (course > 0) View.VISIBLE else View.GONE)
 		if (course > 0) courseTextView.setText(f"Course: $course%.1f°") // Assuming course is in degrees
-		
+
+		// Show device name when the packet has a recognized tocall. Keep the
+		// implementation explicit to avoid Scala inference oddities in Android builds.
+		val deviceTextView = view.findViewById(R.id.station_device).asInstanceOf[TextView]
+		deviceTextView.setVisibility(View.GONE)
+		try {
+			val yamlDeviceOpt = DeviceIdentifier.getDeviceInfo(context, tocall)
+			val storedDevice = if (cursor.getColumnCount > COLUMN_TOCALL + 1) cursor.getString(StorageDatabase.Station.COLUMN_DEVICE) else null
+			val deviceTextOpt = if (yamlDeviceOpt.isDefined) {
+				yamlDeviceOpt.map(info => {
+					val vendor = info.getOrElse("vendor", "").trim
+					val model = info.getOrElse("model", "").trim
+					val clazz = info.getOrElse("class", "").trim
+					val os = info.getOrElse("os", "").trim
+					val head = if (vendor.nonEmpty && model.nonEmpty) vendor + ": " + model
+						else if (model.nonEmpty) model
+						else vendor
+					val parts = Seq(clazz, os).filter(_.nonEmpty)
+					if (parts.nonEmpty) head + " (" + parts.mkString(", ") + ")" else head
+				})
+			} else Option(storedDevice).filter(_.nonEmpty)
+			if (deviceTextOpt.isDefined) {
+				deviceTextView.setText(deviceTextOpt.get)
+				deviceTextView.setVisibility(View.VISIBLE)
+			}
+		} catch {
+			case e: Exception =>
+				Log.e("APRSdroid.StationListAdapter", "Device lookup failed", e)
+				deviceTextView.setVisibility(View.GONE)
+		}
+
 		super.bindView(view, context, cursor)
 	}
 

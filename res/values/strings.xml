@@ -607,4 +607,20 @@
 <string name="p_ptt_tail_summary">Extends PTT to ensure full packet TX</string>
 <string name="p_ptt_tail_entry">Enter the tail time [ms]</string>
 
+
+<!-- Device Identification -->
+<string name="p__device_id">Device Identification</string>
+<string name="p_device_id_summary">Manage APRS device database</string>
+<string name="p_device_id_auto_update">Automatically update on startup</string>
+<string name="p_device_id_url">Database URL</string>
+<string name="p_device_id_url_summary">URL to fetch tocalls.yaml from</string>
+<string name="p_device_id_reset_url">Reset to defaults</string>
+<string name="p_device_id_reset_url_summary">Restore the database URL to the official source</string>
+<string name="p_device_id_update_now">Update now</string>
+<string name="p_device_id_update_now_summary">Download the latest device database</string>
+<string name="device_id_default_url">https://raw.githubusercontent.com/aprsorg/aprs-deviceid/main/tocalls.yaml</string>
+<string name="device_id_update_success">Device database updated</string>
+<string name="device_id_update_failed">Update failed: %s</string>
+<string name="device_id_url_reset">URL reset to default</string>
+
 </resources>
