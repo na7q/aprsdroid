@@ -130,9 +130,13 @@ class AprsService extends Service {
 				Log.d(TAG, "SEND_PACKET ignored, data extra is empty.")
 				return
 			}
-			val p = Parser.parseBody(prefs.getCallSsid(), APP_VERSION, null,
-				data_field)
-			sendPacket(p)
+			val digipath = prefs.getString("digi_path", "WIDE1-1")
+                        val p = Parser.parseBody(
+                            prefs.getCallSsid(),
+                            APP_VERSION,
+                            Digipeater.parseList(digipath, true),
+                            data_field)
+                        sendPacket(p)
 			return
 		} else
 		if (i.getAction() == SERVICE_FREQUENCY) {
