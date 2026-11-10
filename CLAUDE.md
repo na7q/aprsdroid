@@ -24,6 +24,11 @@ NA7Q fork of APRSdroid (Android, **Scala 2.11**, GPLv2). Full detail is in `SPEC
 - Do not log secrets. The code logs full packets and locations with `Log.d`.
 - Never auto-transmit in tests or demos. This app keys real radios under a real callsign.
 
+## Google Maps key setting (added after review)
+- Pref `gmaps_api_key` (Settings > Google Maps). `MapModes.applyGoogleMapsKey` (in `MapMode.scala`) overrides the manifest `com.google.android.geo.API_KEY` metadata at runtime. It is called from `APRSdroidApplication.onCreate` and `GoogleMapAct.onCreate`.
+- **Untested on device.** It's a workaround, not a supported Maps API. If the map stays blank, fall back to a build-time key from `local.properties`.
+- The key is excluded from exported profiles (`PrefsAct.exportPrefs`). Never log it.
+
 ## Known issues (found in review, **not fixed**; see SPEC.md §6)
 1. `SmartBeaconing.smartBeaconSpeedRate` converts an already-m/s speed again.
 2. `MessageService`: with the ack-dupe toggle on and `p.ackdupe` = 0, no ACK is ever sent.
@@ -40,5 +45,5 @@ NA7Q fork of APRSdroid (Android, **Scala 2.11**, GPLv2). Full detail is in `SPEC
 
 ## Workflow rules for this repo and session
 - Develop on branch `ccr-3dbdfe4a-sssbhh`. Push with `git push -u origin ccr-3dbdfe4a-sssbhh`. Do not open a PR unless asked.
-- `SPEC.md` and this `CLAUDE.md` were added in a review-only pass. The user asked for no code changes, and none were made. They are uncommitted unless the user says otherwise.
+- `SPEC.md` and this `CLAUDE.md` came from a review pass. The Google Maps key setting was the first code change (commit b030601). Work stays on the feature branch; `master` is untouched.
 - Update `SPEC.md` and the Known issues list here when behavior changes or a listed issue is fixed.

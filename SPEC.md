@@ -44,7 +44,7 @@ Package: `org.aprsdroid.app`. `minSdk` 14, `targetSdk`/`compileSdk` 33. Source r
   - androidx.core 1.6.0
   - Jetty server and servlet 9.4.43 (used for the local MBTiles tile server)
   - okio 2.1.0
-- A Google Maps key is read from `local.properties` (`mapsApiKey`). If it is absent, **a hard-coded upstream key is embedded** **[Review]**.
+- A Google Maps key is read from `local.properties` (`mapsApiKey`). If it is absent, **a hard-coded upstream key is embedded** **[Review]**. Users can now override it in-app (see §4.11).
 - README notes that incremental builds may produce non-working APKs; do a clean build for verification.
 - I could not run a build in this review environment, so nothing here is build-verified.
 
@@ -190,6 +190,16 @@ Notable manifest items:
 - Location (fine/coarse), Bluetooth (legacy plus CONNECT), RECORD_AUDIO, `MANAGE_EXTERNAL_STORAGE`, `RECEIVE_BOOT_COMPLETED`, `FOREGROUND_SERVICE`, `POST_NOTIFICATIONS`.
 - `usesCleartextTraffic=true`, `allowBackup=true`, `requestLegacyExternalStorage=true`.
 - Exported: `AprsService`, `MapAct`, `ProfileImportActivity`, `KeyfileImportActivity`, `SystemEventReceiver`.
+
+### 4.11 User-supplied Google Maps API key
+
+Added after the initial review. Lets a user paste their own Maps SDK key instead of rebuilding with `local.properties`.
+
+- **Pref:** `gmaps_api_key` (string), an `EditTextPreference` in a "Google Maps" category of `res/xml/preferences.xml`. Strings are `p_gmaps*` in `res/values/strings.xml` (English only).
+- **Injection:** `MapModes.applyGoogleMapsKey(ctx)` (`src/MapMode.scala`) writes the key into `ApplicationInfo.metaData["com.google.android.geo.API_KEY"]`, from both `PackageManager.getApplicationInfo(..., GET_META_DATA)` and `ctx.getApplicationInfo()`. It is called from `APRSdroidApplication.onCreate` and at the start of `GoogleMapAct.onCreate`. An empty pref leaves the build-time key in place.
+- **UI (`PrefsAct`):** the summary shows a masked key (first 4 and last 4 chars). Changing the key shows a toast asking for an app restart, because the Maps SDK reads the key on first init.
+- **Privacy:** `exportPrefs` removes `gmaps_api_key` so exported `.aprs` profiles do not contain it.
+- **Caveat [Review]:** overriding manifest metadata at runtime is a known workaround, not a supported Maps API. It was **not tested on a device** and may not work on every Android version. Fallback plan: take the key from `local.properties` at build time. The key must be unrestricted or restricted to this app's package and signing SHA-1, with "Maps SDK for Android" enabled.
 
 ## 5. Third-party API
 
