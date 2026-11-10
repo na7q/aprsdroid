@@ -30,6 +30,7 @@ class GoogleMapAct extends Activity with MapLoaderBase
 
         override def onCreate(savedInstanceState: Bundle) {
                 super.onCreate(savedInstanceState)
+                MapModes.applyGoogleMapsKey(this)
                 setContentView(R.layout.googlemapview)
 
                 mapview.onCreate(savedInstanceState)
