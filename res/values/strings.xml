@@ -131,6 +131,11 @@
 <string name="p_aprsistorf_entry">Enable Bidirectional IGate</string>
 <string name="p_aprsistorf_summary">Allows messages to pass to RF</string>
 
+<string name="p_gmaps">Google Maps</string>
+<string name="p_gmaps_key_title">Google Maps API key</string>
+<string name="p_gmaps_key_summary">Paste your own Maps SDK for Android key (optional)</string>
+<string name="p_gmaps_key_set">Key set: %s</string>
+<string name="p_gmaps_key_restart">Restart APRSdroid for the new Google Maps key to take effect</string>
 <string name="p_offlinemap">OSM Maps</string>
 <string name="p_offlinemap_entry">Enable offline mapping</string>
 <string name="p_offlinemap_summary">Uses local maps files</string>

@@ -51,7 +51,21 @@
     </PreferenceCategory>
     
 	<PreferenceCategory
-	    android:title="@string/p_offlinemap">        
+	    android:title="@string/p_gmaps">
+
+	<EditTextPreference
+		android:key="gmaps_api_key"
+		android:title="@string/p_gmaps_key_title"
+		android:summary="@string/p_gmaps_key_summary"
+		android:dialogTitle="@string/p_gmaps_key_title"
+		android:hint="AIza..."
+		android:inputType="textNoSuggestions"
+		android:singleLine="true" />
+
+    </PreferenceCategory>
+
+	<PreferenceCategory
+	    android:title="@string/p_offlinemap">
 
 	<CheckBoxPreference
 		android:key="p.offlinemap"

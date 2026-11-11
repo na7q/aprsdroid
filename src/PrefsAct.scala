@@ -30,6 +30,7 @@ class PrefsAct extends PreferenceActivity {
 			val prefs = PreferenceManager.getDefaultSharedPreferences(this)
 			val allPrefs = prefs.getAll
 			allPrefs.remove("map_zoom")
+			allPrefs.remove("gmaps_api_key") // don't leak the user's key in shared profiles
 			val json = new JSONObject(allPrefs)
 			val fo = new PrintWriter(file)
 			fo.println(json.toString(2))
@@ -68,9 +69,31 @@ class PrefsAct extends PreferenceActivity {
         }
 		fileChooserPreference("tilepath", 123456, R.string.p_mbtiles_file_picker_title)
 		//fileChooserPreference("themefile", 123457, R.string.p_themefile_choose)
+
+		// Google Maps API key: the SDK only reads it at first map init, so ask for a restart
+		findPreference("gmaps_api_key").setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+			def onPreferenceChange(preference : Preference, newValue : Object) = {
+				updateGmapsKeySummary(newValue.toString)
+				Toast.makeText(PrefsAct.this, R.string.p_gmaps_key_restart, Toast.LENGTH_LONG).show()
+				true
+			}
+		})
+	}
+
+	// show a masked version of the key (first 4 / last 4 chars) instead of the full secret
+	def updateGmapsKeySummary(key : String) {
+		val k = if (key == null) "" else key.trim
+		val pref = findPreference("gmaps_api_key")
+		if (k.isEmpty)
+			pref.setSummary(R.string.p_gmaps_key_summary)
+		else {
+			val masked = if (k.length > 8) k.take(4) + "..." + k.takeRight(4) else "****"
+			pref.setSummary(getString(R.string.p_gmaps_key_set, masked))
+		}
 	}
 	override def onResume() {
 		super.onResume()
+		updateGmapsKeySummary(prefs.getString("gmaps_api_key", ""))
 		// Get the 'tilepath' value from SharedPreferences
 		val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
 		val tilepath = sharedPreferences.getString("tilepath", null)

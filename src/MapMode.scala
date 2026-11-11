@@ -23,6 +23,29 @@ object MapModes {
 	def reloadOfflineMaps(ctx : Context) {
 	}
 
+	val GMAPS_KEY_META = "com.google.android.geo.API_KEY"
+
+	// Override the manifest's Google Maps API key with the user-pasted one
+	// ("gmaps_api_key" pref). The Maps SDK reads the key from the app's
+	// manifest metadata when it first initializes, so this must run before
+	// any map view is created; changing the key later needs an app restart.
+	def applyGoogleMapsKey(ctx : Context) {
+		try {
+			val key = new PrefsWrapper(ctx).getString("gmaps_api_key", "").trim
+			if (key.isEmpty)
+				return
+			val ai = ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(),
+				PackageManager.GET_META_DATA)
+			if (ai.metaData != null)
+				ai.metaData.putString(GMAPS_KEY_META, key)
+			val ai2 = ctx.getApplicationInfo()
+			if (ai2.metaData != null)
+				ai2.metaData.putString(GMAPS_KEY_META, key)
+		} catch {
+			case e : Exception => android.util.Log.w("MapModes", "applyGoogleMapsKey failed: " + e)
+		}
+	}
+
 	def defaultMapMode(ctx : Context, prefs : PrefsWrapper): MapMode = {
 		MapModes.initialize(ctx)
 		val tag = prefs.getString("mapmode", "google")
